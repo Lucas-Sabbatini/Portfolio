@@ -34,7 +34,7 @@ async def test_login_wrong_password(client: AsyncClient, mock_db):
 
 @pytest.mark.asyncio
 async def test_login_unknown_email(client: AsyncClient, mock_db):
-    with patch("app.auth.service.authenticate_admin", new_callable=AsyncMock) as mock_auth:
+    with patch("app.auth.router.authenticate_admin", new_callable=AsyncMock) as mock_auth:
         mock_auth.return_value = None
         response = await client.post("/api/auth/login", json={"email": "unknown@example.com", "password": "x"})
 
