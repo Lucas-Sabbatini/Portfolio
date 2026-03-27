@@ -34,10 +34,9 @@ if ! docker image inspect "$IMAGE_NAME" &>/dev/null; then
     "$SCRIPT_DIR"
 fi
 
-# ── Volume names (per-session workspace, shared config) ──────────
+# ── Volume names (per-session workspace, shared home) ────────────
 WORKSPACE_VOL="claude-workspace-${SESSION_NAME}"
-CONFIG_VOL="claude-config-shared"          # shared across ALL sessions
-DATA_VOL="claude-data-shared"              # shared across ALL sessions
+CONFIG_VOL="claude-home-shared"            # shared across ALL sessions
 
 # ── Assemble docker run args ─────────────────────────────────────
 DOCKER_ARGS=(
@@ -48,12 +47,12 @@ DOCKER_ARGS=(
   # ── Workspace: each session gets its own named volume ──
   -v "${WORKSPACE_VOL}:/workspace"
 
-  # ── Claude config: shared so you authenticate ONCE ──
-  -v "${CONFIG_VOL}:/home/node/.claude"
-  -v "${DATA_VOL}:/home/node/.local/share/claude"
+  # ── Claude config: persist the entire home dir so auth, settings,
+  #    ~/.claude.json, ~/.claude/, ~/.local/share/claude all survive ──
+  -v "${CONFIG_VOL}:/home/node"
 
-  # ── SSH keys: bind-mount read-only, entrypoint copies them ──
-  -v "${SSH_KEY_DIR}:/home/node/.ssh-mount:ro"
+  # ── SSH keys: mount OUTSIDE home (nested mounts inside a volume don't work) ──
+  -v "${SSH_KEY_DIR}:/tmp/.ssh-host:ro"
 
   # ── Git identity ──
   -e "GIT_USER_NAME=${GIT_USER_NAME}"
@@ -87,6 +86,15 @@ echo "╚═══════════════════════�
 echo ""
 
 "${DOCKER_ARGS[@]}" "$IMAGE_NAME" bash -c '
-  # Start Claude Code in dangerously-skip-permissions mode
-  claude --dangerously-skip-permissions
+  echo "📂 Workspace: $(pwd)"
+  echo "🌿 Branch: $(git branch --show-current 2>/dev/null || echo "N/A")"
+  echo ""
+  echo "Launching Claude Code..."
+  echo "────────────────────────"
+  claude --dangerously-skip-permissions || {
+    echo ""
+    echo "⚠️  Claude exited with code $?. You are now in a bash shell."
+    echo "   Run: claude --dangerously-skip-permissions"
+    exec bash
+  }
 '

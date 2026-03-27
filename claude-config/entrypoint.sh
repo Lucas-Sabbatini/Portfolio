@@ -1,37 +1,46 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
-# ── 0. Fix workspace ownership (needed for pre-existing root-owned volumes) ──
-if [[ ! -w /workspace ]]; then
+echo ">>> entrypoint started"
+echo ">>> USER=$(whoami) HOME=$HOME"
+echo ">>> args: $@"
+
+# ── Home dir init ──
+if [ ! -f /home/node/.bashrc ]; then
+  echo ">>> initializing home dir"
+  cp /etc/skel/.bashrc /home/node/.bashrc 2>/dev/null
+  cp /etc/skel/.profile /home/node/.profile 2>/dev/null
+  mkdir -p /home/node/.local/share/claude
+  mkdir -p /home/node/.claude
+fi
+
+# ── Workspace ownership ──
+if [ ! -w /workspace ]; then
+  echo ">>> fixing workspace ownership"
   sudo chown -R "$(id -u):$(id -g)" /workspace
 fi
 
-# ── 1. Git identity (from env vars set by docker run) ────────────
-if [[ -n "${GIT_USER_NAME:-}" ]]; then
+# ── Git identity ──
+if [ -n "${GIT_USER_NAME:-}" ]; then
   git config --global user.name "$GIT_USER_NAME"
 fi
-if [[ -n "${GIT_USER_EMAIL:-}" ]]; then
+if [ -n "${GIT_USER_EMAIL:-}" ]; then
   git config --global user.email "$GIT_USER_EMAIL"
 fi
 
-# ── 2. SSH key setup ─────────────────────────────────────────────
-# If ~/.ssh was bind-mounted (read-only), fix permissions on a copy
-if [[ -d /home/node/.ssh-mount ]]; then
+# ── SSH keys ──
+if [ -d /tmp/.ssh-host ]; then
+  echo ">>> copying SSH keys"
   mkdir -p /home/node/.ssh
-  cp /home/node/.ssh-mount/* /home/node/.ssh/ 2>/dev/null || true
-  chmod 700 /home/node/.ssh
-  chmod 600 /home/node/.ssh/id_* 2>/dev/null || true
-  chmod 644 /home/node/.ssh/*.pub 2>/dev/null || true
-
-  # Accept github.com host key automatically
-  if ! grep -q "github.com" /home/node/.ssh/known_hosts 2>/dev/null; then
-    ssh-keyscan -t ed25519,rsa github.com >> /home/node/.ssh/known_hosts 2>/dev/null || true
-  fi
+  cp /tmp/.ssh-host/* /home/node/.ssh/ 2>/dev/null
+  chmod 700 /home/node/.ssh 2>/dev/null
+  chmod 600 /home/node/.ssh/id_* 2>/dev/null
+  chmod 644 /home/node/.ssh/*.pub 2>/dev/null
+  ssh-keyscan -t ed25519,rsa github.com >> /home/node/.ssh/known_hosts 2>/dev/null
 fi
 
-# ── 3. Clone repo if REPO_URL is set and /workspace is empty ────
-if [[ -n "${REPO_URL:-}" ]] && [[ ! -d /workspace/.git ]]; then
-  if [[ -n "${REPO_BRANCH:-}" ]]; then
+# ── Clone repo ──
+if [ -n "${REPO_URL:-}" ] && [ ! -d /workspace/.git ]; then
+  if [ -n "${REPO_BRANCH:-}" ]; then
     echo "🔄 Cloning $REPO_URL (branch: $REPO_BRANCH) into /workspace..."
     git clone -b "$REPO_BRANCH" "$REPO_URL" /workspace
   else
@@ -42,13 +51,19 @@ fi
 
 cd /workspace
 
-# ── 4. Claude Code permission bypass settings ────────────────────
-# Pre-accept permissions so you don't have to click through every time.
-# This file lives inside the persisted ~/.claude volume.
-SETTINGS_DIR="/home/node/.claude"
-SETTINGS_FILE="$SETTINGS_DIR/settings.json"
-if [[ ! -f "$SETTINGS_FILE" ]]; then
-  mkdir -p "$SETTINGS_DIR"
+# ── Claude credentials restore ──
+if [ ! -f /home/node/.claude.json ]; then
+  BACKUP=$(ls -t /home/node/.claude/backups/.claude.json.backup.* 2>/dev/null | head -1)
+  if [ -n "$BACKUP" ]; then
+    echo "🔑 Restoring Claude credentials from backup..."
+    cp "$BACKUP" /home/node/.claude.json
+  fi
+fi
+
+# ── Claude permissions ──
+SETTINGS_FILE="/home/node/.claude/settings.json"
+if [ ! -f "$SETTINGS_FILE" ]; then
+  mkdir -p /home/node/.claude
   cat > "$SETTINGS_FILE" << 'SETTINGS'
 {
   "permissions": {
@@ -65,8 +80,11 @@ if [[ ! -f "$SETTINGS_FILE" ]]; then
   "autoUpdatesChannel": "stable"
 }
 SETTINGS
-  echo "✅ Default Claude permissions written to $SETTINGS_FILE"
+  echo "✅ Default Claude permissions written"
 fi
 
-# ── 5. Execute the command ───────────────────────────────────────
+echo ">>> about to exec: $@"
+echo ">>> which claude: $(which claude 2>&1)"
+echo ">>> node version: $(node --version 2>&1)"
+
 exec "$@"

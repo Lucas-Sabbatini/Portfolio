@@ -24,9 +24,8 @@ case "$CMD" in
     echo "═══ Workspace volumes ═══"
     docker volume ls --filter "name=claude-workspace-" --format "table {{.Name}}\t{{.Driver}}" 2>/dev/null || echo "  (none)"
     echo ""
-    echo "═══ Shared config volumes ═══"
-    docker volume ls --filter "name=claude-config-shared" --format "table {{.Name}}" 2>/dev/null
-    docker volume ls --filter "name=claude-data-shared" --format "table {{.Name}}" 2>/dev/null
+    echo "═══ Shared home volume ═══"
+    docker volume ls --filter "name=claude-home-shared" --format "table {{.Name}}" 2>/dev/null
     ;;
 
   shell)
@@ -57,10 +56,10 @@ case "$CMD" in
     ;;
 
   reset-auth)
-    echo "🔑 Removing shared config volumes (you'll need to re-authenticate)..."
-    docker volume rm claude-config-shared claude-data-shared 2>/dev/null \
+    echo "🔑 Removing shared home volume (you'll need to re-authenticate)..."
+    docker volume rm claude-home-shared 2>/dev/null \
       && echo "   Done." \
-      || echo "   Volumes not found or in use."
+      || echo "   Volume not found or in use."
     ;;
 
   *)
