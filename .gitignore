@@ -3,5 +3,9 @@ dist/
 tmp/
 .env
 .env.local
+__pycache__/
+*.pyc
+.pytest_cache/
+backend/.env
 .claude/
 prompts/
