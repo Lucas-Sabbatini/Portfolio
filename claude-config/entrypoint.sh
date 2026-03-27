@@ -31,13 +31,12 @@ fi
 
 # ── 3. Clone repo if REPO_URL is set and /workspace is empty ────
 if [[ -n "${REPO_URL:-}" ]] && [[ ! -d /workspace/.git ]]; then
-  echo "🔄 Cloning $REPO_URL into /workspace..."
-  git clone "$REPO_URL" /workspace
-  
-  # Checkout a specific branch if requested
   if [[ -n "${REPO_BRANCH:-}" ]]; then
-    cd /workspace
-    git checkout "$REPO_BRANCH"
+    echo "🔄 Cloning $REPO_URL (branch: $REPO_BRANCH) into /workspace..."
+    git clone -b "$REPO_BRANCH" "$REPO_URL" /workspace
+  else
+    echo "🔄 Cloning $REPO_URL into /workspace..."
+    git clone "$REPO_URL" /workspace
   fi
 fi
 
