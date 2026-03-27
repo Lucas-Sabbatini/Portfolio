@@ -1,0 +1,278 @@
+import { useState, useMemo, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import BlogFilter from '../components/blog/BlogFilter'
+import {
+  PostCardFeatured,
+  PostCardMedium,
+  PostCardList,
+} from '../components/blog/PostCard'
+import type { PostTag } from '../data/posts'
+import type { Post } from '../api/posts'
+import { fetchPosts } from '../api/posts'
+import { subscribe } from '../api/newsletter'
+import { ApiError } from '../api/client'
+import { useAnalytics } from '../hooks/useAnalytics'
+import { fadeUp, staggerContainer, staggerFast, viewportOnce } from '../lib/animations'
+
+type Filter = 'All' | PostTag
+
+export default function BlogPage() {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+  const [activeFilter, setActiveFilter] = useState<Filter>('All')
+  const [email, setEmail] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [newsletterMsg, setNewsletterMsg] = useState<{ text: string; cls: string } | null>(null)
+  const { track } = useAnalytics()
+
+  useEffect(() => {
+    fetchPosts().then(setPosts).catch(console.error).finally(() => setLoading(false))
+  }, [])
+
+  const tagCounts = posts.reduce<Record<string, number>>((acc, p) => {
+    acc[p.tag] = (acc[p.tag] ?? 0) + 1
+    return acc
+  }, {})
+
+  const filtered = useMemo(
+    () => (activeFilter === 'All' ? posts : posts.filter((p) => p.tag === activeFilter)),
+    [activeFilter, posts],
+  )
+
+  const featured = filtered[0]
+  const gridPosts = filtered.slice(1, 4)
+  const listPosts = filtered.slice(4)
+
+  const handleFilterChange = (filter: Filter) => {
+    setActiveFilter(filter)
+    track('blog-filter', { tag: filter })
+  }
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitting(true)
+    setNewsletterMsg(null)
+    try {
+      await subscribe(email)
+      setEmail('')
+      setNewsletterMsg({ text: 'Signal received.', cls: 'text-primary text-xs' })
+      track('newsletter-subscribe')
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setNewsletterMsg({ text: 'Already subscribed.', cls: 'text-on-surface-variant text-xs' })
+      } else {
+        setNewsletterMsg({ text: 'Something went wrong.', cls: 'text-red-400 text-xs' })
+      }
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <>
+      <main className="min-h-screen pt-36 pb-24 px-6 md:px-12">
+        <div className="max-w-7xl mx-auto space-y-20">
+
+          {/* ── Masthead ───────────────────────────────────────────────── */}
+          <motion.header
+            className="space-y-10"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={fadeUp} className="flex items-end justify-between">
+              <h2 className="font-bold text-[10px] uppercase tracking-[0.6em] text-primary/60">
+                05 / Intelligence
+              </h2>
+              <div className="flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/40">
+                  {posts.length} Signals indexed
+                </span>
+              </div>
+            </motion.div>
+
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 border-b border-white/5 pb-10">
+              <motion.h1
+                variants={fadeUp}
+                className="font-headline font-extrabold text-6xl md:text-[8rem] tracking-tighter leading-[0.85] text-on-surface"
+              >
+                Signal<br />
+                <span className="text-primary-dim">Archive.</span>
+              </motion.h1>
+
+              <motion.p
+                variants={fadeUp}
+                className="text-on-surface-variant font-light text-lg max-w-sm leading-relaxed md:pb-3"
+              >
+                Dispatches on AI systems, infrastructure, and the machinery of intelligence.
+              </motion.p>
+            </div>
+
+            {/* Filter */}
+            <motion.div variants={fadeUp}>
+              <BlogFilter
+                active={activeFilter}
+                onChange={handleFilterChange}
+                counts={tagCounts}
+              />
+            </motion.div>
+          </motion.header>
+
+          {/* ── Content ────────────────────────────────────────────────── */}
+          {loading ? (
+            <div className="space-y-8">
+              <div className="glass-card rounded-[2rem] animate-pulse bg-white/5 h-[480px]" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="glass-card rounded-[2rem] animate-pulse bg-white/5 h-[320px]" />
+                <div className="glass-card rounded-[2rem] animate-pulse bg-white/5 h-[320px]" />
+                <div className="glass-card rounded-[2rem] animate-pulse bg-white/5 h-[320px]" />
+              </div>
+            </div>
+          ) : (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeFilter}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-8"
+              >
+                {filtered.length === 0 ? (
+                  <motion.div
+                    variants={fadeUp}
+                    initial="hidden"
+                    animate="visible"
+                    className="glass-card rounded-[2rem] p-20 flex flex-col items-center justify-center gap-4 text-center"
+                  >
+                    <span className="material-symbols-outlined text-primary/30 text-5xl">
+                      signal_disconnected
+                    </span>
+                    <p className="text-on-surface-variant text-sm font-bold uppercase tracking-widest">
+                      No signals in this category
+                    </p>
+                  </motion.div>
+                ) : (
+                  <>
+                    {/* Featured */}
+                    {featured && (
+                      <Link to={`/blog/${featured.slug}`}>
+                        <PostCardFeatured post={featured} />
+                      </Link>
+                    )}
+
+                    {/* Grid — up to 3 cards */}
+                    {gridPosts.length > 0 && (
+                      <motion.div
+                        className={`grid gap-6 ${
+                          gridPosts.length === 1
+                            ? 'grid-cols-1'
+                            : gridPosts.length === 2
+                              ? 'grid-cols-1 md:grid-cols-2'
+                              : 'grid-cols-1 md:grid-cols-3'
+                        }`}
+                        variants={staggerFast}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={viewportOnce}
+                      >
+                        {gridPosts.map((post, i) => (
+                          <Link key={post.id} to={`/blog/${post.slug}`}>
+                            <PostCardMedium post={post} index={i + 1} />
+                          </Link>
+                        ))}
+                      </motion.div>
+                    )}
+
+                    {/* ── Separator ──────────────────────────────────────── */}
+                    {listPosts.length > 0 && (
+                      <motion.div
+                        className="flex items-center gap-6 pt-4"
+                        variants={fadeUp}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={viewportOnce}
+                      >
+                        <span className="text-[10px] font-bold uppercase tracking-[0.6em] text-primary/40">
+                          Archive
+                        </span>
+                        <div className="flex-1 h-[1px] bg-white/5" />
+                      </motion.div>
+                    )}
+
+                    {/* List */}
+                    {listPosts.length > 0 && (
+                      <motion.div
+                        variants={staggerContainer}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={viewportOnce}
+                      >
+                        <div className="border-t border-white/5">
+                          {listPosts.map((post, i) => (
+                            <Link key={post.id} to={`/blog/${post.slug}`}>
+                              <PostCardList post={post} index={i + gridPosts.length + 1} />
+                            </Link>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          )}
+
+          {/* ── Newsletter strip ──────────────────────────────────────── */}
+          <motion.section
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewportOnce}
+            className="glass-card rounded-[2.5rem] p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden"
+          >
+            {/* Glow */}
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
+
+            <div className="space-y-2 relative z-10">
+              <h3 className="font-headline font-extrabold text-2xl md:text-3xl tracking-tight text-on-surface">
+                Stay on the signal.
+              </h3>
+              <p className="text-on-surface-variant text-sm font-light">
+                New dispatches land in your inbox. No noise.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2 w-full md:w-auto relative z-10">
+              <form onSubmit={handleSubscribe} className="flex gap-3">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="flex-1 md:w-64 bg-white/5 border border-white/10 rounded-full px-5 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/40 outline-none focus:border-primary/40 transition-colors"
+                />
+                <motion.button
+                  type="submit"
+                  disabled={submitting}
+                  whileHover={{ scale: 1.04, boxShadow: '0 0 20px rgba(56,189,248,0.3)' }}
+                  whileTap={{ scale: 0.97 }}
+                  className="bg-primary text-on-primary font-bold tracking-wider text-[10px] uppercase px-6 py-3 rounded-full flex-shrink-0 disabled:opacity-60"
+                >
+                  {submitting ? 'Transmitting…' : 'Subscribe'}
+                </motion.button>
+              </form>
+              {newsletterMsg && (
+                <p className={newsletterMsg.cls}>{newsletterMsg.text}</p>
+              )}
+            </div>
+          </motion.section>
+
+        </div>
+      </main>
+    </>
+  )
+}

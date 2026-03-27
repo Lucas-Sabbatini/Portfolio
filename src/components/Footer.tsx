@@ -1,0 +1,45 @@
+import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { fadeUp, viewportOnce } from '../lib/animations'
+import type { SocialLink } from '../api/content'
+import { fetchSocialLinks } from '../api/content'
+
+export default function Footer() {
+  const [links, setLinks] = useState<SocialLink[]>([])
+
+  useEffect(() => {
+    fetchSocialLinks()
+      .then(all => setLinks([...all].sort((a, b) => a.sort_order - b.sort_order).slice(0, 3)))
+      .catch(console.error)
+  }, [])
+
+  return (
+    <motion.footer
+      className="w-full py-16 border-t border-white/5 bg-[#020202]"
+      variants={fadeUp}
+      initial="hidden"
+      whileInView="visible"
+      viewport={viewportOnce}
+    >
+      <div className="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-10">
+        <div className="text-xl font-black text-on-surface">lucas.janot</div>
+
+        <div className="flex gap-10 text-[10px] font-bold uppercase tracking-[0.2em]">
+          {links.map((link) => (
+            <a
+              key={link.id}
+              href={link.url}
+              className="text-on-surface/40 hover:text-primary transition-all"
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+
+        <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface/40 text-center md:text-right leading-loose">
+          © 2024 Lucas Janot. <br /> Built on Obsidian Principles.
+        </p>
+      </div>
+    </motion.footer>
+  )
+}
