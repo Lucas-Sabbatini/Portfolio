@@ -1,8 +1,10 @@
 import logging
 import time
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
 from app.database import close_pool
