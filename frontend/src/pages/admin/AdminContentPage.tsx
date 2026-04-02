@@ -113,7 +113,13 @@ export default function AdminContentPage() {
       <SectionPanel
         title="Narrative"
         section="narrative"
-        keys={['section_label', 'body']}
+        keys={[
+          'section_label', 'body',
+          'stat_1_label', 'stat_1_value', 'stat_1_sub', 'stat_1_small',
+          'stat_2_label', 'stat_2_value', 'stat_2_sub', 'stat_2_small',
+          'stat_3_label', 'stat_3_value', 'stat_3_sub', 'stat_3_small',
+          'stat_4_label', 'stat_4_value', 'stat_4_sub', 'stat_4_small',
+        ]}
         data={narrative}
       />
       <SectionPanel

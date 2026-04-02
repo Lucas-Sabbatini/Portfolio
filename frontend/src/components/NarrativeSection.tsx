@@ -3,12 +3,21 @@ import { motion } from 'framer-motion'
 import { fadeUp, scaleIn, staggerContainer, staggerFast, viewportOnce } from '../lib/animations'
 import { fetchContent } from '../api/content'
 
-const stats = [
-  { label: 'Experience', value: '2+', sub: 'Circuits' },
+const defaultStats = [
+  { label: 'Experience', value: '2+', sub: 'Circuits', small: false },
   { label: 'Linguistics', value: 'C2', sub: 'Level', small: true },
-  { label: 'Architected', value: '3', sub: 'Monoliths' },
-  { label: 'Papers', value: '608', sub: 'Indexed' },
+  { label: 'Architected', value: '3', sub: 'Monoliths', small: false },
+  { label: 'Papers', value: '608', sub: 'Indexed', small: false },
 ]
+
+function buildStats(content: Record<string, string>) {
+  return [1, 2, 3, 4].map((i) => ({
+    label: content[`stat_${i}_label`] ?? defaultStats[i - 1].label,
+    value: content[`stat_${i}_value`] ?? defaultStats[i - 1].value,
+    sub: content[`stat_${i}_sub`] ?? defaultStats[i - 1].sub,
+    small: content[`stat_${i}_small`] != null ? content[`stat_${i}_small`] === 'true' : defaultStats[i - 1].small,
+  }))
+}
 
 const Skeleton = () => (
   <span className="inline-block w-32 h-6 rounded bg-white/5 animate-pulse" />
@@ -52,7 +61,7 @@ export default function NarrativeSection() {
         whileInView="visible"
         viewport={viewportOnce}
       >
-        {stats.map((stat) => (
+        {buildStats(content).map((stat) => (
           <motion.div
             key={stat.label}
             variants={scaleIn}
