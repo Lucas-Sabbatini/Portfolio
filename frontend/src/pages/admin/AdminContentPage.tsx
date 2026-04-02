@@ -107,13 +107,19 @@ export default function AdminContentPage() {
       <SectionPanel
         title="Hero"
         section="hero"
-        keys={['headline_line1', 'headline_line2', 'status_badge', 'cta_primary', 'cta_secondary']}
+        keys={['headline_line1', 'headline_line2', 'status_badge', 'cta_primary', 'cta_primary_link', 'cta_secondary', 'cta_secondary_link']}
         data={hero}
       />
       <SectionPanel
         title="Narrative"
         section="narrative"
-        keys={['section_label', 'body']}
+        keys={[
+          'section_label', 'body',
+          'stat_1_label', 'stat_1_value', 'stat_1_sub', 'stat_1_small',
+          'stat_2_label', 'stat_2_value', 'stat_2_sub', 'stat_2_small',
+          'stat_3_label', 'stat_3_value', 'stat_3_sub', 'stat_3_small',
+          'stat_4_label', 'stat_4_value', 'stat_4_sub', 'stat_4_small',
+        ]}
         data={narrative}
       />
       <SectionPanel

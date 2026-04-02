@@ -23,7 +23,7 @@ function SkillForm({
       {[
         { label: 'Name', value: name, set: setName },
         { label: 'Category', value: category, set: setCategory },
-        { label: 'Icon', value: icon, set: setIcon },
+        { label: 'Icon URL', value: icon, set: setIcon },
         { label: 'Sort Order', value: sortOrder, set: setSortOrder },
       ].map(({ label, value, set }) => (
         <div key={label} className="flex items-center gap-3">
@@ -112,7 +112,11 @@ export default function AdminSkillsPage() {
                 className="glass-card rounded-[1.5rem] p-5 flex items-center gap-6 cursor-pointer"
                 onClick={() => setEditing(skill.id)}
               >
-                <span className="text-xl">{skill.icon}</span>
+                {skill.icon ? (
+                  <img src={skill.icon} height="32" width="40" alt={skill.name} className="inline-block" />
+                ) : (
+                  <span className="text-xl">—</span>
+                )}
                 <div className="flex-1">
                   <p className="font-bold text-sm text-on-surface">{skill.name}</p>
                   <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">{skill.category}</p>

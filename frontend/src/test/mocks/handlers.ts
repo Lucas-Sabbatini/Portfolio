@@ -81,7 +81,20 @@ export const handlers = [
       headline_line2: 'at scale',
       status_badge: 'Operational',
       cta_primary: 'Explore Works',
+      cta_primary_link: '/works',
       cta_secondary: 'Research Lab',
+      cta_secondary_link: '/research',
+    })
+  }),
+
+  http.get(`${BASE}/api/content/narrative`, () => {
+    return HttpResponse.json({
+      section_label: '01 / Philosophy',
+      body: 'Fusing mathematical rigor with intuitive interfaces.',
+      stat_1_label: 'Experience', stat_1_value: '2+', stat_1_sub: 'Circuits', stat_1_small: 'false',
+      stat_2_label: 'Linguistics', stat_2_value: 'C2', stat_2_sub: 'Level', stat_2_small: 'true',
+      stat_3_label: 'Architected', stat_3_value: '3', stat_3_sub: 'Monoliths', stat_3_small: 'false',
+      stat_4_label: 'Papers', stat_4_value: '608', stat_4_sub: 'Indexed', stat_4_small: 'false',
     })
   }),
 

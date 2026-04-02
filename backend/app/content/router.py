@@ -194,7 +194,9 @@ async def create_social_link(
     _admin: dict[str, str] = Depends(get_current_admin),
 ) -> SocialLinkResponse:
     try:
-        row = await service.create_social_link(body.platform, body.url, body.label, body.sort_order)
+        row = await service.create_social_link(
+            body.platform, body.url, body.label, body.icon, body.sort_order
+        )
         return SocialLinkResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
     except Exception as exc:
         logger.error("Error creating social link", exc_info=True)

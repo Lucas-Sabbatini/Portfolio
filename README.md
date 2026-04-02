@@ -77,6 +77,19 @@ python scripts/create_admin.py
 
 Then log in at http://localhost:5173/admin.
 
+## Linting
+
+```bash
+# Frontend (ESLint — zero warnings tolerance)
+cd frontend && npm run lint
+
+# Backend (Ruff — linter + formatter)
+cd backend && ruff check app tests
+cd backend && ruff format app tests
+```
+
+> **Tip:** Install backend dev dependencies first with `pip install -r backend/requirements-dev.txt`.
+
 ## Running Tests
 
 ```bash

@@ -1,15 +1,7 @@
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, staggerContainer, staggerFast, viewportOnce } from '../lib/animations'
-import type { SocialLink } from '../api/content'
-import { fetchSocialLinks } from '../api/content'
+import { fadeUp, staggerContainer, viewportOnce } from '../lib/animations'
 
 export default function ContactSection() {
-  const [links, setLinks] = useState<SocialLink[]>([])
-
-  useEffect(() => {
-    fetchSocialLinks().then(setLinks).catch(console.error)
-  }, [])
 
   return (
     <motion.section
@@ -35,23 +27,6 @@ export default function ContactSection() {
         <span className="text-primary-dim">together.</span>
       </motion.h3>
 
-      <motion.div
-        className="flex flex-wrap justify-center gap-4 pt-10"
-        variants={staggerFast}
-      >
-        {links.map((link) => (
-          <motion.a
-            key={link.id}
-            href={link.url}
-            variants={fadeUp}
-            whileHover={{ scale: 1.06, y: -3, transition: { duration: 0.2 } }}
-            whileTap={{ scale: 0.96 }}
-            className="glass-card px-6 py-3 md:px-10 md:py-5 rounded-full hover:bg-primary/10 transition-all font-bold uppercase tracking-widest text-[10px]"
-          >
-            {link.label}
-          </motion.a>
-        ))}
-      </motion.div>
     </motion.section>
   )
 }

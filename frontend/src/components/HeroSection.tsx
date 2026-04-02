@@ -45,7 +45,8 @@ export default function HeroSection() {
         variants={staggerContainer}
         className="flex flex-wrap gap-6 mt-6"
       >
-        <motion.button
+        <motion.a
+          href={content.cta_primary_link ?? '#'}
           variants={fadeUp}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
@@ -56,16 +57,17 @@ export default function HeroSection() {
           <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
             north_east
           </span>
-        </motion.button>
+        </motion.a>
 
-        <motion.button
+        <motion.a
+          href={content.cta_secondary_link ?? '#'}
           variants={fadeUp}
           whileHover={{ x: 4 }}
           onClick={() => track('cta-click', { label: content.cta_secondary ?? 'Research Lab' })}
           className="flex items-center gap-3 px-5 py-3 md:px-10 md:py-5 rounded-full text-on-surface-variant hover:text-primary transition-colors font-bold uppercase tracking-widest text-[10px]"
         >
           {loading ? <Skeleton /> : (content.cta_secondary ?? 'Research Lab')}
-        </motion.button>
+        </motion.a>
       </motion.div>
     </motion.section>
   )
