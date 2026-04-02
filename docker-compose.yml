@@ -32,12 +32,12 @@ services:
 
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
+    profiles: [umami]
     ports:
       - "3000:3000"
     environment:
       DATABASE_URL: ${UMAMI_DATABASE_URL}
       DATABASE_TYPE: postgresql
-    depends_on: []
 
 volumes:
   postgres_data:
