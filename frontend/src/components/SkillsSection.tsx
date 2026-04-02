@@ -34,7 +34,7 @@ export default function SkillsSection() {
       </motion.h2>
 
       <motion.div
-        className="flex flex-wrap gap-4"
+        className="flex flex-wrap gap-4 justify-center"
         variants={staggerFast}
         initial="hidden"
         whileInView="visible"
@@ -49,9 +49,8 @@ export default function SkillsSection() {
             className="glass-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] cursor-default flex items-center gap-2.5"
           >
             {skill.icon && (
-              <span className="material-symbols-outlined text-primary/70 text-base leading-none">{skill.icon}</span>
+              <img src={skill.icon} height="40" width="50" alt={skill.name} className="inline-block" />
             )}
-            {skill.name}
           </motion.span>
         ))}
       </motion.div>
