@@ -20,7 +20,7 @@ async def subscribe(email: str) -> dict:
     except Exception as exc:
         # asyncpg raises asyncpg.UniqueViolationError for duplicates
         if "unique" in str(exc).lower() or "duplicate" in str(exc).lower():
-            raise ValueError("already_subscribed")
+            raise ValueError("already_subscribed") from exc
         logger.error("Database error subscribing: %s", email, exc_info=True)
         raise
 
@@ -28,12 +28,14 @@ async def subscribe(email: str) -> dict:
     try:
         settings = get_settings()
         resend.api_key = settings.resend_api_key
-        resend.Emails.send({
-            "from": settings.resend_from_email,
-            "to": email,
-            "subject": "You're subscribed!",
-            "html": "<p>Thanks for subscribing to the newsletter.</p>",
-        })
+        resend.Emails.send(
+            {
+                "from": settings.resend_from_email,
+                "to": email,
+                "subject": "You're subscribed!",
+                "html": "<p>Thanks for subscribing to the newsletter.</p>",
+            }
+        )
         logger.info("Confirmation email sent to: %s", email)
     except Exception:
         logger.error("Failed to send confirmation email to: %s", email, exc_info=True)

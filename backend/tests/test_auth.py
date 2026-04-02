@@ -1,8 +1,9 @@
 """Tests for auth endpoints."""
-import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
-from httpx import AsyncClient
 
+from unittest.mock import AsyncMock, patch
+
+import pytest
+from httpx import AsyncClient
 
 ADMIN_ROW = {
     "id": "00000000-0000-0000-0000-000000000001",
@@ -15,7 +16,9 @@ ADMIN_ROW = {
 async def test_login_success(client: AsyncClient, mock_db):
     with patch("app.auth.router.authenticate_admin", new_callable=AsyncMock) as mock_auth:
         mock_auth.return_value = {"id": "test-id", "email": "admin@example.com"}
-        response = await client.post("/api/auth/login", json={"email": "admin@example.com", "password": "secret"})
+        response = await client.post(
+            "/api/auth/login", json={"email": "admin@example.com", "password": "secret"}
+        )
 
     assert response.status_code == 200
     assert response.json() == {"message": "ok"}
@@ -26,7 +29,9 @@ async def test_login_success(client: AsyncClient, mock_db):
 async def test_login_wrong_password(client: AsyncClient, mock_db):
     with patch("app.auth.router.authenticate_admin", new_callable=AsyncMock) as mock_auth:
         mock_auth.return_value = None
-        response = await client.post("/api/auth/login", json={"email": "admin@example.com", "password": "wrong"})
+        response = await client.post(
+            "/api/auth/login", json={"email": "admin@example.com", "password": "wrong"}
+        )
 
     assert response.status_code == 401
     assert "access_token" not in response.cookies
@@ -36,7 +41,9 @@ async def test_login_wrong_password(client: AsyncClient, mock_db):
 async def test_login_unknown_email(client: AsyncClient, mock_db):
     with patch("app.auth.router.authenticate_admin", new_callable=AsyncMock) as mock_auth:
         mock_auth.return_value = None
-        response = await client.post("/api/auth/login", json={"email": "unknown@example.com", "password": "x"})
+        response = await client.post(
+            "/api/auth/login", json={"email": "unknown@example.com", "password": "x"}
+        )
 
     assert response.status_code == 401
 

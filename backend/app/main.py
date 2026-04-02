@@ -6,12 +6,12 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.config import get_settings
-from app.database import close_pool
 from app.auth.router import router as auth_router
-from app.posts.router import router as posts_router
+from app.config import get_settings
 from app.content.router import router as content_router
+from app.database import close_pool
 from app.newsletter.router import router as newsletter_router
+from app.posts.router import router as posts_router
 from app.upload.router import router as upload_router
 
 logging.basicConfig(
@@ -39,7 +39,13 @@ async def log_requests(request: Request, call_next):
     logger.info("%s %s", request.method, request.url.path)
     response = await call_next(request)
     duration = time.time() - start
-    logger.info("%s %s completed %s in %.3fs", request.method, request.url.path, response.status_code, duration)
+    logger.info(
+        "%s %s completed %s in %.3fs",
+        request.method,
+        request.url.path,
+        response.status_code,
+        duration,
+    )
     return response
 
 

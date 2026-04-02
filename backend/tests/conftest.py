@@ -1,19 +1,19 @@
 """Pytest fixtures for backend tests."""
+
 import asyncio
-from datetime import datetime, timezone, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
-from typing import AsyncGenerator
-
-import pytest
-import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
-from jose import jwt
-
 
 # ---------------------------------------------------------------------------
 # Settings override – supply dummy env vars before importing the app
 # ---------------------------------------------------------------------------
 import os
+from collections.abc import AsyncGenerator
+from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
+from jose import jwt
 
 os.environ.setdefault("DATABASE_URL", "postgresql://test:test@localhost/test")
 os.environ.setdefault("SECRET_KEY", "testsecretkey1234567890123456789")
@@ -33,8 +33,10 @@ def event_loop():
 def app():
     # Clear lru_cache so settings are re-read with env vars above
     from app.config import get_settings
+
     get_settings.cache_clear()
     from app.main import app as fastapi_app
+
     return fastapi_app
 
 
@@ -52,8 +54,10 @@ def mock_db():
     mock_pool.fetch = AsyncMock(return_value=[])
     mock_pool.execute = AsyncMock(return_value="DELETE 0")
 
-    with patch("app.database._pool", mock_pool), \
-         patch("app.database.get_pool", AsyncMock(return_value=mock_pool)):
+    with (
+        patch("app.database._pool", mock_pool),
+        patch("app.database.get_pool", AsyncMock(return_value=mock_pool)),
+    ):
         yield {"pool": mock_pool}
 
 
@@ -61,9 +65,10 @@ def mock_db():
 def auth_cookie() -> str:
     """Return a valid JWT access_token cookie value."""
     from app.config import get_settings
+
     get_settings.cache_clear()
     settings = get_settings()
-    expire = datetime.now(timezone.utc) + timedelta(hours=8)
+    expire = datetime.now(UTC) + timedelta(hours=8)
     token = jwt.encode(
         {"email": "admin@example.com", "id": "test-id", "exp": expire.timestamp()},
         settings.secret_key,
