@@ -26,6 +26,7 @@ router = APIRouter(prefix="/api", tags=["content"])
 
 # --- Content blocks ---
 
+
 @router.get("/content/{section}")
 async def get_content(section: str) -> dict[str, str]:
     try:
@@ -52,11 +53,14 @@ async def patch_content(
 
 # --- Experience ---
 
+
 @router.get("/experience", response_model=list[ExperienceResponse])
 async def list_experience() -> list[ExperienceResponse]:
     try:
         rows = await service.list_experience()
-        return [ExperienceResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows]
+        return [
+            ExperienceResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows
+        ]
     except Exception as exc:
         logger.error("Error listing experience", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
@@ -112,6 +116,7 @@ async def delete_experience(
 
 # --- Skills ---
 
+
 @router.get("/skills", response_model=list[SkillResponse])
 async def list_skills() -> list[SkillResponse]:
     try:
@@ -142,7 +147,9 @@ async def update_skill(
     _admin: dict[str, str] = Depends(get_current_admin),
 ) -> SkillResponse:
     try:
-        row = await service.update_skill(str(skill_id), body.name, body.category, body.icon, body.sort_order)
+        row = await service.update_skill(
+            str(skill_id), body.name, body.category, body.icon, body.sort_order
+        )
     except Exception as exc:
         logger.error("Error updating skill", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
@@ -168,11 +175,14 @@ async def delete_skill(
 
 # --- Social links ---
 
+
 @router.get("/social-links", response_model=list[SocialLinkResponse])
 async def list_social_links() -> list[SocialLinkResponse]:
     try:
         rows = await service.list_social_links()
-        return [SocialLinkResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows]
+        return [
+            SocialLinkResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows
+        ]
     except Exception as exc:
         logger.error("Error listing social links", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
@@ -198,7 +208,9 @@ async def update_social_link(
     _admin: dict[str, str] = Depends(get_current_admin),
 ) -> SocialLinkResponse:
     try:
-        row = await service.update_social_link(str(link_id), body.platform, body.url, body.label, body.sort_order)
+        row = await service.update_social_link(
+            str(link_id), body.platform, body.url, body.label, body.sort_order
+        )
     except Exception as exc:
         logger.error("Error updating social link", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc

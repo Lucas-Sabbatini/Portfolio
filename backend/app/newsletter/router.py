@@ -42,7 +42,10 @@ async def list_subscribers(
 ) -> list[SubscriberResponse]:
     try:
         rows = await service.list_subscribers()
-        return [SubscriberResponse(id=str(r["id"]), email=r["email"], created_at=r.get("created_at")) for r in rows]
+        return [
+            SubscriberResponse(id=str(r["id"]), email=r["email"], created_at=r.get("created_at"))
+            for r in rows
+        ]
     except Exception as exc:
         logger.error("Error listing subscribers", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc

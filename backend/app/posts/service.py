@@ -58,8 +58,14 @@ async def create_post(data: PostCreate) -> dict:
         row = await pool.fetchrow(
             "INSERT INTO posts (slug, title, excerpt, body, tag, status, cover_image, read_time) "
             "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-            slug, data.title, data.excerpt, data.body, data.tag, data.status,
-            data.cover_image, read_time,
+            slug,
+            data.title,
+            data.excerpt,
+            data.body,
+            data.tag,
+            data.status,
+            data.cover_image,
+            read_time,
         )
         logger.info("Created post: %s", slug)
         return dict(row)
@@ -77,8 +83,15 @@ async def update_post(slug: str, data: PostUpdate) -> dict | None:
             "UPDATE posts SET slug = $1, title = $2, excerpt = $3, body = $4, tag = $5, "
             "status = $6, cover_image = $7, read_time = $8, updated_at = now() "
             "WHERE slug = $9 RETURNING *",
-            new_slug, data.title, data.excerpt, data.body, data.tag,
-            data.status, data.cover_image, read_time, slug,
+            new_slug,
+            data.title,
+            data.excerpt,
+            data.body,
+            data.tag,
+            data.status,
+            data.cover_image,
+            read_time,
+            slug,
         )
         if row:
             logger.info("Updated post: %s", slug)
@@ -116,7 +129,9 @@ async def toggle_publish(slug: str) -> dict | None:
         updated = await pool.fetchrow(
             "UPDATE posts SET status = $1, published_at = $2, updated_at = now() "
             "WHERE slug = $3 RETURNING *",
-            new_status, published_at, slug,
+            new_status,
+            published_at,
+            slug,
         )
         logger.info("Toggled post %s to %s", slug, new_status)
         return dict(updated) if updated else None

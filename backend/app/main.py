@@ -39,7 +39,13 @@ async def log_requests(request: Request, call_next):
     logger.info("%s %s", request.method, request.url.path)
     response = await call_next(request)
     duration = time.time() - start
-    logger.info("%s %s completed %s in %.3fs", request.method, request.url.path, response.status_code, duration)
+    logger.info(
+        "%s %s completed %s in %.3fs",
+        request.method,
+        request.url.path,
+        response.status_code,
+        duration,
+    )
     return response
 
 

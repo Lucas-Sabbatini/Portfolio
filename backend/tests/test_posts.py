@@ -1,9 +1,10 @@
 """Tests for posts endpoints."""
-import pytest
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, patch, MagicMock
-from httpx import AsyncClient
 
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, patch
+
+import pytest
+from httpx import AsyncClient
 
 PUBLISHED_POST = {
     "id": "00000000-0000-0000-0000-000000000001",
@@ -15,9 +16,9 @@ PUBLISHED_POST = {
     "status": "published",
     "cover_image": None,
     "read_time": "1 min read",
-    "published_at": datetime(2024, 1, 1, tzinfo=timezone.utc),
-    "created_at": datetime(2024, 1, 1, tzinfo=timezone.utc),
-    "updated_at": datetime(2024, 1, 1, tzinfo=timezone.utc),
+    "published_at": datetime(2024, 1, 1, tzinfo=UTC),
+    "created_at": datetime(2024, 1, 1, tzinfo=UTC),
+    "updated_at": datetime(2024, 1, 1, tzinfo=UTC),
 }
 
 DRAFT_POST = {**PUBLISHED_POST, "status": "draft", "slug": "draft-post"}
@@ -104,7 +105,11 @@ async def test_create_post_unauthenticated(client: AsyncClient, mock_db):
 
 @pytest.mark.asyncio
 async def test_publish_post(client: AsyncClient, mock_db, auth_cookie: str):
-    published = {**PUBLISHED_POST, "status": "published", "published_at": datetime(2024, 1, 1, tzinfo=timezone.utc)}
+    published = {
+        **PUBLISHED_POST,
+        "status": "published",
+        "published_at": datetime(2024, 1, 1, tzinfo=UTC),
+    }
     with patch("app.posts.service.toggle_publish", new_callable=AsyncMock) as mock_toggle:
         mock_toggle.return_value = published
         response = await client.patch(

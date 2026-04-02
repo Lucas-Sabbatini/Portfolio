@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Standalone script to create the first admin user."""
+
 import asyncio
 import os
 import sys

@@ -7,12 +7,11 @@ logger = logging.getLogger(__name__)
 
 # --- Content blocks ---
 
+
 async def get_content_section(section: str) -> dict[str, str]:
     try:
         pool = await get_pool()
-        rows = await pool.fetch(
-            "SELECT key, value FROM content_blocks WHERE section = $1", section
-        )
+        rows = await pool.fetch("SELECT key, value FROM content_blocks WHERE section = $1", section)
         return {r["key"]: r["value"] for r in rows}
     except Exception:
         logger.error("Database error getting content section: %s", section, exc_info=True)
@@ -25,7 +24,9 @@ async def upsert_content(section: str, key: str, value: str) -> None:
         await pool.execute(
             "INSERT INTO content_blocks (section, key, value) VALUES ($1, $2, $3) "
             "ON CONFLICT (section, key) DO UPDATE SET value = $3, updated_at = now()",
-            section, key, value,
+            section,
+            key,
+            value,
         )
         logger.info("Upserted content block %s/%s", section, key)
     except Exception:
@@ -35,25 +36,30 @@ async def upsert_content(section: str, key: str, value: str) -> None:
 
 # --- Experience ---
 
+
 async def list_experience() -> list[dict]:
     try:
         pool = await get_pool()
-        rows = await pool.fetch(
-            "SELECT * FROM experience_entries ORDER BY sort_order"
-        )
+        rows = await pool.fetch("SELECT * FROM experience_entries ORDER BY sort_order")
         return [dict(r) for r in rows]
     except Exception:
         logger.error("Database error listing experience", exc_info=True)
         raise
 
 
-async def create_experience(role: str, company: str, period: str, description: list[str], sort_order: int) -> dict:
+async def create_experience(
+    role: str, company: str, period: str, description: list[str], sort_order: int
+) -> dict:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
             "INSERT INTO experience_entries (role, company, period, description, sort_order) "
             "VALUES ($1, $2, $3, $4, $5) RETURNING *",
-            role, company, period, description, sort_order,
+            role,
+            company,
+            period,
+            description,
+            sort_order,
         )
         logger.info("Created experience entry: %s at %s", role, company)
         return dict(row)
@@ -62,13 +68,20 @@ async def create_experience(role: str, company: str, period: str, description: l
         raise
 
 
-async def update_experience(entry_id: str, role: str, company: str, period: str, description: list[str], sort_order: int) -> dict | None:
+async def update_experience(
+    entry_id: str, role: str, company: str, period: str, description: list[str], sort_order: int
+) -> dict | None:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
             "UPDATE experience_entries SET role = $1, company = $2, period = $3, "
             "description = $4, sort_order = $5, updated_at = now() WHERE id = $6 RETURNING *",
-            role, company, period, description, sort_order, entry_id,
+            role,
+            company,
+            period,
+            description,
+            sort_order,
+            entry_id,
         )
         if row:
             logger.info("Updated experience entry: %s", entry_id)
@@ -93,6 +106,7 @@ async def delete_experience(entry_id: str) -> bool:
 
 # --- Skills ---
 
+
 async def list_skills() -> list[dict]:
     try:
         pool = await get_pool()
@@ -108,7 +122,10 @@ async def create_skill(name: str, category: str, icon: str | None, sort_order: i
         pool = await get_pool()
         row = await pool.fetchrow(
             "INSERT INTO skills (name, category, icon, sort_order) VALUES ($1, $2, $3, $4) RETURNING *",
-            name, category, icon, sort_order,
+            name,
+            category,
+            icon,
+            sort_order,
         )
         logger.info("Created skill: %s", name)
         return dict(row)
@@ -117,12 +134,18 @@ async def create_skill(name: str, category: str, icon: str | None, sort_order: i
         raise
 
 
-async def update_skill(skill_id: str, name: str, category: str, icon: str | None, sort_order: int) -> dict | None:
+async def update_skill(
+    skill_id: str, name: str, category: str, icon: str | None, sort_order: int
+) -> dict | None:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
             "UPDATE skills SET name = $1, category = $2, icon = $3, sort_order = $4 WHERE id = $5 RETURNING *",
-            name, category, icon, sort_order, skill_id,
+            name,
+            category,
+            icon,
+            sort_order,
+            skill_id,
         )
         if row:
             logger.info("Updated skill: %s", skill_id)
@@ -147,6 +170,7 @@ async def delete_skill(skill_id: str) -> bool:
 
 # --- Social links ---
 
+
 async def list_social_links() -> list[dict]:
     try:
         pool = await get_pool()
@@ -162,7 +186,10 @@ async def create_social_link(platform: str, url: str, label: str, sort_order: in
         pool = await get_pool()
         row = await pool.fetchrow(
             "INSERT INTO social_links (platform, url, label, sort_order) VALUES ($1, $2, $3, $4) RETURNING *",
-            platform, url, label, sort_order,
+            platform,
+            url,
+            label,
+            sort_order,
         )
         logger.info("Created social link: %s", platform)
         return dict(row)
@@ -171,12 +198,18 @@ async def create_social_link(platform: str, url: str, label: str, sort_order: in
         raise
 
 
-async def update_social_link(link_id: str, platform: str, url: str, label: str, sort_order: int) -> dict | None:
+async def update_social_link(
+    link_id: str, platform: str, url: str, label: str, sort_order: int
+) -> dict | None:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
             "UPDATE social_links SET platform = $1, url = $2, label = $3, sort_order = $4 WHERE id = $5 RETURNING *",
-            platform, url, label, sort_order, link_id,
+            platform,
+            url,
+            label,
+            sort_order,
+            link_id,
         )
         if row:
             logger.info("Updated social link: %s", link_id)

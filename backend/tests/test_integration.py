@@ -1,10 +1,10 @@
 """Integration smoke tests — full HTTP request/response cycle with mocked DB."""
-import pytest
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
-from httpx import AsyncClient
-import io
 
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, patch
+
+import pytest
+from httpx import AsyncClient
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -20,15 +20,16 @@ PUBLISHED_POST = {
     "status": "published",
     "cover_image": None,
     "read_time": "1 min read",
-    "published_at": datetime(2024, 1, 1, tzinfo=timezone.utc),
-    "created_at": datetime(2024, 1, 1, tzinfo=timezone.utc),
-    "updated_at": datetime(2024, 1, 1, tzinfo=timezone.utc),
+    "published_at": datetime(2024, 1, 1, tzinfo=UTC),
+    "created_at": datetime(2024, 1, 1, tzinfo=UTC),
+    "updated_at": datetime(2024, 1, 1, tzinfo=UTC),
 }
 
 
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_health_returns_ok(client: AsyncClient, mock_db):
@@ -61,7 +62,9 @@ async def test_auth_cookie_flow(client: AsyncClient, mock_db):
     # Login
     with patch("app.auth.router.authenticate_admin", new_callable=AsyncMock) as mock_auth:
         mock_auth.return_value = {"id": "test-id", "email": "admin@example.com"}
-        login_resp = await client.post("/api/auth/login", json={"email": "admin@example.com", "password": "secret"})
+        login_resp = await client.post(
+            "/api/auth/login", json={"email": "admin@example.com", "password": "secret"}
+        )
 
     assert login_resp.status_code == 200
     token = login_resp.cookies.get("access_token")
@@ -94,7 +97,7 @@ async def test_protected_route_without_cookie(client: AsyncClient, mock_db):
 async def test_full_post_lifecycle(client: AsyncClient, mock_db, auth_cookie: str):
     """Create → get by slug → publish → list (appears) → delete → list (gone)."""
     post = {**PUBLISHED_POST, "status": "draft", "published_at": None}
-    published = {**post, "status": "published", "published_at": datetime(2024, 6, 1, tzinfo=timezone.utc)}
+    published = {**post, "status": "published", "published_at": datetime(2024, 6, 1, tzinfo=UTC)}
     cookies = {"access_token": auth_cookie}
 
     # Create
