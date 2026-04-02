@@ -4,6 +4,13 @@ import { fadeUp, viewportOnce } from '../lib/animations'
 import type { SocialLink } from '../api/content'
 import { fetchSocialLinks } from '../api/content'
 
+function SocialIcon({ icon }: { icon: string }) {
+  if (icon.startsWith('http://') || icon.startsWith('https://')) {
+    return <img src={icon} alt="" className="w-[14px] h-[14px] object-contain" />
+  }
+  return <span className="material-symbols-outlined text-sm">{icon}</span>
+}
+
 export default function Footer() {
   const [links, setLinks] = useState<SocialLink[]>([])
 
@@ -31,9 +38,7 @@ export default function Footer() {
               href={link.url}
               className="text-on-surface/40 hover:text-primary transition-all flex items-center gap-1.5"
             >
-              {link.icon && (
-                <span className="material-symbols-outlined text-sm">{link.icon}</span>
-              )}
+              {link.icon && <SocialIcon icon={link.icon} />}
               {link.label && <span>{link.label}</span>}
             </a>
           ))}
