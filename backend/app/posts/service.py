@@ -1,6 +1,5 @@
 import logging
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from app.database import get_pool
 from app.posts.schemas import PostCreate, PostUpdate, slugify
@@ -12,7 +11,7 @@ def compute_read_time(body: str) -> str:
     return f"{max(1, len(body.split()) // 200)} min read"
 
 
-async def list_posts(tag: Optional[str] = None) -> list[dict]:
+async def list_posts(tag: str | None = None) -> list[dict]:
     try:
         pool = await get_pool()
         if tag:
@@ -35,7 +34,7 @@ async def list_posts(tag: Optional[str] = None) -> list[dict]:
         raise
 
 
-async def get_post_by_slug(slug: str) -> Optional[dict]:
+async def get_post_by_slug(slug: str) -> dict | None:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
@@ -59,8 +58,14 @@ async def create_post(data: PostCreate) -> dict:
         row = await pool.fetchrow(
             "INSERT INTO posts (slug, title, excerpt, body, tag, status, cover_image, read_time) "
             "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-            slug, data.title, data.excerpt, data.body, data.tag, data.status,
-            data.cover_image, read_time,
+            slug,
+            data.title,
+            data.excerpt,
+            data.body,
+            data.tag,
+            data.status,
+            data.cover_image,
+            read_time,
         )
         logger.info("Created post: %s", slug)
         return dict(row)
@@ -69,7 +74,7 @@ async def create_post(data: PostCreate) -> dict:
         raise
 
 
-async def update_post(slug: str, data: PostUpdate) -> Optional[dict]:
+async def update_post(slug: str, data: PostUpdate) -> dict | None:
     new_slug = data.slug if data.slug else slug
     read_time = data.read_time if data.read_time else compute_read_time(data.body)
     try:
@@ -78,8 +83,15 @@ async def update_post(slug: str, data: PostUpdate) -> Optional[dict]:
             "UPDATE posts SET slug = $1, title = $2, excerpt = $3, body = $4, tag = $5, "
             "status = $6, cover_image = $7, read_time = $8, updated_at = now() "
             "WHERE slug = $9 RETURNING *",
-            new_slug, data.title, data.excerpt, data.body, data.tag,
-            data.status, data.cover_image, read_time, slug,
+            new_slug,
+            data.title,
+            data.excerpt,
+            data.body,
+            data.tag,
+            data.status,
+            data.cover_image,
+            read_time,
+            slug,
         )
         if row:
             logger.info("Updated post: %s", slug)
@@ -102,7 +114,7 @@ async def delete_post(slug: str) -> bool:
         raise
 
 
-async def toggle_publish(slug: str) -> Optional[dict]:
+async def toggle_publish(slug: str) -> dict | None:
     try:
         pool = await get_pool()
         row = await pool.fetchrow("SELECT * FROM posts WHERE slug = $1", slug)
@@ -112,12 +124,14 @@ async def toggle_publish(slug: str) -> Optional[dict]:
         new_status = "published" if row["status"] == "draft" else "draft"
         published_at = row["published_at"]
         if new_status == "published" and published_at is None:
-            published_at = datetime.now(timezone.utc)
+            published_at = datetime.now(UTC)
 
         updated = await pool.fetchrow(
             "UPDATE posts SET status = $1, published_at = $2, updated_at = now() "
             "WHERE slug = $3 RETURNING *",
-            new_status, published_at, slug,
+            new_status,
+            published_at,
+            slug,
         )
         logger.info("Toggled post %s to %s", slug, new_status)
         return dict(updated) if updated else None

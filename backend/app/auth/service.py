@@ -1,6 +1,5 @@
 import logging
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -24,12 +23,12 @@ def hash_password(password: str) -> str:
 def create_access_token(data: dict[str, str]) -> str:
     settings = get_settings()
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(hours=settings.access_token_expire_hours)
+    expire = datetime.now(UTC) + timedelta(hours=settings.access_token_expire_hours)
     to_encode["exp"] = expire.timestamp()
     return jwt.encode(to_encode, settings.secret_key, algorithm="HS256")
 
 
-async def authenticate_admin(email: str, password: str) -> Optional[dict[str, str]]:
+async def authenticate_admin(email: str, password: str) -> dict[str, str] | None:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
