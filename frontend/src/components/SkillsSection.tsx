@@ -46,8 +46,11 @@ export default function SkillsSection() {
             variants={pill}
             whileHover={{ scale: 1.08, backgroundColor: 'rgba(56,189,248,0.1)', transition: { duration: 0.15 } }}
             whileTap={{ scale: 0.95 }}
-            className="glass-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] cursor-default"
+            className="glass-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] cursor-default flex items-center gap-2.5"
           >
+            {skill.icon && (
+              <span className="material-symbols-outlined text-primary/70 text-base leading-none">{skill.icon}</span>
+            )}
             {skill.name}
           </motion.span>
         ))}
