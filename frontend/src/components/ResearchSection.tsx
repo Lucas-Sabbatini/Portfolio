@@ -88,7 +88,7 @@ export default function ResearchSection() {
           </motion.div>
 
           <motion.div
-            className="relative aspect-[4/3] rounded-[2rem] overflow-hidden glass-card group"
+            className="relative rounded-[2rem] overflow-hidden glass-card group"
             variants={fadeIn}
             initial="hidden"
             whileInView="visible"
@@ -101,7 +101,7 @@ export default function ResearchSection() {
                 : 'https://lh3.googleusercontent.com/aida-public/AB6AXuC1t2vwe_ExDeathDRMChULSiv7l2yccCWvcV1gVuKLP3w7ednBTMBOS0MNmR_mttaEMQrzVwmwq5ru2B0epV5rBuqNzouCOv_rfsnzqk5GflgcBEkQqu7-UnvJO8o27faQQ2lkJ5JSWp0jthm925-ULoGkTuckUGkhUL9ewkgI2gJErqgZCtbPxdozoiOx37LI1AGo8tuwDorRajqbme34y5VO1e3i1hHTKB0qfkuXNXj70o_nki_IkfLsdbLGGt0m4ICOkTs-Iw'}
               alt="Neural Topology"
               fetchPriority="high"
-              className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000"
+              className="w-full h-auto object-contain opacity-80 group-hover:scale-105 transition-transform duration-1000"
             />
             <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-transparent" />
           </motion.div>
