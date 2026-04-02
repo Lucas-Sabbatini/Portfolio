@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS social_links (
   platform   text NOT NULL,
   url        text NOT NULL,
   label      text NOT NULL,
+  icon       text,
   sort_order int NOT NULL DEFAULT 0
 );
 

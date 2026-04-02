@@ -55,6 +55,7 @@ export interface SocialLink {
   platform: string
   url: string
   label: string
+  icon?: string
   sort_order: number
 }
 

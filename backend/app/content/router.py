@@ -178,7 +178,7 @@ async def create_social_link(
     _admin: dict[str, str] = Depends(get_current_admin),
 ) -> SocialLinkResponse:
     try:
-        row = await service.create_social_link(body.platform, body.url, body.label, body.sort_order)
+        row = await service.create_social_link(body.platform, body.url, body.label, body.icon, body.sort_order)
         return SocialLinkResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
     except Exception:
         logger.error("Error creating social link", exc_info=True)
@@ -192,7 +192,7 @@ async def update_social_link(
     _admin: dict[str, str] = Depends(get_current_admin),
 ) -> SocialLinkResponse:
     try:
-        row = await service.update_social_link(str(link_id), body.platform, body.url, body.label, body.sort_order)
+        row = await service.update_social_link(str(link_id), body.platform, body.url, body.label, body.icon, body.sort_order)
     except Exception:
         logger.error("Error updating social link", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error")

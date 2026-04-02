@@ -29,9 +29,12 @@ export default function Footer() {
             <a
               key={link.id}
               href={link.url}
-              className="text-on-surface/40 hover:text-primary transition-all"
+              className="text-on-surface/40 hover:text-primary transition-all flex items-center gap-1.5"
             >
-              {link.label}
+              {link.icon && (
+                <span className="material-symbols-outlined text-sm">{link.icon}</span>
+              )}
+              {link.label && <span>{link.label}</span>}
             </a>
           ))}
         </div>

@@ -158,12 +158,12 @@ async def list_social_links() -> list[dict]:
         raise
 
 
-async def create_social_link(platform: str, url: str, label: str, sort_order: int) -> dict:
+async def create_social_link(platform: str, url: str, label: str, icon: Optional[str], sort_order: int) -> dict:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
-            "INSERT INTO social_links (platform, url, label, sort_order) VALUES ($1, $2, $3, $4) RETURNING *",
-            platform, url, label, sort_order,
+            "INSERT INTO social_links (platform, url, label, icon, sort_order) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+            platform, url, label, icon, sort_order,
         )
         logger.info("Created social link: %s", platform)
         return dict(row)
@@ -172,12 +172,12 @@ async def create_social_link(platform: str, url: str, label: str, sort_order: in
         raise
 
 
-async def update_social_link(link_id: str, platform: str, url: str, label: str, sort_order: int) -> Optional[dict]:
+async def update_social_link(link_id: str, platform: str, url: str, label: str, icon: Optional[str], sort_order: int) -> Optional[dict]:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
-            "UPDATE social_links SET platform = $1, url = $2, label = $3, sort_order = $4 WHERE id = $5 RETURNING *",
-            platform, url, label, sort_order, link_id,
+            "UPDATE social_links SET platform = $1, url = $2, label = $3, icon = $4, sort_order = $5 WHERE id = $6 RETURNING *",
+            platform, url, label, icon, sort_order, link_id,
         )
         if row:
             logger.info("Updated social link: %s", link_id)
