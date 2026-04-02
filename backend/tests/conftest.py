@@ -46,19 +46,15 @@ async def client(app, mock_db) -> AsyncGenerator[AsyncClient, None]:
 
 @pytest.fixture
 def mock_db():
-    """Patch asyncpg pool and supabase client."""
+    """Patch asyncpg pool."""
     mock_pool = MagicMock()
     mock_pool.fetchrow = AsyncMock(return_value=None)
     mock_pool.fetch = AsyncMock(return_value=[])
     mock_pool.execute = AsyncMock(return_value="DELETE 0")
 
-    mock_supabase = MagicMock()
-
     with patch("app.database._pool", mock_pool), \
-         patch("app.database._supabase", mock_supabase), \
-         patch("app.database.get_pool", AsyncMock(return_value=mock_pool)), \
-         patch("app.database.get_supabase", MagicMock(return_value=mock_supabase)):
-        yield {"pool": mock_pool, "supabase": mock_supabase}
+         patch("app.database.get_pool", AsyncMock(return_value=mock_pool)):
+        yield {"pool": mock_pool}
 
 
 @pytest.fixture
