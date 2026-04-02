@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import Optional
 
 import asyncpg
 
@@ -8,7 +7,7 @@ from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 
-_pool: Optional[asyncpg.Pool] = None
+_pool: asyncpg.Pool | None = None
 
 MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "migrations"
 

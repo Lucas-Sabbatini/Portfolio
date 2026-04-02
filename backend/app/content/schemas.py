@@ -59,7 +59,7 @@ class SocialLinkCreate(BaseModel):
     platform: str
     url: str
     label: str
-    icon: Optional[str] = None
+    icon: str | None = None
     sort_order: int = 0
 
 
@@ -67,7 +67,7 @@ class SocialLinkUpdate(BaseModel):
     platform: str
     url: str
     label: str
-    icon: Optional[str] = None
+    icon: str | None = None
     sort_order: int = 0
 
 
@@ -76,5 +76,5 @@ class SocialLinkResponse(BaseModel):
     platform: str
     url: str
     label: str
-    icon: Optional[str] = None
+    icon: str | None = None
     sort_order: int

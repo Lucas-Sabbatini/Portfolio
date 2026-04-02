@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, staggerContainer, staggerFast, viewportOnce } from '../lib/animations'
-import type { SocialLink } from '../api/content'
+import { fadeUp, staggerContainer, viewportOnce } from '../lib/animations'
 
 export default function ContactSection() {
 
