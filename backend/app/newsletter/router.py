@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr
@@ -20,7 +19,7 @@ class SubscribeRequest(BaseModel):
 class SubscriberResponse(BaseModel):
     id: str
     email: str
-    created_at: Optional[datetime] = None
+    created_at: datetime | None = None
 
 
 @router.post("/subscribe", status_code=201)
@@ -30,11 +29,11 @@ async def subscribe(body: SubscribeRequest) -> dict:
         return {"id": str(row["id"]), "email": row["email"]}
     except ValueError as exc:
         if "already_subscribed" in str(exc):
-            raise HTTPException(status_code=409, detail="Email already subscribed")
-        raise HTTPException(status_code=400, detail="Bad request")
-    except Exception:
+            raise HTTPException(status_code=409, detail="Email already subscribed") from exc
+        raise HTTPException(status_code=400, detail="Bad request") from exc
+    except Exception as exc:
         logger.error("Error subscribing", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
 
 @router.get("/subscribers", response_model=list[SubscriberResponse])
@@ -43,7 +42,10 @@ async def list_subscribers(
 ) -> list[SubscriberResponse]:
     try:
         rows = await service.list_subscribers()
-        return [SubscriberResponse(id=str(r["id"]), email=r["email"], created_at=r.get("created_at")) for r in rows]
-    except Exception:
+        return [
+            SubscriberResponse(id=str(r["id"]), email=r["email"], created_at=r.get("created_at"))
+            for r in rows
+        ]
+    except Exception as exc:
         logger.error("Error listing subscribers", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc

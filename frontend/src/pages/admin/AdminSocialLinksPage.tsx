@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import type { SocialLink } from '../../api/content'
 import { fetchSocialLinks, createSocialLink, updateSocialLink, deleteSocialLink } from '../../api/content'
 
-const emptyForm = { platform: '', url: '', label: '', sort_order: 0 }
+const emptyForm = { platform: '', url: '', label: '', icon: '', sort_order: 0 }
 
 function LinkForm({
   initial,
@@ -16,6 +16,7 @@ function LinkForm({
   const [platform, setPlatform] = useState(initial.platform)
   const [url, setUrl] = useState(initial.url)
   const [label, setLabel] = useState(initial.label)
+  const [icon, setIcon] = useState(initial.icon ?? '')
   const [sortOrder, setSortOrder] = useState(String(initial.sort_order))
 
   return (
@@ -24,13 +25,15 @@ function LinkForm({
         { label: 'Platform', value: platform, set: setPlatform },
         { label: 'URL', value: url, set: setUrl },
         { label: 'Label', value: label, set: setLabel },
+        { label: 'Icon', value: icon, set: setIcon, hint: 'Material Symbol key' },
         { label: 'Sort Order', value: sortOrder, set: setSortOrder },
-      ].map(({ label: lbl, value, set }) => (
+      ].map(({ label: lbl, value, set, hint }) => (
         <div key={lbl} className="flex items-center gap-3">
           <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-24">{lbl}</span>
           <input
             type="text"
             value={value}
+            placeholder={hint}
             onChange={(e) => set(e.target.value)}
             className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm outline-none focus:border-primary/40 transition-colors"
           />
@@ -38,7 +41,7 @@ function LinkForm({
       ))}
       <div className="flex gap-3">
         <button
-          onClick={() => onSave({ platform, url, label, sort_order: Number(sortOrder) })}
+          onClick={() => onSave({ platform, url, label, icon: icon || undefined, sort_order: Number(sortOrder) })}
           className="bg-primary text-on-primary font-bold tracking-wider text-[10px] uppercase px-6 py-2 rounded-full"
         >
           Save
@@ -112,6 +115,9 @@ export default function AdminSocialLinksPage() {
                 className="glass-card rounded-[1.5rem] p-5 flex items-center gap-6 cursor-pointer"
                 onClick={() => setEditing(link.id)}
               >
+                {link.icon && (
+                  <span className="material-symbols-outlined text-xl text-primary/70">{link.icon}</span>
+                )}
                 <div className="flex-1">
                   <p className="font-bold text-sm text-on-surface">{link.label}</p>
                   <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">{link.platform} · {link.url}</p>

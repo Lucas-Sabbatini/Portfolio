@@ -49,7 +49,7 @@ export default function PostPage() {
 
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [post?.slug])
+  }, [post, track])
 
   if (loading) {
     return (

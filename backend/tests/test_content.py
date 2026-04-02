@@ -1,9 +1,10 @@
 """Tests for content endpoints."""
-import pytest
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, patch
-from httpx import AsyncClient
 
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, patch
+
+import pytest
+from httpx import AsyncClient
 
 EXPERIENCE_ROW = {
     "id": "00000000-0000-0000-0000-000000000002",
@@ -12,7 +13,7 @@ EXPERIENCE_ROW = {
     "period": "2020-2023",
     "description": ["Did stuff", "More stuff"],
     "sort_order": 0,
-    "updated_at": datetime(2024, 1, 1, tzinfo=timezone.utc),
+    "updated_at": datetime(2024, 1, 1, tzinfo=UTC),
 }
 
 
@@ -71,7 +72,13 @@ async def test_create_experience_authenticated(client: AsyncClient, mock_db, aut
         mock_create.return_value = EXPERIENCE_ROW
         response = await client.post(
             "/api/experience",
-            json={"role": "Engineer", "company": "Acme", "period": "2020-2023", "description": [], "sort_order": 0},
+            json={
+                "role": "Engineer",
+                "company": "Acme",
+                "period": "2020-2023",
+                "description": [],
+                "sort_order": 0,
+            },
             cookies={"access_token": auth_cookie},
         )
 
