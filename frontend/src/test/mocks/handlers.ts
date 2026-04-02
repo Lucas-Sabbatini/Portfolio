@@ -81,7 +81,9 @@ export const handlers = [
       headline_line2: 'at scale',
       status_badge: 'Operational',
       cta_primary: 'Explore Works',
+      cta_primary_link: '/works',
       cta_secondary: 'Research Lab',
+      cta_secondary_link: '/research',
     })
   }),
 
