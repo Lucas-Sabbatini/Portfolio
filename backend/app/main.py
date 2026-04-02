@@ -40,6 +40,8 @@ async def log_requests(request: Request, call_next):
     response = await call_next(request)
     duration = time.time() - start
     logger.info("%s %s completed %s in %.3fs", request.method, request.url.path, response.status_code, duration)
+    if request.url.path.startswith("/uploads/"):
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     return response
 
 

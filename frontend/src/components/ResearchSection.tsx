@@ -96,8 +96,11 @@ export default function ResearchSection() {
             whileHover={{ scale: 1.02, transition: { duration: 0.4 } }}
           >
             <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1t2vwe_ExDeathDRMChULSiv7l2yccCWvcV1gVuKLP3w7ednBTMBOS0MNmR_mttaEMQrzVwmwq5ru2B0epV5rBuqNzouCOv_rfsnzqk5GflgcBEkQqu7-UnvJO8o27faQQ2lkJ5JSWp0jthm925-ULoGkTuckUGkhUL9ewkgI2gJErqgZCtbPxdozoiOx37LI1AGo8tuwDorRajqbme34y5VO1e3i1hHTKB0qfkuXNXj70o_nki_IkfLsdbLGGt0m4ICOkTs-Iw"
+              src={content.image_url
+                ? (content.image_url.startsWith('/') ? `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}${content.image_url}` : content.image_url)
+                : 'https://lh3.googleusercontent.com/aida-public/AB6AXuC1t2vwe_ExDeathDRMChULSiv7l2yccCWvcV1gVuKLP3w7ednBTMBOS0MNmR_mttaEMQrzVwmwq5ru2B0epV5rBuqNzouCOv_rfsnzqk5GflgcBEkQqu7-UnvJO8o27faQQ2lkJ5JSWp0jthm925-ULoGkTuckUGkhUL9ewkgI2gJErqgZCtbPxdozoiOx37LI1AGo8tuwDorRajqbme34y5VO1e3i1hHTKB0qfkuXNXj70o_nki_IkfLsdbLGGt0m4ICOkTs-Iw'}
               alt="Neural Topology"
+              fetchPriority="high"
               className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000"
             />
             <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-transparent" />

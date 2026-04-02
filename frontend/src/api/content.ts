@@ -9,6 +9,16 @@ export const patchContent = (section: string, key: string, value: string): Promi
     body: JSON.stringify({ value }),
   })
 
+export const uploadImage = (file: File): Promise<{ url: string }> => {
+  const form = new FormData()
+  form.append('file', file)
+  return apiFetch('/api/upload', {
+    method: 'POST',
+    body: form,
+    headers: {},
+  })
+}
+
 export interface ExperienceEntry {
   id: string
   role: string
