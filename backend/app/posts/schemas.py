@@ -1,6 +1,5 @@
 import re
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -17,9 +16,9 @@ class PostCreate(BaseModel):
     excerpt: str
     body: str = ""
     tag: str
-    slug: Optional[str] = None
-    cover_image: Optional[str] = None
-    read_time: Optional[str] = None
+    slug: str | None = None
+    cover_image: str | None = None
+    read_time: str | None = None
     status: str = "draft"
 
 
@@ -28,9 +27,9 @@ class PostUpdate(BaseModel):
     excerpt: str
     body: str = ""
     tag: str
-    slug: Optional[str] = None
-    cover_image: Optional[str] = None
-    read_time: Optional[str] = None
+    slug: str | None = None
+    cover_image: str | None = None
+    read_time: str | None = None
     status: str = "draft"
 
 
@@ -42,11 +41,11 @@ class PostResponse(BaseModel):
     body: str
     tag: str
     status: str
-    cover_image: Optional[str] = None
-    read_time: Optional[str] = None
-    published_at: Optional[datetime] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    cover_image: str | None = None
+    read_time: str | None = None
+    published_at: datetime | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 
 class PostListItem(BaseModel):
@@ -56,8 +55,8 @@ class PostListItem(BaseModel):
     excerpt: str
     tag: str
     status: str
-    cover_image: Optional[str] = None
-    read_time: Optional[str] = None
-    published_at: Optional[datetime] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    cover_image: str | None = None
+    read_time: str | None = None
+    published_at: datetime | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None

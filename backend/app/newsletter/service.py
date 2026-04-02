@@ -20,7 +20,7 @@ async def subscribe(email: str) -> dict:
     except Exception as exc:
         # asyncpg raises asyncpg.UniqueViolationError for duplicates
         if "unique" in str(exc).lower() or "duplicate" in str(exc).lower():
-            raise ValueError("already_subscribed")
+            raise ValueError("already_subscribed") from exc
         logger.error("Database error subscribing: %s", email, exc_info=True)
         raise
 

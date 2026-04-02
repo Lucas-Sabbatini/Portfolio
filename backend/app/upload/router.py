@@ -2,7 +2,7 @@ import logging
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from app.auth.dependencies import get_current_admin
 from app.config import get_settings
@@ -51,6 +51,6 @@ async def upload_file(
         dest.write_bytes(contents)
         logger.info("Uploaded file: %s", filename)
         return {"url": f"/uploads/covers/{filename}"}
-    except Exception:
+    except Exception as exc:
         logger.error("Error saving uploaded file", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc

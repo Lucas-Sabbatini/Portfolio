@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from app.database import get_pool
 
@@ -63,7 +62,7 @@ async def create_experience(role: str, company: str, period: str, description: l
         raise
 
 
-async def update_experience(entry_id: str, role: str, company: str, period: str, description: list[str], sort_order: int) -> Optional[dict]:
+async def update_experience(entry_id: str, role: str, company: str, period: str, description: list[str], sort_order: int) -> dict | None:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
@@ -104,7 +103,7 @@ async def list_skills() -> list[dict]:
         raise
 
 
-async def create_skill(name: str, category: str, icon: Optional[str], sort_order: int) -> dict:
+async def create_skill(name: str, category: str, icon: str | None, sort_order: int) -> dict:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
@@ -118,7 +117,7 @@ async def create_skill(name: str, category: str, icon: Optional[str], sort_order
         raise
 
 
-async def update_skill(skill_id: str, name: str, category: str, icon: Optional[str], sort_order: int) -> Optional[dict]:
+async def update_skill(skill_id: str, name: str, category: str, icon: str | None, sort_order: int) -> dict | None:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(
@@ -172,7 +171,7 @@ async def create_social_link(platform: str, url: str, label: str, sort_order: in
         raise
 
 
-async def update_social_link(link_id: str, platform: str, url: str, label: str, sort_order: int) -> Optional[dict]:
+async def update_social_link(link_id: str, platform: str, url: str, label: str, sort_order: int) -> dict | None:
     try:
         pool = await get_pool()
         row = await pool.fetchrow(

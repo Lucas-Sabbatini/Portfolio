@@ -5,13 +5,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 
 from app.auth.dependencies import get_current_admin
+from app.content import service
 from app.content.schemas import (
     ContentUpdate,
-    ExperienceCreate, ExperienceUpdate, ExperienceResponse,
-    SkillCreate, SkillUpdate, SkillResponse,
-    SocialLinkCreate, SocialLinkUpdate, SocialLinkResponse,
+    ExperienceCreate,
+    ExperienceResponse,
+    ExperienceUpdate,
+    SkillCreate,
+    SkillResponse,
+    SkillUpdate,
+    SocialLinkCreate,
+    SocialLinkResponse,
+    SocialLinkUpdate,
 )
-from app.content import service
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +30,9 @@ router = APIRouter(prefix="/api", tags=["content"])
 async def get_content(section: str) -> dict[str, str]:
     try:
         return await service.get_content_section(section)
-    except Exception:
+    except Exception as exc:
         logger.error("Error getting content section", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
 
 @router.patch("/content/{section}/{key}")
@@ -39,9 +45,9 @@ async def patch_content(
     try:
         await service.upsert_content(section, key, body.value)
         return {"section": section, "key": key, "value": body.value}
-    except Exception:
+    except Exception as exc:
         logger.error("Error patching content", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
 
 # --- Experience ---
@@ -51,9 +57,9 @@ async def list_experience() -> list[ExperienceResponse]:
     try:
         rows = await service.list_experience()
         return [ExperienceResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows]
-    except Exception:
+    except Exception as exc:
         logger.error("Error listing experience", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
 
 @router.post("/experience", response_model=ExperienceResponse, status_code=201)
@@ -66,9 +72,9 @@ async def create_experience(
             body.role, body.company, body.period, body.description, body.sort_order
         )
         return ExperienceResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
-    except Exception:
+    except Exception as exc:
         logger.error("Error creating experience", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
 
 @router.put("/experience/{entry_id}", response_model=ExperienceResponse)
@@ -81,9 +87,9 @@ async def update_experience(
         row = await service.update_experience(
             str(entry_id), body.role, body.company, body.period, body.description, body.sort_order
         )
-    except Exception:
+    except Exception as exc:
         logger.error("Error updating experience", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
     if row is None:
         raise HTTPException(status_code=404, detail="Not found")
     return ExperienceResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
@@ -96,9 +102,9 @@ async def delete_experience(
 ) -> Response:
     try:
         deleted = await service.delete_experience(str(entry_id))
-    except Exception:
+    except Exception as exc:
         logger.error("Error deleting experience", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
     if not deleted:
         raise HTTPException(status_code=404, detail="Not found")
     return Response(status_code=204)
@@ -111,9 +117,9 @@ async def list_skills() -> list[SkillResponse]:
     try:
         rows = await service.list_skills()
         return [SkillResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows]
-    except Exception:
+    except Exception as exc:
         logger.error("Error listing skills", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
 
 @router.post("/skills", response_model=SkillResponse, status_code=201)
@@ -124,9 +130,9 @@ async def create_skill(
     try:
         row = await service.create_skill(body.name, body.category, body.icon, body.sort_order)
         return SkillResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
-    except Exception:
+    except Exception as exc:
         logger.error("Error creating skill", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
 
 @router.put("/skills/{skill_id}", response_model=SkillResponse)
@@ -137,9 +143,9 @@ async def update_skill(
 ) -> SkillResponse:
     try:
         row = await service.update_skill(str(skill_id), body.name, body.category, body.icon, body.sort_order)
-    except Exception:
+    except Exception as exc:
         logger.error("Error updating skill", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
     if row is None:
         raise HTTPException(status_code=404, detail="Not found")
     return SkillResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
@@ -152,9 +158,9 @@ async def delete_skill(
 ) -> Response:
     try:
         deleted = await service.delete_skill(str(skill_id))
-    except Exception:
+    except Exception as exc:
         logger.error("Error deleting skill", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
     if not deleted:
         raise HTTPException(status_code=404, detail="Not found")
     return Response(status_code=204)
@@ -167,9 +173,9 @@ async def list_social_links() -> list[SocialLinkResponse]:
     try:
         rows = await service.list_social_links()
         return [SocialLinkResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows]
-    except Exception:
+    except Exception as exc:
         logger.error("Error listing social links", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
 
 @router.post("/social-links", response_model=SocialLinkResponse, status_code=201)
@@ -180,9 +186,9 @@ async def create_social_link(
     try:
         row = await service.create_social_link(body.platform, body.url, body.label, body.sort_order)
         return SocialLinkResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
-    except Exception:
+    except Exception as exc:
         logger.error("Error creating social link", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
 
 @router.put("/social-links/{link_id}", response_model=SocialLinkResponse)
@@ -193,9 +199,9 @@ async def update_social_link(
 ) -> SocialLinkResponse:
     try:
         row = await service.update_social_link(str(link_id), body.platform, body.url, body.label, body.sort_order)
-    except Exception:
+    except Exception as exc:
         logger.error("Error updating social link", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
     if row is None:
         raise HTTPException(status_code=404, detail="Not found")
     return SocialLinkResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
@@ -208,9 +214,9 @@ async def delete_social_link(
 ) -> Response:
     try:
         deleted = await service.delete_social_link(str(link_id))
-    except Exception:
+    except Exception as exc:
         logger.error("Error deleting social link", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error")
+        raise HTTPException(status_code=500, detail="internal server error") from exc
     if not deleted:
         raise HTTPException(status_code=404, detail="Not found")
     return Response(status_code=204)

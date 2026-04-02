@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import asyncpg
 
@@ -7,7 +6,7 @@ from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 
-_pool: Optional[asyncpg.Pool] = None
+_pool: asyncpg.Pool | None = None
 
 
 async def get_pool() -> asyncpg.Pool:
