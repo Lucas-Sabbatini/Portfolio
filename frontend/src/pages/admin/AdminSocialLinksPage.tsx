@@ -2,7 +2,22 @@ import { useState, useEffect } from 'react'
 import type { SocialLink } from '../../api/content'
 import { fetchSocialLinks, createSocialLink, updateSocialLink, deleteSocialLink } from '../../api/content'
 
-const emptyForm = { platform: '', url: '', label: '', icon: '', sort_order: 0 }
+const emptyForm = { platform: '', url: '', label: '', icon: '', color: '', sort_order: 0 }
+
+function IconPreview({ icon, color }: { icon: string; color?: string }) {
+  if (!icon) return null
+  if (icon.startsWith('http://') || icon.startsWith('https://')) {
+    return <img src={icon} alt="" style={{ width: 20, height: 20, objectFit: 'contain' }} />
+  }
+  return (
+    <span
+      className="material-symbols-outlined"
+      style={{ fontSize: 20, lineHeight: 1, color: color || undefined }}
+    >
+      {icon}
+    </span>
+  )
+}
 
 function LinkForm({
   initial,
@@ -17,7 +32,11 @@ function LinkForm({
   const [url, setUrl] = useState(initial.url)
   const [label, setLabel] = useState(initial.label)
   const [icon, setIcon] = useState(initial.icon ?? '')
+  const [color, setColor] = useState(initial.color ?? '')
   const [sortOrder, setSortOrder] = useState(String(initial.sort_order))
+
+  const isUrl = icon.startsWith('http://') || icon.startsWith('https://')
+  const isMaterialIcon = icon.length > 0 && !isUrl
 
   return (
     <div className="space-y-3 p-6 glass-card rounded-[1.5rem]">
@@ -25,23 +44,87 @@ function LinkForm({
         { label: 'Platform', value: platform, set: setPlatform },
         { label: 'URL', value: url, set: setUrl },
         { label: 'Label', value: label, set: setLabel },
-        { label: 'Icon', value: icon, set: setIcon, hint: 'Material Symbol key' },
-        { label: 'Sort Order', value: sortOrder, set: setSortOrder },
-      ].map(({ label: lbl, value, set, hint }) => (
+      ].map(({ label: lbl, value, set }) => (
         <div key={lbl} className="flex items-center gap-3">
           <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-24">{lbl}</span>
           <input
             type="text"
             value={value}
-            placeholder={hint}
             onChange={(e) => set(e.target.value)}
             className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm outline-none focus:border-primary/40 transition-colors"
           />
         </div>
       ))}
+
+      {/* Icon field with live preview */}
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-24">Icon</span>
+        <input
+          type="text"
+          value={icon}
+          placeholder="Material Symbol key or https://... URL"
+          onChange={(e) => setIcon(e.target.value)}
+          className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm outline-none focus:border-primary/40 transition-colors"
+        />
+        {icon && (
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10">
+            <IconPreview icon={icon} color={color || undefined} />
+          </div>
+        )}
+      </div>
+
+      {/* Color field — only meaningful for Material Symbol icons */}
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-24">Color</span>
+        <div className="flex flex-1 items-center gap-2">
+          <input
+            type="color"
+            value={color || '#ffffff'}
+            onChange={(e) => setColor(e.target.value)}
+            className="w-8 h-8 rounded-full cursor-pointer bg-transparent border-0 p-0"
+          />
+          <input
+            type="text"
+            value={color}
+            placeholder={isMaterialIcon ? '#ffffff or rgb(...)' : 'N/A for URL icons'}
+            onChange={(e) => setColor(e.target.value)}
+            className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm outline-none focus:border-primary/40 transition-colors"
+          />
+          {color && (
+            <button
+              onClick={() => setColor('')}
+              className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-full hover:text-primary transition-colors"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
+      {isUrl && (
+        <p className="text-[10px] text-on-surface-variant/50 pl-[7.5rem]">Color applies to Material Symbol icons only</p>
+      )}
+
+      {/* Sort order */}
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-24">Sort Order</span>
+        <input
+          type="text"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm outline-none focus:border-primary/40 transition-colors"
+        />
+      </div>
+
       <div className="flex gap-3">
         <button
-          onClick={() => onSave({ platform, url, label, icon: icon || undefined, sort_order: Number(sortOrder) })}
+          onClick={() => onSave({
+            platform,
+            url,
+            label,
+            icon: icon || undefined,
+            color: color || undefined,
+            sort_order: Number(sortOrder),
+          })}
           className="bg-primary text-on-primary font-bold tracking-wider text-[10px] uppercase px-6 py-2 rounded-full"
         >
           Save
@@ -116,12 +199,21 @@ export default function AdminSocialLinksPage() {
                 onClick={() => setEditing(link.id)}
               >
                 {link.icon && (
-                  <span className="material-symbols-outlined text-xl text-primary/70">{link.icon}</span>
+                  <div className="flex items-center justify-center w-8 h-8">
+                    <IconPreview icon={link.icon} color={link.color} />
+                  </div>
                 )}
                 <div className="flex-1">
                   <p className="font-bold text-sm text-on-surface">{link.label}</p>
                   <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">{link.platform} · {link.url}</p>
                 </div>
+                {link.color && (
+                  <div
+                    className="w-4 h-4 rounded-full border border-white/20"
+                    style={{ backgroundColor: link.color }}
+                    title={link.color}
+                  />
+                )}
                 <button
                   onClick={(e) => { e.stopPropagation(); handleDelete(link.id, link.label) }}
                   className="text-red-400 text-[10px] font-bold uppercase tracking-widest"

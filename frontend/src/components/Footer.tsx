@@ -4,11 +4,18 @@ import { fadeUp, viewportOnce } from '../lib/animations'
 import type { SocialLink } from '../api/content'
 import { fetchSocialLinks } from '../api/content'
 
-function SocialIcon({ icon }: { icon: string }) {
+function SocialIcon({ icon, color }: { icon: string; color?: string }) {
   if (icon.startsWith('http://') || icon.startsWith('https://')) {
-    return <img src={icon} alt="" className="w-[14px] h-[14px] object-contain" />
+    return <img src={icon} alt="" className="w-[14px] h-[14px] object-contain" style={{ width: 14, height: 14 }} />
   }
-  return <span className="material-symbols-outlined text-sm">{icon}</span>
+  return (
+    <span
+      className="material-symbols-outlined"
+      style={{ fontSize: 14, lineHeight: 1, color: color || undefined }}
+    >
+      {icon}
+    </span>
+  )
 }
 
 export default function Footer() {
@@ -38,7 +45,7 @@ export default function Footer() {
               href={link.url}
               className="text-on-surface/40 hover:text-primary transition-all flex items-center gap-1.5"
             >
-              {link.icon && <SocialIcon icon={link.icon} />}
+              {link.icon && <SocialIcon icon={link.icon} color={link.color} />}
               {link.label && <span>{link.label}</span>}
             </a>
           ))}

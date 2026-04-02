@@ -60,6 +60,7 @@ class SocialLinkCreate(BaseModel):
     url: str
     label: str
     icon: str | None = None
+    color: str | None = None
     sort_order: int = 0
 
 
@@ -68,6 +69,7 @@ class SocialLinkUpdate(BaseModel):
     url: str
     label: str
     icon: str | None = None
+    color: str | None = None
     sort_order: int = 0
 
 
@@ -77,4 +79,5 @@ class SocialLinkResponse(BaseModel):
     url: str
     label: str
     icon: str | None = None
+    color: str | None = None
     sort_order: int
