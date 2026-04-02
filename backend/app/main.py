@@ -1,8 +1,10 @@
 import logging
 import time
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
 from app.database import close_pool
@@ -56,3 +58,8 @@ app.include_router(posts_router)
 app.include_router(content_router)
 app.include_router(newsletter_router)
 app.include_router(upload_router)
+
+# Serve uploaded files
+_upload_dir = Path(settings.upload_dir)
+_upload_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(_upload_dir)), name="uploads")

@@ -3,11 +3,11 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    # Supabase
-    supabase_url: str
-    supabase_anon_key: str
-    supabase_service_role_key: str
+    # Database
     database_url: str
+
+    # File uploads
+    upload_dir: str = "./uploads"
 
     # Auth
     secret_key: str

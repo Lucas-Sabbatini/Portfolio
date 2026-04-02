@@ -1,10 +1,11 @@
 import logging
 import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 
 from app.auth.dependencies import get_current_admin
-from app.database import get_supabase
+from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -12,13 +13,6 @@ router = APIRouter(prefix="/api/upload", tags=["upload"])
 
 ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
-
-# Magic bytes for MIME detection
-MAGIC_BYTES: dict[bytes, str] = {
-    b"\xff\xd8\xff": "image/jpeg",
-    b"\x89PNG": "image/png",
-    b"RIFF": "image/webp",  # partial — we check further below
-}
 
 
 def detect_mime(data: bytes) -> str | None:
@@ -50,15 +44,13 @@ async def upload_file(
     filename = f"{uuid.uuid4()}.{ext}"
 
     try:
-        supabase = get_supabase()
-        result = supabase.storage.from_("covers").upload(
-            path=filename,
-            file=contents,
-            file_options={"content-type": mime},
-        )
-        public_url = supabase.storage.from_("covers").get_public_url(filename)
+        settings = get_settings()
+        covers_dir = Path(settings.upload_dir) / "covers"
+        covers_dir.mkdir(parents=True, exist_ok=True)
+        dest = covers_dir / filename
+        dest.write_bytes(contents)
         logger.info("Uploaded file: %s", filename)
-        return {"url": public_url}
+        return {"url": f"/uploads/covers/{filename}"}
     except Exception:
-        logger.error("Error uploading file", exc_info=True)
+        logger.error("Error saving uploaded file", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error")

@@ -15,9 +15,6 @@ from jose import jwt
 # ---------------------------------------------------------------------------
 import os
 
-os.environ.setdefault("SUPABASE_URL", "https://test.supabase.co")
-os.environ.setdefault("SUPABASE_ANON_KEY", "test-anon-key")
-os.environ.setdefault("SUPABASE_SERVICE_ROLE_KEY", "test-service-key")
 os.environ.setdefault("DATABASE_URL", "postgresql://test:test@localhost/test")
 os.environ.setdefault("SECRET_KEY", "testsecretkey1234567890123456789")
 os.environ.setdefault("RESEND_API_KEY", "re_test_key")
@@ -49,19 +46,15 @@ async def client(app, mock_db) -> AsyncGenerator[AsyncClient, None]:
 
 @pytest.fixture
 def mock_db():
-    """Patch asyncpg pool and supabase client."""
+    """Patch asyncpg pool."""
     mock_pool = MagicMock()
     mock_pool.fetchrow = AsyncMock(return_value=None)
     mock_pool.fetch = AsyncMock(return_value=[])
     mock_pool.execute = AsyncMock(return_value="DELETE 0")
 
-    mock_supabase = MagicMock()
-
     with patch("app.database._pool", mock_pool), \
-         patch("app.database._supabase", mock_supabase), \
-         patch("app.database.get_pool", AsyncMock(return_value=mock_pool)), \
-         patch("app.database.get_supabase", MagicMock(return_value=mock_supabase)):
-        yield {"pool": mock_pool, "supabase": mock_supabase}
+         patch("app.database.get_pool", AsyncMock(return_value=mock_pool)):
+        yield {"pool": mock_pool}
 
 
 @pytest.fixture
