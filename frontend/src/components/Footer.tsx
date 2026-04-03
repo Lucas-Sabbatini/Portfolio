@@ -59,7 +59,7 @@ export default function Footer() {
       viewport={viewportOnce}
     >
       <div className="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-10">
-        <div className="text-xl font-black text-on-surface">lucas.janot</div>
+        <div className="text-xl font-black text-on-surface md:flex-1">lucas.janot</div>
 
         <div className="flex gap-10 text-[10px] font-bold uppercase tracking-[0.2em]">
           {links.map((link) => (
@@ -74,7 +74,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface/40 text-center md:text-right leading-loose">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface/40 text-center md:text-right md:flex-1 leading-loose">
           © 2024 Lucas Janot. <br /> Built on Obsidian Principles.
         </p>
       </div>
