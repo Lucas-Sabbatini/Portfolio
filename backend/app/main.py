@@ -46,6 +46,8 @@ async def log_requests(request: Request, call_next):
         response.status_code,
         duration,
     )
+    if request.url.path.startswith("/uploads/"):
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     return response
 
 

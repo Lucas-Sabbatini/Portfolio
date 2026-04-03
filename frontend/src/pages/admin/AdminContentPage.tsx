@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchContent, patchContent } from '../../api/content'
+import { fetchContent, patchContent, uploadImage } from '../../api/content'
 
 interface FieldRowProps {
   section: string
@@ -53,14 +53,73 @@ function FieldRow({ section, fieldKey, value: initialValue }: FieldRowProps) {
   )
 }
 
+function ImageFieldRow({ section, fieldKey, value: initialValue }: FieldRowProps) {
+  const [url, setUrl] = useState(initialValue)
+  const [uploading, setUploading] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => { setUrl(initialValue) }, [initialValue])
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setSaved(false)
+    setError('')
+    try {
+      const result = await uploadImage(file)
+      await patchContent(section, fieldKey, result.url)
+      setUrl(result.url)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      if (err instanceof Error) setError(err.message)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+
+  return (
+    <div className="flex items-center gap-4 py-3 border-b border-white/5">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-48 flex-shrink-0">
+        {fieldKey}
+      </span>
+      <div className="flex-1 flex items-center gap-4">
+        {url && (
+          <img
+            src={url.startsWith('/') ? `${apiBase}${url}` : url}
+            alt="Preview"
+            className="w-20 h-14 object-cover rounded-lg border border-white/10"
+          />
+        )}
+        <label className="bg-primary text-on-primary font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full cursor-pointer disabled:opacity-60 flex-shrink-0">
+          {uploading ? 'Uploading…' : saved ? 'Saved' : 'Upload'}
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleUpload}
+            disabled={uploading}
+            className="hidden"
+          />
+        </label>
+      </div>
+      {error && <span className="text-red-400 text-xs">{error}</span>}
+    </div>
+  )
+}
+
 interface SectionPanelProps {
   title: string
   section: string
   keys: string[]
+  imageKeys?: string[]
   data: Record<string, string>
 }
 
-function SectionPanel({ title, section, keys, data }: SectionPanelProps) {
+function SectionPanel({ title, section, keys, imageKeys = [], data }: SectionPanelProps) {
   const [open, setOpen] = useState(true)
 
   return (
@@ -78,6 +137,9 @@ function SectionPanel({ title, section, keys, data }: SectionPanelProps) {
         <div>
           {keys.map(k => (
             <FieldRow key={k} section={section} fieldKey={k} value={data[k] ?? ''} />
+          ))}
+          {imageKeys.map(k => (
+            <ImageFieldRow key={k} section={section} fieldKey={k} value={data[k] ?? ''} />
           ))}
         </div>
       )}
@@ -126,6 +188,7 @@ export default function AdminContentPage() {
         title="Research"
         section="research"
         keys={['title_line1', 'title_line2', 'body', 'stat_citations_value', 'stat_citations_label', 'stat_pubs_value', 'stat_pubs_label']}
+        imageKeys={['image_url']}
         data={research}
       />
     </div>
