@@ -5,13 +5,36 @@ import type { SocialLink } from '../api/content'
 import { fetchSocialLinks } from '../api/content'
 
 function SocialIcon({ icon, color }: { icon: string; color?: string }) {
-  if (icon.startsWith('http://') || icon.startsWith('https://')) {
-    return <img src={icon} alt="" className="w-[14px] h-[14px] object-contain" style={{ width: 14, height: 14 }} />
+  const isUrl = icon.startsWith('http://') || icon.startsWith('https://')
+
+  if (isUrl && color && icon.toLowerCase().includes('.svg')) {
+    return (
+      <span
+        style={{
+          display: 'inline-block',
+          width: 18, height: 18,
+          backgroundColor: color,
+          WebkitMaskImage: `url(${icon})`,
+          WebkitMaskSize: 'contain',
+          WebkitMaskRepeat: 'no-repeat',
+          WebkitMaskPosition: 'center',
+          maskImage: `url(${icon})`,
+          maskSize: 'contain',
+          maskRepeat: 'no-repeat',
+          maskPosition: 'center',
+        }}
+      />
+    )
   }
+
+  if (isUrl) {
+    return <img src={icon} alt="" className="w-[18px] h-[18px] object-contain" style={{ width: 18, height: 18 }} />
+  }
+
   return (
     <span
       className="material-symbols-outlined"
-      style={{ fontSize: 14, lineHeight: 1, color: color || undefined }}
+      style={{ fontSize: 18, lineHeight: 1, color: color || undefined }}
     >
       {icon}
     </span>

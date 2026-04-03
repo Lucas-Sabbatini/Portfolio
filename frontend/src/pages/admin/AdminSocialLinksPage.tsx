@@ -6,9 +6,32 @@ const emptyForm = { platform: '', url: '', label: '', icon: '', color: '', sort_
 
 function IconPreview({ icon, color }: { icon: string; color?: string }) {
   if (!icon) return null
-  if (icon.startsWith('http://') || icon.startsWith('https://')) {
+  const isUrl = icon.startsWith('http://') || icon.startsWith('https://')
+
+  if (isUrl && color && icon.toLowerCase().includes('.svg')) {
+    return (
+      <span
+        style={{
+          display: 'inline-block',
+          width: 20, height: 20,
+          backgroundColor: color,
+          WebkitMaskImage: `url(${icon})`,
+          WebkitMaskSize: 'contain',
+          WebkitMaskRepeat: 'no-repeat',
+          WebkitMaskPosition: 'center',
+          maskImage: `url(${icon})`,
+          maskSize: 'contain',
+          maskRepeat: 'no-repeat',
+          maskPosition: 'center',
+        }}
+      />
+    )
+  }
+
+  if (isUrl) {
     return <img src={icon} alt="" style={{ width: 20, height: 20, objectFit: 'contain' }} />
   }
+
   return (
     <span
       className="material-symbols-outlined"
@@ -34,9 +57,6 @@ function LinkForm({
   const [icon, setIcon] = useState(initial.icon ?? '')
   const [color, setColor] = useState(initial.color ?? '')
   const [sortOrder, setSortOrder] = useState(String(initial.sort_order))
-
-  const isUrl = icon.startsWith('http://') || icon.startsWith('https://')
-  const isMaterialIcon = icon.length > 0 && !isUrl
 
   return (
     <div className="space-y-3 p-6 glass-card rounded-[1.5rem]">
@@ -73,7 +93,7 @@ function LinkForm({
         )}
       </div>
 
-      {/* Color field — only meaningful for Material Symbol icons */}
+      {/* Color field */}
       <div className="flex items-center gap-3">
         <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-24">Color</span>
         <div className="flex flex-1 items-center gap-2">
@@ -86,7 +106,7 @@ function LinkForm({
           <input
             type="text"
             value={color}
-            placeholder={isMaterialIcon ? '#ffffff or rgb(...)' : 'N/A for URL icons'}
+            placeholder="#ffffff or rgb(...)"
             onChange={(e) => setColor(e.target.value)}
             className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-sm outline-none focus:border-primary/40 transition-colors"
           />
@@ -100,10 +120,6 @@ function LinkForm({
           )}
         </div>
       </div>
-      {isUrl && (
-        <p className="text-[10px] text-on-surface-variant/50 pl-[7.5rem]">Color applies to Material Symbol icons only</p>
-      )}
-
       {/* Sort order */}
       <div className="flex items-center gap-3">
         <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-24">Sort Order</span>
