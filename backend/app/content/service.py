@@ -203,7 +203,13 @@ async def create_social_link(
 
 
 async def update_social_link(
-    link_id: str, platform: str, url: str, label: str, icon: str | None, color: str | None, sort_order: int
+    link_id: str,
+    platform: str,
+    url: str,
+    label: str,
+    icon: str | None,
+    color: str | None,
+    sort_order: int,
 ) -> dict | None:
     try:
         pool = await get_pool()

@@ -211,7 +211,13 @@ async def update_social_link(
 ) -> SocialLinkResponse:
     try:
         row = await service.update_social_link(
-            str(link_id), body.platform, body.url, body.label, body.icon, body.color, body.sort_order
+            str(link_id),
+            body.platform,
+            body.url,
+            body.label,
+            body.icon,
+            body.color,
+            body.sort_order,
         )
     except Exception as exc:
         logger.error("Error updating social link", exc_info=True)
