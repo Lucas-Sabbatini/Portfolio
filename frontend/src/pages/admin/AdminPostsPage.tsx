@@ -64,8 +64,7 @@ export default function AdminPostsPage() {
 
   const load = () => {
     setLoading(true)
-    // GET /api/posts?status=all — backend must support this when authenticated
-    fetchPosts().then(setPosts).catch((err) => setError(err.message)).finally(() => setLoading(false))
+    fetchPosts(undefined, 'all').then(setPosts).catch((err) => setError(err.message)).finally(() => setLoading(false))
   }
 
   useEffect(() => { load() }, [])

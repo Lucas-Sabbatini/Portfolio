@@ -45,7 +45,7 @@ async def test_list_posts_tag_filter(client: AsyncClient, mock_db):
         response = await client.get("/api/posts?tag=Research")
 
     assert response.status_code == 200
-    mock_list.assert_called_once_with(ANY, tag="Research")
+    mock_list.assert_called_once_with(ANY, tag="Research", status=None)
 
 
 @pytest.mark.asyncio
@@ -155,3 +155,138 @@ async def test_read_time_auto_computed(client: AsyncClient, mock_db, auth_cookie
     call_arg = mock_create.call_args[0][1]
     # read_time was not provided in request
     assert call_arg.read_time is None
+
+
+# ---------------------------------------------------------------------------
+# Draft / status filter tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_list_posts_status_all_authenticated(client: AsyncClient, mock_db, auth_cookie: str):
+    """Authenticated admin can list all posts (drafts + published)."""
+    with patch("app.posts.service.list_posts", new_callable=AsyncMock) as mock_list:
+        mock_list.return_value = [PUBLISHED_POST, DRAFT_POST]
+        response = await client.get(
+            "/api/posts?status=all",
+            cookies={"access_token": auth_cookie},
+        )
+
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+    mock_list.assert_called_once_with(ANY, tag=None, status="all")
+
+
+@pytest.mark.asyncio
+async def test_list_posts_status_all_unauthenticated(client: AsyncClient, mock_db):
+    """Unauthenticated request with status=all should be rejected."""
+    response = await client.get("/api/posts?status=all")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_list_posts_status_draft_authenticated(client: AsyncClient, mock_db, auth_cookie: str):
+    """Authenticated admin can list only draft posts."""
+    with patch("app.posts.service.list_posts", new_callable=AsyncMock) as mock_list:
+        mock_list.return_value = [DRAFT_POST]
+        response = await client.get(
+            "/api/posts?status=draft",
+            cookies={"access_token": auth_cookie},
+        )
+
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+    assert response.json()[0]["status"] == "draft"
+    mock_list.assert_called_once_with(ANY, tag=None, status="draft")
+
+
+@pytest.mark.asyncio
+async def test_list_posts_status_draft_unauthenticated(client: AsyncClient, mock_db):
+    """Unauthenticated request with status=draft should be rejected."""
+    response = await client.get("/api/posts?status=draft")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_list_posts_status_published_no_auth_required(client: AsyncClient, mock_db):
+    """Explicitly passing status=published should work without auth."""
+    with patch("app.posts.service.list_posts", new_callable=AsyncMock) as mock_list:
+        mock_list.return_value = [PUBLISHED_POST]
+        response = await client.get("/api/posts?status=published")
+
+    assert response.status_code == 200
+    mock_list.assert_called_once_with(ANY, tag=None, status="published")
+
+
+@pytest.mark.asyncio
+async def test_list_posts_status_all_with_tag(client: AsyncClient, mock_db, auth_cookie: str):
+    """status and tag params work together."""
+    with patch("app.posts.service.list_posts", new_callable=AsyncMock) as mock_list:
+        mock_list.return_value = [DRAFT_POST]
+        response = await client.get(
+            "/api/posts?status=all&tag=Research",
+            cookies={"access_token": auth_cookie},
+        )
+
+    assert response.status_code == 200
+    mock_list.assert_called_once_with(ANY, tag="Research", status="all")
+
+
+@pytest.mark.asyncio
+async def test_list_posts_status_all_invalid_token(client: AsyncClient, mock_db):
+    """Expired/invalid token with status=all should be rejected."""
+    response = await client.get(
+        "/api/posts?status=all",
+        cookies={"access_token": "invalid-token"},
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_draft_post_authenticated(client: AsyncClient, mock_db, auth_cookie: str):
+    """Authenticated admin can view a draft post by slug."""
+    with patch("app.posts.service.get_post_by_slug", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = DRAFT_POST
+        response = await client.get(
+            "/api/posts/draft-post",
+            cookies={"access_token": auth_cookie},
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["slug"] == "draft-post"
+    assert data["status"] == "draft"
+
+
+@pytest.mark.asyncio
+async def test_get_draft_post_unauthenticated(client: AsyncClient, mock_db):
+    """Unauthenticated user cannot view a draft post (existing test, kept for clarity)."""
+    with patch("app.posts.service.get_post_by_slug", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = DRAFT_POST
+        response = await client.get("/api/posts/draft-post")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_draft_post_invalid_token(client: AsyncClient, mock_db):
+    """Invalid token should not grant access to draft posts."""
+    with patch("app.posts.service.get_post_by_slug", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = DRAFT_POST
+        response = await client.get(
+            "/api/posts/draft-post",
+            cookies={"access_token": "garbage"},
+        )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_published_post_no_auth_still_works(client: AsyncClient, mock_db):
+    """Published posts remain accessible without authentication."""
+    with patch("app.posts.service.get_post_by_slug", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = PUBLISHED_POST
+        response = await client.get("/api/posts/test-post")
+
+    assert response.status_code == 200
+    assert response.json()["slug"] == "test-post"

@@ -3,8 +3,13 @@ import type { Post, PostDetail, PostCreate } from '@/types/post'
 
 export type { Post, PostDetail, PostCreate }
 
-export const fetchPosts = (tag?: string): Promise<Post[]> =>
-  apiFetch(`/api/posts${tag ? `?tag=${encodeURIComponent(tag)}` : ''}`)
+export const fetchPosts = (tag?: string, status?: string): Promise<Post[]> => {
+  const params = new URLSearchParams()
+  if (tag) params.set('tag', tag)
+  if (status) params.set('status', status)
+  const qs = params.toString()
+  return apiFetch(`/api/posts${qs ? `?${qs}` : ''}`)
+}
 
 export const fetchPost = (slug: string): Promise<PostDetail> =>
   apiFetch(`/api/posts/${slug}`)
