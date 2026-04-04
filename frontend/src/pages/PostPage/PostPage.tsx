@@ -6,7 +6,7 @@ import rehypeRaw from 'rehype-raw'
 import type { PostDetail } from '@/types/post'
 import { fetchPost } from '@/api/posts'
 import { ApiError } from '@/api/client'
-import { TagChip } from '@/components/blog/PostCard'
+import { TagChip } from '@/components/blog/PostCard/PostCard'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import './PostPage.css'
 

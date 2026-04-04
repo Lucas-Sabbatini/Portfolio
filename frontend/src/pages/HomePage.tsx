@@ -1,12 +1,12 @@
 import { lazy, Suspense } from 'react'
-import HeroSection from '@/components/sections/HeroSection'
-import NarrativeSection from '@/components/sections/NarrativeSection'
+import HeroSection from '@/components/sections/HeroSection/HeroSection'
+import NarrativeSection from '@/components/sections/NarrativeSection/NarrativeSection'
 
-const ExperienceSection = lazy(() => import('@/components/sections/ExperienceSection'))
-const ResearchSection = lazy(() => import('@/components/sections/ResearchSection'))
-const SkillsSection = lazy(() => import('@/components/sections/SkillsSection'))
-const BlogSection = lazy(() => import('@/components/sections/BlogSection'))
-const ContactSection = lazy(() => import('@/components/sections/ContactSection'))
+const ExperienceSection = lazy(() => import('@/components/sections/ExperienceSection/ExperienceSection'))
+const ResearchSection = lazy(() => import('@/components/sections/ResearchSection/ResearchSection'))
+const SkillsSection = lazy(() => import('@/components/sections/SkillsSection/SkillsSection'))
+const BlogSection = lazy(() => import('@/components/sections/BlogSection/BlogSection'))
+const ContactSection = lazy(() => import('@/components/sections/ContactSection/ContactSection'))
 
 const LazyFallback = () => <div className="min-h-[200px]" />
 

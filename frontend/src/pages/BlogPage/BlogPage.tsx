@@ -6,7 +6,7 @@ import {
   PostCardFeatured,
   PostCardMedium,
   PostCardList,
-} from '@/components/blog/PostCard'
+} from '@/components/blog/PostCard/PostCard'
 import type { PostTag } from '@/data/posts'
 import type { Post } from '@/types/post'
 import { fetchPosts } from '@/api/posts'
@@ -117,7 +117,6 @@ export default function BlogPage() {
             </motion.div>
           </motion.header>
 
-          {/* ── Content ────────────────────────────────────────────────── */}
           {loading ? (
             <div className="space-y-8">
               <div className="glass-card rounded-[2rem] animate-pulse bg-white/5 h-[480px]" />
@@ -218,7 +217,6 @@ export default function BlogPage() {
             </AnimatePresence>
           )}
 
-          {/* ── Newsletter strip ──────────────────────────────────────── */}
           <motion.section
             variants={fadeUp}
             initial="hidden"

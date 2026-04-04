@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { server } from '../mocks/server'
-import SkillsSection from '../../components/sections/SkillsSection'
+import SkillsSection from '../../components/sections/SkillsSection/SkillsSection'
 
 const BASE = 'http://localhost:8000'
 
