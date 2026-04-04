@@ -84,8 +84,8 @@ Then log in at http://localhost:5173/admin.
 cd frontend && npm run lint
 
 # Backend (Ruff — linter + formatter)
-cd backend && ruff check app tests
-cd backend && ruff format app tests
+cd backend && ruff format --check .
+cd backend && ruff format . 
 ```
 
 > **Tip:** Install backend dev dependencies first with `pip install -r backend/requirements-dev.txt`.

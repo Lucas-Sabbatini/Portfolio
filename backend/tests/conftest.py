@@ -17,6 +17,7 @@ from httpx import ASGITransport, AsyncClient
 from jose import jwt
 
 os.environ.setdefault("TEST_DATABASE_URL", "postgresql://test:test@localhost/test")
+os.environ.setdefault("DATABASE_URL", "postgresql://test:test@localhost/test")
 os.environ.setdefault("SECRET_KEY", "testsecretkey1234567890123456789")
 os.environ.setdefault("RESEND_API_KEY", "re_test_key")
 os.environ.setdefault("RESEND_FROM_EMAIL", "test@example.com")
@@ -102,7 +103,6 @@ async def db_session(db_engine) -> AsyncGenerator:
         yield session
         await session.close()
         await trans.rollback()
-
 
 
 @pytest.fixture

@@ -54,7 +54,12 @@ async def test_create_social_link_authenticated(client: AsyncClient, mock_db, au
 async def test_create_social_link_unauthenticated(client: AsyncClient, mock_db):
     response = await client.post(
         "/api/social-links",
-        json={"platform": "GitHub", "url": "https://github.com", "label": "GitHub", "sort_order": 0},
+        json={
+            "platform": "GitHub",
+            "url": "https://github.com",
+            "label": "GitHub",
+            "sort_order": 0,
+        },
     )
     assert response.status_code == 401
 

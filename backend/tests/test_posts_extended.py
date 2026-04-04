@@ -68,7 +68,11 @@ async def test_update_post_unauthenticated(client: AsyncClient, mock_db):
 
 @pytest.mark.asyncio
 async def test_toggle_publish_draft_to_published(client: AsyncClient, mock_db, auth_cookie: str):
-    published = {**DRAFT_POST, "status": "published", "published_at": datetime(2024, 6, 1, tzinfo=UTC)}
+    published = {
+        **DRAFT_POST,
+        "status": "published",
+        "published_at": datetime(2024, 6, 1, tzinfo=UTC),
+    }
     with patch("app.posts.service.toggle_publish", new_callable=AsyncMock) as mock_toggle:
         mock_toggle.return_value = published
         response = await client.patch(

@@ -82,7 +82,11 @@ async def test_expired_token_rejected(client: AsyncClient, mock_db):
     get_settings.cache_clear()
     settings = get_settings()
     expired_token = jwt.encode(
-        {"email": "admin@example.com", "id": "test-id", "exp": (datetime.now(UTC) - timedelta(hours=1)).timestamp()},
+        {
+            "email": "admin@example.com",
+            "id": "test-id",
+            "exp": (datetime.now(UTC) - timedelta(hours=1)).timestamp(),
+        },
         settings.secret_key,
         algorithm="HS256",
     )

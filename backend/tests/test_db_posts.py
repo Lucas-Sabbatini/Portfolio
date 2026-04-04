@@ -92,8 +92,12 @@ async def test_list_posts_returns_only_published(
 
 
 async def test_list_posts_tag_filter(db_session: AsyncSession):
-    await create_post(db_session, PostCreate(title="A", excerpt="x", body="x", tag="Research", status="published"))
-    await create_post(db_session, PostCreate(title="B", excerpt="x", body="x", tag="Archived", status="published"))
+    await create_post(
+        db_session, PostCreate(title="A", excerpt="x", body="x", tag="Research", status="published")
+    )
+    await create_post(
+        db_session, PostCreate(title="B", excerpt="x", body="x", tag="Archived", status="published")
+    )
     rows = await list_posts(db_session, tag="Research")
     assert all(r["tag"] == "Research" for r in rows)
 
@@ -132,7 +136,9 @@ async def test_toggle_publish_draft_to_published(db_session: AsyncSession, draft
     assert row["published_at"] is not None
 
 
-async def test_toggle_publish_sets_published_at_once(db_session: AsyncSession, draft_data: PostCreate):
+async def test_toggle_publish_sets_published_at_once(
+    db_session: AsyncSession, draft_data: PostCreate
+):
     await create_post(db_session, draft_data)
     published = await toggle_publish(db_session, "test-post")
     first_published_at = published["published_at"]
