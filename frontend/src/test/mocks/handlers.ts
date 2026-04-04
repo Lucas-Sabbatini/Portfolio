@@ -98,16 +98,50 @@ export const handlers = [
     })
   }),
 
+  http.get(`${BASE}/api/content/research`, () => {
+    return HttpResponse.json({
+      title_line1: 'AI Researcher',
+      title_line2: '@ AINet',
+      body: 'Investigating Transformer efficiency.',
+      stat_citations_value: '14+',
+      stat_citations_label: 'Citations',
+      stat_pubs_value: '04',
+      stat_pubs_label: 'Pubs',
+      image_url: 'https://example.com/neural.png',
+    })
+  }),
+
   http.get(`${BASE}/api/content/:section`, ({ params }) => {
     return HttpResponse.json({ section: params.section })
   }),
 
   http.get(`${BASE}/api/experience`, () => {
-    return HttpResponse.json([])
+    return HttpResponse.json([
+      {
+        id: '1',
+        role: 'Senior Engineer',
+        company: 'Acme Corp',
+        period: '2024 – Present',
+        description: ['Led platform migration', 'Improved latency by 40%'],
+        sort_order: 1,
+      },
+      {
+        id: '2',
+        role: 'Software Engineer',
+        company: 'StartupCo',
+        period: '2022 – 2024',
+        description: ['Built REST APIs', 'Designed data pipelines'],
+        sort_order: 2,
+      },
+    ])
   }),
 
   http.get(`${BASE}/api/skills`, () => {
-    return HttpResponse.json([])
+    return HttpResponse.json([
+      { id: '1', name: 'TypeScript', category: 'Language', icon: '/icons/ts.svg', sort_order: 1 },
+      { id: '2', name: 'React', category: 'Framework', icon: '/icons/react.svg', sort_order: 2 },
+      { id: '3', name: 'Python', category: 'Language', sort_order: 3 },
+    ])
   }),
 
   http.get(`${BASE}/api/social-links`, () => {
