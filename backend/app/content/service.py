@@ -24,7 +24,7 @@ async def upsert_content(session: AsyncSession, section: str, key: str, value: s
         pg_insert(ContentBlock)
         .values(section=section, key=key, value=value)
         .on_conflict_do_update(
-            constraint="content_blocks_section_key",
+            index_elements=["section", "key"],
             set_={"value": value, "updated_at": datetime.now(UTC)},
         )
     )
