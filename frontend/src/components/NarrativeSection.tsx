@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUp, scaleIn, staggerContainer, staggerFast, viewportOnce } from '../lib/animations'
 import { fetchContent } from '../api/content'
+import Skeleton from './Skeleton'
 
 const defaultStats = [
   { label: 'Experience', value: '2+', sub: 'Circuits', small: false },
@@ -19,10 +20,6 @@ function buildStats(content: Record<string, string>) {
   }))
 }
 
-const Skeleton = () => (
-  <span className="inline-block w-32 h-6 rounded bg-white/5 animate-pulse" />
-)
-
 export default function NarrativeSection() {
   const [content, setContent] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
@@ -32,7 +29,7 @@ export default function NarrativeSection() {
   }, [])
 
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-12 gap-12" id="work">
+    <section className="grid grid-cols-1 lg:grid-cols-12 gap-12" id="work" aria-labelledby="work-heading">
       <motion.div
         className="lg:col-span-7 flex flex-col justify-center space-y-10"
         variants={staggerContainer}
@@ -40,18 +37,19 @@ export default function NarrativeSection() {
         whileInView="visible"
         viewport={viewportOnce}
       >
-        <motion.h2
+        <motion.p
           variants={fadeUp}
-          className="font-bold text-[10px] uppercase tracking-[0.6em] text-primary/60"
+          className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60"
         >
           {loading ? <Skeleton /> : (content.section_label ?? '01 / Philosophy')}
-        </motion.h2>
-        <motion.p
+        </motion.p>
+        <motion.h2
+          id="work-heading"
           variants={fadeUp}
           className="font-headline text-3xl md:text-5xl font-light text-on-surface leading-tight"
         >
           {loading ? <Skeleton /> : (content.body ?? 'Fusing mathematical rigor with intuitive interfaces. Architecting the next generation of neural systems.')}
-        </motion.p>
+        </motion.h2>
       </motion.div>
 
       <motion.div
@@ -66,14 +64,14 @@ export default function NarrativeSection() {
             key={stat.label}
             variants={scaleIn}
             whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-            className="glass-card p-5 sm:p-7 md:p-8 rounded-[2rem] flex flex-col justify-between aspect-square"
+            className="glass-card p-5 sm:p-7 md:p-8 rounded-[2rem] flex flex-col justify-between aspect-square overflow-hidden"
           >
             <span className="text-primary/60 text-[10px] uppercase font-bold tracking-widest">
               {stat.label}
             </span>
             <div className="flex flex-col">
               <span
-                className={`font-extrabold font-headline leading-none ${stat.small ? 'text-3xl sm:text-4xl' : 'text-4xl sm:text-5xl md:text-6xl'}`}
+                className={`font-extrabold font-headline leading-none break-words ${stat.small ? 'text-xl sm:text-3xl md:text-4xl' : 'text-2xl sm:text-4xl md:text-6xl'}`}
               >
                 {stat.value}
                 {stat.small && (

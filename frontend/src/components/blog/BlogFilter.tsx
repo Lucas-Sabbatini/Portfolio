@@ -27,7 +27,7 @@ export default function BlogFilter({ active, onChange, counts }: BlogFilterProps
             className={`relative px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
               isActive
                 ? 'bg-primary text-on-primary shadow-[0_0_20px_rgba(56,189,248,0.25)]'
-                : 'glass-card text-on-surface-variant hover:text-on-surface'
+                : 'solid-card text-on-surface-variant hover:text-on-surface'
             }`}
           >
             {f}

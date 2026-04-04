@@ -16,21 +16,25 @@ const card: import('framer-motion').Variants = {
 }
 
 const gradientFallbacks = [
-  'from-[#002b3d] via-[#001a26] to-[#020202]',
-  'from-[#1e1b4b] via-[#0f0e2e] to-[#020202]',
-  'from-[#0f172a] via-[#080f1c] to-[#020202]',
+  'from-primary-container via-surface-container-low to-background',
+  'from-tertiary-container via-surface-container-low to-background',
+  'from-secondary-container via-surface-container-low to-background',
 ]
 
 export default function BlogSection() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    fetchPosts().then(p => setPosts(p.slice(0, 3))).catch(console.error).finally(() => setLoading(false))
+    fetchPosts()
+      .then(p => setPosts(p.slice(0, 3)))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
   }, [])
 
   return (
-    <section className="space-y-16" id="blog">
+    <section className="space-y-16" id="blog" aria-label="Blog posts">
       <motion.div
         className="flex justify-between items-center"
         variants={fadeUp}
@@ -38,16 +42,20 @@ export default function BlogSection() {
         whileInView="visible"
         viewport={viewportOnce}
       >
-        <h2 className="font-bold text-[10px] uppercase tracking-[0.6em] text-primary/60">
+        <p className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
           05 / Intelligence
-        </h2>
+        </p>
         <Link
           to="/blog"
-          className="text-on-surface-variant hover:text-primary transition-colors text-[10px] font-bold uppercase tracking-widest"
+          className="text-on-surface-variant hover:text-primary transition-colors text-[10px] font-bold uppercase tracking-widest min-h-[44px] flex items-center"
         >
           Library →
         </Link>
       </motion.div>
+
+      {error && !loading && posts.length === 0 && (
+        <p className="text-on-surface-variant text-sm">Unable to load posts.</p>
+      )}
 
       <motion.div
         className="grid grid-cols-1 md:grid-cols-3 gap-8"

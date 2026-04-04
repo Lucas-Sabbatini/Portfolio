@@ -16,22 +16,29 @@ const pill: import('framer-motion').Variants = {
 
 export default function SkillsSection() {
   const [skills, setSkills] = useState<Skill[]>([])
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    fetchSkills().then(setSkills).catch(console.error)
+    fetchSkills()
+      .then(setSkills)
+      .catch(() => setError(true))
   }, [])
 
   return (
     <section className="space-y-12">
-      <motion.h2
+      <motion.p
         variants={fadeUp}
         initial="hidden"
         whileInView="visible"
         viewport={viewportOnce}
-        className="font-bold text-[10px] uppercase tracking-[0.6em] text-primary/60"
+        className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60"
       >
         04 / Core Stack
-      </motion.h2>
+      </motion.p>
+
+      {error && skills.length === 0 && (
+        <p className="text-on-surface-variant text-sm">Unable to load skills.</p>
+      )}
 
       <motion.div
         className="flex flex-wrap gap-4 justify-center"
@@ -44,13 +51,14 @@ export default function SkillsSection() {
           <motion.span
             key={skill.id}
             variants={pill}
-            whileHover={{ scale: 1.08, backgroundColor: 'rgba(56,189,248,0.1)', transition: { duration: 0.15 } }}
+            whileHover={{ y: -3, transition: { duration: 0.15 } }}
             whileTap={{ scale: 0.95 }}
-            className="glass-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] cursor-default flex items-center gap-2.5"
+            className="solid-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2.5"
           >
             {skill.icon && (
-              <img src={skill.icon} height="40" width="50" alt={skill.name} className="inline-block" />
+              <img src={skill.icon} height="40" width="50" alt="" className="inline-block" aria-hidden="true" />
             )}
+            <span className="sr-only">{skill.name}</span>
           </motion.span>
         ))}
       </motion.div>
