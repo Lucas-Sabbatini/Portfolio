@@ -1,9 +1,11 @@
 """Tests for auth endpoints."""
 
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient
+from jose import jwt
 
 ADMIN_ROW = {
     "id": "00000000-0000-0000-0000-000000000001",
@@ -71,3 +73,26 @@ async def test_logout(client: AsyncClient, mock_db, auth_cookie: str):
     # Cookie should be cleared (set to empty or deleted)
     cookie_val = response.cookies.get("access_token")
     assert cookie_val is None or cookie_val == ""
+
+
+@pytest.mark.asyncio
+async def test_expired_token_rejected(client: AsyncClient, mock_db):
+    from app.config import get_settings
+
+    get_settings.cache_clear()
+    settings = get_settings()
+    expired_token = jwt.encode(
+        {"email": "admin@example.com", "id": "test-id", "exp": (datetime.now(UTC) - timedelta(hours=1)).timestamp()},
+        settings.secret_key,
+        algorithm="HS256",
+    )
+    response = await client.get("/api/auth/me", cookies={"access_token": expired_token})
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_tampered_token_rejected(client: AsyncClient, mock_db):
+    response = await client.get(
+        "/api/auth/me", cookies={"access_token": "eyJhbGciOiJIUzI1NiJ9.tampered.signature"}
+    )
+    assert response.status_code == 401

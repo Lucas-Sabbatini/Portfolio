@@ -98,3 +98,49 @@ async def test_delete_experience(client: AsyncClient, mock_db, auth_cookie: str)
         )
 
     assert response.status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_update_experience_success(client: AsyncClient, mock_db, auth_cookie: str):
+    entry_id = "00000000-0000-0000-0000-000000000002"
+    updated = {**EXPERIENCE_ROW, "role": "Senior Engineer"}
+    with patch("app.content.service.update_experience", new_callable=AsyncMock) as mock_update:
+        mock_update.return_value = updated
+        response = await client.put(
+            f"/api/experience/{entry_id}",
+            json={
+                "role": "Senior Engineer",
+                "company": "Acme",
+                "period": "2020-2023",
+                "description": ["Led team"],
+                "sort_order": 0,
+            },
+            cookies={"access_token": auth_cookie},
+        )
+
+    assert response.status_code == 200
+    assert response.json()["role"] == "Senior Engineer"
+
+
+@pytest.mark.asyncio
+async def test_update_experience_not_found(client: AsyncClient, mock_db, auth_cookie: str):
+    entry_id = "00000000-0000-0000-0000-000000000099"
+    with patch("app.content.service.update_experience", new_callable=AsyncMock) as mock_update:
+        mock_update.return_value = None
+        response = await client.put(
+            f"/api/experience/{entry_id}",
+            json={"role": "x", "company": "x", "period": "x", "description": [], "sort_order": 0},
+            cookies={"access_token": auth_cookie},
+        )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_experience_unauthenticated(client: AsyncClient, mock_db):
+    entry_id = "00000000-0000-0000-0000-000000000002"
+    response = await client.put(
+        f"/api/experience/{entry_id}",
+        json={"role": "x", "company": "x", "period": "x", "description": [], "sort_order": 0},
+    )
+    assert response.status_code == 401

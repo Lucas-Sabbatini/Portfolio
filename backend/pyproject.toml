@@ -16,3 +16,8 @@ known-first-party = ["app"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+filterwarnings = [
+  "ignore::DeprecationWarning:passlib",
+  "ignore::DeprecationWarning:httpx",
+  "ignore::DeprecationWarning:fastapi",
+]

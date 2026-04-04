@@ -21,6 +21,44 @@ os.environ.setdefault("RESEND_API_KEY", "re_test_key")
 os.environ.setdefault("RESEND_FROM_EMAIL", "test@example.com")
 os.environ.setdefault("ALLOWED_ORIGINS", "http://localhost:5173")
 
+# ---------------------------------------------------------------------------
+# Real database fixtures (skipped when TEST_DATABASE_URL is not set)
+# ---------------------------------------------------------------------------
+
+
+@pytest_asyncio.fixture(scope="session")
+async def db_engine():
+    """Create all tables once per session against a real Postgres DB."""
+    from sqlalchemy.ext.asyncio import create_async_engine
+
+    from app.models import Base
+
+    url = os.environ.get("TEST_DATABASE_URL")
+    if not url:
+        pytest.skip("TEST_DATABASE_URL not set — skipping real DB tests")
+
+    engine = create_async_engine(url)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    yield engine
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+    await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def db_session(db_engine) -> AsyncGenerator:
+    """Yield a session per test; roll back all changes afterwards."""
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    async with db_engine.connect() as conn:
+        trans = await conn.begin()
+        session = AsyncSession(bind=conn, expire_on_commit=False)
+        yield session
+        await session.close()
+        await trans.rollback()
+
 
 @pytest.fixture(scope="session")
 def event_loop():
