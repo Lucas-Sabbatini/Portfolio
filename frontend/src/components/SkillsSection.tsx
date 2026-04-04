@@ -51,9 +51,9 @@ export default function SkillsSection() {
           <motion.span
             key={skill.id}
             variants={pill}
-            whileHover={{ scale: 1.08, backgroundColor: 'rgba(56,189,248,0.1)', transition: { duration: 0.15 } }}
+            whileHover={{ y: -3, transition: { duration: 0.15 } }}
             whileTap={{ scale: 0.95 }}
-            className="glass-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2.5"
+            className="solid-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2.5"
             role="img"
             aria-label={skill.name}
           >

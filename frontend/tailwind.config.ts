@@ -59,6 +59,7 @@ const config: Config = {
         'primary-fixed': '#0ea5e9',
       },
       fontFamily: {
+        display: ['"Syne"', 'sans-serif'],
         headline: ['"Plus Jakarta Sans"', 'sans-serif'],
         body: ['"Plus Jakarta Sans"', 'sans-serif'],
         label: ['"Plus Jakarta Sans"', 'sans-serif'],

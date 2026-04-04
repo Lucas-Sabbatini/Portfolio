@@ -35,7 +35,7 @@ export default function HeroSection() {
 
       <motion.h1
         variants={fadeUp}
-        className="font-headline font-extrabold text-6xl md:text-[9rem] tracking-tighter max-w-5xl leading-[0.85] text-on-surface"
+        className="font-display font-extrabold text-6xl md:text-[6rem] tracking-tighter max-w-5xl leading-[0.85] text-on-surface"
       >
         {loading ? <Skeleton /> : (content.headline_line1 ?? 'Building')} <br />
         {loading ? <Skeleton /> : (content.headline_line2 ?? 'at scale')}<span className="text-primary-dim">.</span>
@@ -48,7 +48,7 @@ export default function HeroSection() {
         <motion.a
           href={content.cta_primary_link ?? '#'}
           variants={fadeUp}
-          whileHover={{ scale: 1.03 }}
+          whileHover={{ y: -2 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => track('cta-click', { label: content.cta_primary ?? 'Explore Works' })}
           className="flex items-center gap-2 glass-card px-6 py-3 md:px-10 md:py-5 rounded-full text-sm md:text-base text-on-surface font-semibold group hover:bg-white/5"

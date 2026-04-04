@@ -93,7 +93,7 @@ export default function ResearchSection() {
             initial="hidden"
             whileInView="visible"
             viewport={viewportOnce}
-            whileHover={{ scale: 1.02, transition: { duration: 0.4 } }}
+            whileHover={{ y: -4, transition: { duration: 0.4 } }}
           >
             <img
               src={content.image_url

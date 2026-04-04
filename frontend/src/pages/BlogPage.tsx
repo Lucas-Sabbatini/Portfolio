@@ -231,7 +231,7 @@ export default function BlogPage() {
             initial="hidden"
             whileInView="visible"
             viewport={viewportOnce}
-            className="glass-card rounded-[2.5rem] p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden"
+            className="solid-card rounded-[2.5rem] p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden"
           >
             {/* Glow */}
             <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />

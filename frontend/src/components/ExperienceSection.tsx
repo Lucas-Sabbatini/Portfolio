@@ -53,7 +53,7 @@ export default function ExperienceSection() {
               className="relative pl-14 group"
             >
               <motion.div
-                className="absolute left-0 top-1.5 w-[35px] h-[35px] rounded-full glass-card flex items-center justify-center z-10"
+                className="absolute left-0 top-1.5 w-[35px] h-[35px] rounded-full solid-card flex items-center justify-center z-10"
                 whileHover={{ scale: 1.2 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               >
@@ -63,7 +63,7 @@ export default function ExperienceSection() {
               </motion.div>
 
               <motion.div
-                className="glass-card p-10 rounded-[2.5rem]"
+                className="solid-card p-10 rounded-[2.5rem]"
                 whileHover={{ x: 3, transition: { duration: 0.25, ease: 'easeOut' } }}
               >
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">

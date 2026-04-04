@@ -9,14 +9,14 @@ import ContactSection from '../components/ContactSection'
 export default function HomePage() {
   return (
     <main className="mesh-gradient min-h-screen pt-40 pb-24 px-6 md:px-12">
-      <div className="max-w-7xl mx-auto space-y-40">
+      <div className="max-w-7xl mx-auto">
         <HeroSection />
-        <NarrativeSection />
-        <ExperienceSection />
-        <ResearchSection />
-        <SkillsSection />
-        <BlogSection />
-        <ContactSection />
+        <div className="mt-48"><NarrativeSection /></div>
+        <div className="mt-32"><ExperienceSection /></div>
+        <div className="mt-40"><ResearchSection /></div>
+        <div className="mt-24"><SkillsSection /></div>
+        <div className="mt-40"><BlogSection /></div>
+        <div className="mt-32"><ContactSection /></div>
       </div>
     </main>
   )

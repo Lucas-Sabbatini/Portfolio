@@ -44,7 +44,7 @@ export default function ContactSection() {
 
       <motion.h3
         variants={fadeUp}
-        className="font-headline text-6xl md:text-[8rem] font-extrabold tracking-tighter leading-none"
+        className="font-display text-6xl md:text-[6rem] font-extrabold tracking-tighter leading-none"
       >
         Let's build <br />
         <span className="text-primary-dim">together.</span>
