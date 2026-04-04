@@ -24,9 +24,13 @@ const gradientFallbacks = [
 export default function BlogSection() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    fetchPosts().then(p => setPosts(p.slice(0, 3))).catch(console.error).finally(() => setLoading(false))
+    fetchPosts()
+      .then(p => setPosts(p.slice(0, 3)))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
   }, [])
 
   return (
@@ -38,7 +42,7 @@ export default function BlogSection() {
         whileInView="visible"
         viewport={viewportOnce}
       >
-        <h2 className="font-bold text-[10px] uppercase tracking-[0.6em] text-primary/60">
+        <h2 className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
           05 / Intelligence
         </h2>
         <Link
@@ -48,6 +52,10 @@ export default function BlogSection() {
           Library →
         </Link>
       </motion.div>
+
+      {error && !loading && posts.length === 0 && (
+        <p className="text-on-surface-variant text-sm">Unable to load posts.</p>
+      )}
 
       <motion.div
         className="grid grid-cols-1 md:grid-cols-3 gap-8"

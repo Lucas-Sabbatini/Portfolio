@@ -42,7 +42,7 @@ export default function NarrativeSection() {
       >
         <motion.h2
           variants={fadeUp}
-          className="font-bold text-[10px] uppercase tracking-[0.6em] text-primary/60"
+          className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60"
         >
           {loading ? <Skeleton /> : (content.section_label ?? '01 / Philosophy')}
         </motion.h2>

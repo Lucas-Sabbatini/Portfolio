@@ -47,7 +47,7 @@ export default function ResearchSection() {
           >
             <motion.h2
               variants={fadeUp}
-              className="font-bold text-[10px] uppercase tracking-[0.6em] text-primary/60"
+              className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60"
             >
               03 / Research
             </motion.h2>

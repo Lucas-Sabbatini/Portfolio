@@ -6,9 +6,12 @@ import { fetchExperience } from '../api/content'
 
 export default function ExperienceSection() {
   const [experiences, setExperiences] = useState<ExperienceEntry[]>([])
+  const [error, setError] = useState(false)
 
   useEffect(() => {
-    fetchExperience().then(setExperiences).catch(console.error)
+    fetchExperience()
+      .then(setExperiences)
+      .catch(() => setError(true))
   }, [])
 
   const sorted = [...experiences].sort((a, b) => a.sort_order - b.sort_order)
@@ -22,13 +25,17 @@ export default function ExperienceSection() {
         whileInView="visible"
         viewport={viewportOnce}
       >
-        <h2 className="font-bold text-[10px] uppercase tracking-[0.6em] text-primary/60">
+        <h2 className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
           02 / Timeline
         </h2>
         <span className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest opacity-40">
           System History
         </span>
       </motion.div>
+
+      {error && sorted.length === 0 && (
+        <p className="text-on-surface-variant text-sm">Unable to load experience data.</p>
+      )}
 
       <motion.div
         className="relative space-y-16 before:content-[''] before:absolute before:left-[17px] before:top-4 before:bottom-4 before:w-[1px] before:bg-gradient-to-b before:from-primary/40 before:to-transparent"
