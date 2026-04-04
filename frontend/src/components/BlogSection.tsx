@@ -16,9 +16,9 @@ const card: import('framer-motion').Variants = {
 }
 
 const gradientFallbacks = [
-  'from-[#002b3d] via-[#001a26] to-[#020202]',
-  'from-[#1e1b4b] via-[#0f0e2e] to-[#020202]',
-  'from-[#0f172a] via-[#080f1c] to-[#020202]',
+  'from-primary-container via-surface-container-low to-background',
+  'from-tertiary-container via-surface-container-low to-background',
+  'from-secondary-container via-surface-container-low to-background',
 ]
 
 export default function BlogSection() {
@@ -34,7 +34,7 @@ export default function BlogSection() {
   }, [])
 
   return (
-    <section className="space-y-16" id="blog">
+    <section className="space-y-16" id="blog" aria-label="Blog posts">
       <motion.div
         className="flex justify-between items-center"
         variants={fadeUp}
@@ -42,12 +42,12 @@ export default function BlogSection() {
         whileInView="visible"
         viewport={viewportOnce}
       >
-        <h2 className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
+        <p className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
           05 / Intelligence
-        </h2>
+        </p>
         <Link
           to="/blog"
-          className="text-on-surface-variant hover:text-primary transition-colors text-[10px] font-bold uppercase tracking-widest"
+          className="text-on-surface-variant hover:text-primary transition-colors text-[10px] font-bold uppercase tracking-widest min-h-[44px] flex items-center"
         >
           Library →
         </Link>

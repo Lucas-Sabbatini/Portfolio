@@ -26,7 +26,7 @@ export default function SkillsSection() {
 
   return (
     <section className="space-y-12">
-      <motion.h2
+      <motion.p
         variants={fadeUp}
         initial="hidden"
         whileInView="visible"
@@ -34,7 +34,7 @@ export default function SkillsSection() {
         className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60"
       >
         04 / Core Stack
-      </motion.h2>
+      </motion.p>
 
       {error && skills.length === 0 && (
         <p className="text-on-surface-variant text-sm">Unable to load skills.</p>
@@ -54,11 +54,9 @@ export default function SkillsSection() {
             whileHover={{ y: -3, transition: { duration: 0.15 } }}
             whileTap={{ scale: 0.95 }}
             className="solid-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2.5"
-            role="img"
-            aria-label={skill.name}
           >
             {skill.icon && (
-              <img src={skill.icon} height="40" width="50" alt={skill.name} className="inline-block" aria-hidden="true" />
+              <img src={skill.icon} height="40" width="50" alt="" className="inline-block" aria-hidden="true" />
             )}
             <span className="sr-only">{skill.name}</span>
           </motion.span>

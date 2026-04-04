@@ -15,21 +15,20 @@ describe('SkillsSection', () => {
   it('renders skill pills with icons from API', async () => {
     render(<SkillsSection />)
     await waitFor(() => {
-      const tsIcon = screen.getByAltText('TypeScript')
+      const tsIcon = document.querySelector('img[src="/icons/ts.svg"]')
       expect(tsIcon).toBeInTheDocument()
-      expect(tsIcon).toHaveAttribute('src', '/icons/ts.svg')
 
-      const reactIcon = screen.getByAltText('React')
+      const reactIcon = document.querySelector('img[src="/icons/react.svg"]')
       expect(reactIcon).toBeInTheDocument()
-      expect(reactIcon).toHaveAttribute('src', '/icons/react.svg')
     })
   })
 
-  it('renders skill without icon when icon is absent', async () => {
+  it('renders accessible skill names via sr-only text', async () => {
     render(<SkillsSection />)
     await waitFor(() => {
-      // Python has no icon, so there should be no img with alt "Python"
-      expect(screen.queryByAltText('Python')).not.toBeInTheDocument()
+      expect(screen.getByText('TypeScript')).toBeInTheDocument()
+      expect(screen.getByText('React')).toBeInTheDocument()
+      expect(screen.getByText('Python')).toBeInTheDocument()
     })
   })
 

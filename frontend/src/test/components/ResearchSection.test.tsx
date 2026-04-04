@@ -15,9 +15,9 @@ describe('ResearchSection', () => {
   it('renders title, body, and stats from API', async () => {
     render(<ResearchSection />)
     await waitFor(() => {
-      const h3 = document.querySelector('h3')
-      expect(h3?.textContent).toContain('AI Researcher')
-      expect(h3?.textContent).toContain('@ AINet')
+      const h2 = document.querySelector('h2')
+      expect(h2?.textContent).toContain('AI Researcher')
+      expect(h2?.textContent).toContain('@ AINet')
       expect(screen.getByText('Investigating Transformer efficiency.')).toBeInTheDocument()
       expect(screen.getByText('14+')).toBeInTheDocument()
       expect(screen.getByText('Citations')).toBeInTheDocument()

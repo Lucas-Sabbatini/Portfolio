@@ -4,8 +4,8 @@
 
 @layer base {
   body {
-    background-color: #020202;
-    color: #f8fafc;
+    background-color: theme('colors.background');
+    color: theme('colors.on-surface');
     font-family: 'Plus Jakarta Sans', sans-serif;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
@@ -13,8 +13,8 @@
   }
 
   ::selection {
-    background-color: rgba(56, 189, 248, 0.3);
-    color: #38bdf8;
+    background-color: theme('colors.primary / 0.3');
+    color: theme('colors.primary');
   }
 }
 
@@ -24,12 +24,14 @@
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .glass-card:hover {
     background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(56, 189, 248, 0.2);
+    border-color: theme('colors.primary / 0.2');
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
   }
 
@@ -40,13 +42,14 @@
   }
 
   .solid-card {
-    background: #0a0a0a;
+    background: theme('colors.surface-container-high');
     border: 1px solid rgba(255, 255, 255, 0.04);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .solid-card:hover {
-    background: #0e0e0e;
+    background: theme('colors.surface-bright');
     border-color: rgba(255, 255, 255, 0.08);
   }
 

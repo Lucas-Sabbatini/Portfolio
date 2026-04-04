@@ -2,10 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUp, fadeIn, scaleIn, staggerContainer, viewportOnce } from '../lib/animations'
 import { fetchContent } from '../api/content'
-
-const Skeleton = () => (
-  <span className="inline-block w-24 h-5 rounded bg-white/5 animate-pulse" />
-)
+import Skeleton from './Skeleton'
 
 export default function ResearchSection() {
   const [content, setContent] = useState<Record<string, string>>({})
@@ -27,7 +24,7 @@ export default function ResearchSection() {
   ]
 
   return (
-    <section className="relative" id="research">
+    <section className="relative" id="research" aria-labelledby="research-heading">
       <div className="absolute -inset-10 bg-primary/10 blur-[150px] rounded-full -z-10 opacity-30" />
 
       <motion.div
@@ -45,24 +42,25 @@ export default function ResearchSection() {
             whileInView="visible"
             viewport={viewportOnce}
           >
-            <motion.h2
+            <motion.p
               variants={fadeUp}
               className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60"
             >
               03 / Research
-            </motion.h2>
-            <motion.h3
+            </motion.p>
+            <motion.h2
+              id="research-heading"
               variants={fadeUp}
-              className="text-5xl md:text-6xl font-extrabold tracking-tighter"
+              className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter"
             >
-              {loading ? <Skeleton /> : (content.title_line1 ?? 'AI Researcher')} <br />
-              {loading ? <Skeleton /> : (content.title_line2 ?? '@ AINet')}
-            </motion.h3>
+              {loading ? <Skeleton className="w-24 h-5" /> : (content.title_line1 ?? 'AI Researcher')} <br />
+              {loading ? <Skeleton className="w-24 h-5" /> : (content.title_line2 ?? '@ AINet')}
+            </motion.h2>
             <motion.p
               variants={fadeUp}
               className="text-on-surface-variant text-xl leading-relaxed font-light"
             >
-              {loading ? <Skeleton /> : (content.body ?? 'Investigating the efficiency of Transformer-based models in resource-constrained environments. Contributing to open-source frameworks for neural network pruning and quantization.')}
+              {loading ? <Skeleton className="w-24 h-5" /> : (content.body ?? 'Investigating the efficiency of Transformer-based models in resource-constrained environments. Contributing to open-source frameworks for neural network pruning and quantization.')}
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex gap-12">
@@ -76,10 +74,10 @@ export default function ResearchSection() {
                     whileHover={{ y: -4, transition: { duration: 0.2 } }}
                   >
                     <span className="text-primary text-4xl font-extrabold tracking-tight">
-                      {stat.value ?? <Skeleton />}
+                      {stat.value ?? <Skeleton className="w-24 h-5" />}
                     </span>
                     <span className="text-[9px] uppercase tracking-[0.3em] font-bold text-on-surface-variant mt-1">
-                      {stat.label ?? <Skeleton />}
+                      {stat.label ?? <Skeleton className="w-24 h-5" />}
                     </span>
                   </motion.div>
                 </div>
@@ -100,7 +98,7 @@ export default function ResearchSection() {
                 ? (content.image_url.startsWith('/') ? `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}${content.image_url}` : content.image_url)
                 : 'https://lh3.googleusercontent.com/aida-public/AB6AXuC1t2vwe_ExDeathDRMChULSiv7l2yccCWvcV1gVuKLP3w7ednBTMBOS0MNmR_mttaEMQrzVwmwq5ru2B0epV5rBuqNzouCOv_rfsnzqk5GflgcBEkQqu7-UnvJO8o27faQQ2lkJ5JSWp0jthm925-ULoGkTuckUGkhUL9ewkgI2gJErqgZCtbPxdozoiOx37LI1AGo8tuwDorRajqbme34y5VO1e3i1hHTKB0qfkuXNXj70o_nki_IkfLsdbLGGt0m4ICOkTs-Iw'}
               alt="Neural Topology"
-              fetchPriority="high"
+              loading="lazy"
               className="w-full h-auto object-contain opacity-80 group-hover:scale-105 transition-transform duration-1000"
             />
             <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-transparent" />

@@ -30,25 +30,27 @@ export default function ContactSection() {
     <motion.section
       className="flex flex-col items-center text-center py-20 space-y-14"
       id="contact"
+      aria-labelledby="contact-heading"
       variants={staggerContainer}
       initial="hidden"
       whileInView="visible"
       viewport={viewportOnce}
     >
-      <motion.h2
+      <motion.p
         variants={fadeUp}
         className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60"
       >
         06 / Contact
-      </motion.h2>
+      </motion.p>
 
-      <motion.h3
+      <motion.h2
+        id="contact-heading"
         variants={fadeUp}
-        className="font-display text-6xl md:text-[6rem] font-extrabold tracking-tighter leading-none"
+        className="font-display text-4xl sm:text-5xl md:text-[6rem] font-extrabold tracking-tighter leading-none"
       >
         Let's build <br />
         <span className="text-primary-dim">together.</span>
-      </motion.h3>
+      </motion.h2>
 
       <motion.p
         variants={fadeUp}
