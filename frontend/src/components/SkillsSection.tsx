@@ -58,7 +58,7 @@ export default function SkillsSection() {
             aria-label={skill.name}
           >
             {skill.icon && (
-              <img src={skill.icon} height="40" width="50" alt="" className="inline-block" aria-hidden="true" />
+              <img src={skill.icon} height="40" width="50" alt={skill.name} className="inline-block" aria-hidden="true" />
             )}
             <span className="sr-only">{skill.name}</span>
           </motion.span>
