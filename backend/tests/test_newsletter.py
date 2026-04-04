@@ -1,7 +1,7 @@
 """Tests for newsletter endpoints."""
 
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
 from httpx import AsyncClient
@@ -25,7 +25,7 @@ async def test_subscribe_success(client: AsyncClient, mock_db):
         )
 
     assert response.status_code == 201
-    mock_sub.assert_called_once_with("user@example.com")
+    mock_sub.assert_called_once_with(ANY, "user@example.com")
 
 
 @pytest.mark.asyncio

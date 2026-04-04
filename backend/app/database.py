@@ -1,41 +1,56 @@
 import logging
-from pathlib import Path
+from collections.abc import AsyncGenerator
 
-import asyncpg
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 
-_pool: asyncpg.Pool | None = None
+_engine = None
+_session_factory: async_sessionmaker[AsyncSession] | None = None
 
-MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "migrations"
+
+def get_engine():
+    global _engine
+    if _engine is None:
+        settings = get_settings()
+        _engine = create_async_engine(
+            settings.async_database_url,
+            pool_size=10,
+            max_overflow=20,
+            echo=False,
+        )
+        logger.info("Database engine created")
+    return _engine
 
 
-async def run_migrations(pool: asyncpg.Pool) -> None:
-    for sql_file in sorted(MIGRATIONS_DIR.glob("*.sql")):
-        sql = sql_file.read_text()
+def get_session_factory() -> async_sessionmaker[AsyncSession]:
+    global _session_factory
+    if _session_factory is None:
+        _session_factory = async_sessionmaker(
+            bind=get_engine(),
+            expire_on_commit=False,
+            class_=AsyncSession,
+        )
+    return _session_factory
+
+
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    factory = get_session_factory()
+    async with factory() as session:
         try:
-            await pool.execute(sql)
-            logger.info("Migration applied: %s", sql_file.name)
+            yield session
+            await session.commit()
         except Exception:
-            logger.error("Migration failed: %s", sql_file.name, exc_info=True)
+            await session.rollback()
             raise
 
 
-async def get_pool() -> asyncpg.Pool:
-    global _pool
-    if _pool is None:
-        settings = get_settings()
-        _pool = await asyncpg.create_pool(dsn=settings.database_url)
-        logger.info("Database pool created")
-        await run_migrations(_pool)
-    return _pool
-
-
-async def close_pool() -> None:
-    global _pool
-    if _pool is not None:
-        await _pool.close()
-        _pool = None
-        logger.info("Database pool closed")
+async def close_engine() -> None:
+    global _engine, _session_factory
+    if _engine is not None:
+        await _engine.dispose()
+        _engine = None
+        _session_factory = None
+        logger.info("Database engine closed")

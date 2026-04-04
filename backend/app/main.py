@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from app.auth.router import router as auth_router
 from app.config import get_settings
 from app.content.router import router as content_router
-from app.database import close_pool
+from app.database import close_engine
 from app.newsletter.router import router as newsletter_router
 from app.posts.router import router as posts_router
 from app.upload.router import router as upload_router
@@ -53,7 +53,7 @@ async def log_requests(request: Request, call_next):
 
 @app.on_event("shutdown")
 async def shutdown() -> None:
-    await close_pool()
+    await close_engine()
 
 
 @app.get("/health")

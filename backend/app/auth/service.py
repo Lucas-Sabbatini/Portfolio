@@ -3,9 +3,11 @@ from datetime import UTC, datetime, timedelta
 
 from jose import jwt
 from passlib.context import CryptContext
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.database import get_pool
+from app.models import AdminUser
 
 logger = logging.getLogger(__name__)
 
@@ -28,13 +30,12 @@ def create_access_token(data: dict[str, str]) -> str:
     return jwt.encode(to_encode, settings.secret_key, algorithm="HS256")
 
 
-async def authenticate_admin(email: str, password: str) -> dict[str, str] | None:
+async def authenticate_admin(
+    session: AsyncSession, email: str, password: str
+) -> dict[str, str] | None:
     try:
-        pool = await get_pool()
-        row = await pool.fetchrow(
-            "SELECT id, email, password_hash FROM admin_users WHERE email = $1",
-            email,
-        )
+        result = await session.execute(select(AdminUser).where(AdminUser.email == email))
+        row = result.scalar_one_or_none()
     except Exception:
         logger.error("Database error during authentication", exc_info=True)
         return None
@@ -43,9 +44,9 @@ async def authenticate_admin(email: str, password: str) -> dict[str, str] | None
         logger.warning("Failed login attempt for unknown email: %s", email)
         return None
 
-    if not verify_password(password, row["password_hash"]):
+    if not verify_password(password, row.password_hash):
         logger.warning("Failed login attempt (wrong password) for email: %s", email)
         return None
 
     logger.info("Successful login for email: %s", email)
-    return {"id": str(row["id"]), "email": row["email"]}
+    return {"id": str(row.id), "email": row.email}

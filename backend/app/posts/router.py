@@ -2,8 +2,10 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_admin
+from app.database import get_session
 from app.posts import service
 from app.posts.schemas import PostCreate, PostListItem, PostResponse, PostUpdate
 
@@ -13,9 +15,12 @@ router = APIRouter(prefix="/api/posts", tags=["posts"])
 
 
 @router.get("", response_model=list[PostListItem])
-async def list_posts(tag: str | None = Query(default=None)) -> list[PostListItem]:
+async def list_posts(
+    tag: str | None = Query(default=None),
+    session: AsyncSession = Depends(get_session),
+) -> list[PostListItem]:
     try:
-        rows = await service.list_posts(tag=tag)
+        rows = await service.list_posts(session, tag=tag)
         return [PostListItem(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows]
     except Exception as exc:
         logger.error("Error listing posts", exc_info=True)
@@ -23,9 +28,12 @@ async def list_posts(tag: str | None = Query(default=None)) -> list[PostListItem
 
 
 @router.get("/{slug}", response_model=PostResponse)
-async def get_post(slug: str) -> PostResponse:
+async def get_post(
+    slug: str,
+    session: AsyncSession = Depends(get_session),
+) -> PostResponse:
     try:
-        row = await service.get_post_by_slug(slug)
+        row = await service.get_post_by_slug(session, slug)
     except Exception as exc:
         logger.error("Error getting post", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
@@ -38,9 +46,10 @@ async def get_post(slug: str) -> PostResponse:
 async def create_post(
     body: PostCreate,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> PostResponse:
     try:
-        row = await service.create_post(body)
+        row = await service.create_post(session, body)
         return PostResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
     except Exception as exc:
         logger.error("Error creating post", exc_info=True)
@@ -52,9 +61,10 @@ async def update_post(
     slug: str,
     body: PostUpdate,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> PostResponse:
     try:
-        row = await service.update_post(slug, body)
+        row = await service.update_post(session, slug, body)
     except Exception as exc:
         logger.error("Error updating post", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
@@ -67,9 +77,10 @@ async def update_post(
 async def delete_post(
     slug: str,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> Response:
     try:
-        deleted = await service.delete_post(slug)
+        deleted = await service.delete_post(session, slug)
     except Exception as exc:
         logger.error("Error deleting post", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
@@ -82,9 +93,10 @@ async def delete_post(
 async def publish_post(
     slug: str,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> PostResponse:
     try:
-        row = await service.toggle_publish(slug)
+        row = await service.toggle_publish(session, slug)
     except Exception as exc:
         logger.error("Error toggling publish", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
