@@ -35,7 +35,7 @@ export default function HeroSection() {
 
       <motion.h1
         variants={fadeUp}
-        className="font-display font-extrabold text-6xl md:text-[6rem] tracking-tighter max-w-5xl leading-[0.85] text-on-surface"
+        className="font-display font-extrabold text-6xl md:text-[6rem] tracking-tighter max-w-5xl leading-[1.1] text-on-surface"
       >
         {loading ? <Skeleton /> : (content.headline_line1 ?? 'Building')} <br />
         {loading ? <Skeleton /> : (content.headline_line2 ?? 'at scale')}<span className="text-primary-dim">.</span>
