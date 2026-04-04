@@ -99,7 +99,13 @@ async def update_experience(
 ) -> ExperienceResponse:
     try:
         row = await service.update_experience(
-            session, str(entry_id), body.role, body.company, body.period, body.description, body.sort_order
+            session,
+            str(entry_id),
+            body.role,
+            body.company,
+            body.period,
+            body.description,
+            body.sort_order,
         )
     except Exception as exc:
         logger.error("Error updating experience", exc_info=True)
@@ -147,7 +153,9 @@ async def create_skill(
     session: AsyncSession = Depends(get_session),
 ) -> SkillResponse:
     try:
-        row = await service.create_skill(session, body.name, body.category, body.icon, body.sort_order)
+        row = await service.create_skill(
+            session, body.name, body.category, body.icon, body.sort_order
+        )
         return SkillResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
     except Exception as exc:
         logger.error("Error creating skill", exc_info=True)
