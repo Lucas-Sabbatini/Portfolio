@@ -15,13 +15,21 @@ def compute_read_time(body: str) -> str:
     return f"{max(1, len(body.split()) // 200)} min read"
 
 
-async def list_posts(session: AsyncSession, tag: str | None = None) -> list[dict]:
-    stmt = select(Post).where(Post.status == "published").order_by(Post.published_at.desc())
+async def list_posts(
+    session: AsyncSession, tag: str | None = None, status: str | None = None
+) -> list[dict]:
+    stmt = select(Post).order_by(Post.published_at.desc().nulls_last(), Post.created_at.desc())
+    if status == "all":
+        pass
+    elif status == "draft":
+        stmt = stmt.where(Post.status == "draft")
+    else:
+        stmt = stmt.where(Post.status == "published")
     if tag:
         stmt = stmt.where(Post.tag == tag)
     result = await session.execute(stmt)
     rows = result.scalars().all()
-    logger.info("Listed %d published posts", len(rows))
+    logger.info("Listed %d posts (status=%s)", len(rows), status or "published")
     return [orm_to_dict(r) for r in rows]
 
 
