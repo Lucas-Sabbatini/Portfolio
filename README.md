@@ -97,5 +97,5 @@ cd backend && ruff format app tests
 cd frontend && npx vitest run
 
 # Backend
-cd backend && pytest -v
+(.venv) cd backend && python -m pytest
 ```

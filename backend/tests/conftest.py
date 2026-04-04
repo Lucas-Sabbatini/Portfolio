@@ -1,6 +1,6 @@
 """Pytest fixtures for backend tests."""
 
-import asyncio
+import socket
 
 # ---------------------------------------------------------------------------
 # Settings override – supply dummy env vars before importing the app
@@ -8,6 +8,7 @@ import asyncio
 import os
 from collections.abc import AsyncGenerator
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -15,27 +16,70 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from jose import jwt
 
-os.environ.setdefault("DATABASE_URL", "postgresql://test:test@localhost/test")
+os.environ.setdefault("TEST_DATABASE_URL", "postgresql://test:test@localhost/test")
 os.environ.setdefault("SECRET_KEY", "testsecretkey1234567890123456789")
 os.environ.setdefault("RESEND_API_KEY", "re_test_key")
 os.environ.setdefault("RESEND_FROM_EMAIL", "test@example.com")
 os.environ.setdefault("ALLOWED_ORIGINS", "http://localhost:5173")
 
+
 # ---------------------------------------------------------------------------
-# Real database fixtures (skipped when TEST_DATABASE_URL is not set)
+# pytest-docker: auto-manage a Postgres container for tests
+# ---------------------------------------------------------------------------
+
+
+def _pg_ready(host: str, port: int) -> bool:
+    """Return True when Postgres accepts TCP connections."""
+    try:
+        with socket.create_connection((host, port), timeout=1):
+            return True
+    except OSError:
+        return False
+
+
+@pytest.fixture(scope="session")
+def docker_compose_file() -> str:
+    return str(Path(__file__).resolve().parent.parent / "docker-compose.test.yml")
+
+
+@pytest.fixture(scope="session")
+def docker_compose_project_name() -> str:
+    return "blog-test"
+
+
+@pytest.fixture(scope="session")
+def postgres_url(docker_services, docker_ip) -> str:
+    """Wait for Postgres to be ready and return the async connection URL."""
+    port = docker_services.port_for("test-db", 5432)
+    docker_services.wait_until_responsive(
+        timeout=30,
+        pause=0.5,
+        check=lambda: _pg_ready(docker_ip, port),
+    )
+    return f"postgresql+asyncpg://test:test@{docker_ip}:{port}/test"
+
+
+# ---------------------------------------------------------------------------
+# Real database fixtures
 # ---------------------------------------------------------------------------
 
 
 @pytest_asyncio.fixture(scope="session")
-async def db_engine():
-    """Create all tables once per session against a real Postgres DB."""
+async def db_engine(request):
+    """Create all tables once per session against a real Postgres DB.
+
+    Uses TEST_DATABASE_URL env var directly (e.g. in CI) or falls back
+    to the pytest-docker managed container for local runs.
+    """
     from sqlalchemy.ext.asyncio import create_async_engine
 
     from app.models import Base
 
-    url = os.environ.get("TEST_DATABASE_URL")
-    if not url:
-        pytest.skip("TEST_DATABASE_URL not set — skipping real DB tests")
+    env_url = os.environ.get("TEST_DATABASE_URL")
+    if env_url and env_url.startswith("postgresql+asyncpg://"):
+        url = env_url
+    else:
+        url = request.getfixturevalue("postgres_url")
 
     engine = create_async_engine(url)
     async with engine.begin() as conn:
@@ -59,12 +103,6 @@ async def db_session(db_engine) -> AsyncGenerator:
         await session.close()
         await trans.rollback()
 
-
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest.fixture
