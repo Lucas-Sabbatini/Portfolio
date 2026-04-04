@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, viewportOnce } from '../lib/animations'
-import type { SocialLink } from '../api/content'
-import { fetchSocialLinks } from '../api/content'
+import { fadeUp, viewportOnce } from '@/lib/animations'
+import type { SocialLink } from '@/types/social'
+import { fetchSocialLinks } from '@/api/content'
+import './Footer.css'
 
 function SocialIcon({ icon, color }: { icon: string; color?: string }) {
   const isUrl = icon.startsWith('http://') || icon.startsWith('https://')
@@ -10,31 +11,24 @@ function SocialIcon({ icon, color }: { icon: string; color?: string }) {
   if (isUrl && color && icon.toLowerCase().includes('.svg')) {
     return (
       <span
+        className="social-icon-mask"
         style={{
-          display: 'inline-block',
-          width: 18, height: 18,
           backgroundColor: color,
           WebkitMaskImage: `url(${icon})`,
-          WebkitMaskSize: 'contain',
-          WebkitMaskRepeat: 'no-repeat',
-          WebkitMaskPosition: 'center',
           maskImage: `url(${icon})`,
-          maskSize: 'contain',
-          maskRepeat: 'no-repeat',
-          maskPosition: 'center',
         }}
       />
     )
   }
 
   if (isUrl) {
-    return <img src={icon} alt="" className="w-[18px] h-[18px] object-contain" style={{ width: 18, height: 18 }} />
+    return <img src={icon} alt="" className="social-icon-img" />
   }
 
   return (
     <span
-      className="material-symbols-outlined"
-      style={{ fontSize: 18, lineHeight: 1, color: color || undefined }}
+      className="material-symbols-outlined material-icon-sm"
+      style={{ color: color || undefined }}
     >
       {icon}
     </span>
@@ -63,18 +57,14 @@ export default function Footer() {
 
         <div className="flex gap-10 text-[10px] font-bold uppercase tracking-[0.2em]">
           {links.map((link) => (
-            <a
-              key={link.id}
-              href={link.url}
-              className="text-on-surface/40 hover:text-primary transition-all flex items-center gap-1.5"
-            >
+            <a key={link.id} href={link.url} className="footer-link">
               {link.icon && <SocialIcon icon={link.icon} color={link.color} />}
               {link.label && <span>{link.label}</span>}
             </a>
           ))}
         </div>
 
-        <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface/40 text-center md:text-right md:flex-1 leading-loose">
+        <p className="footer-copyright">
           © 2024 Lucas Janot. <br /> Built on Obsidian Principles.
         </p>
       </div>

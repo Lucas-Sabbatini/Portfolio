@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, staggerFast, viewportOnce } from '../lib/animations'
-import type { Skill } from '../api/content'
-import { fetchSkills } from '../api/content'
+import { fadeUp, staggerFast, viewportOnce } from '@/lib/animations'
+import type { Skill } from '@/types/skill'
+import { fetchSkills } from '@/api/content'
+import './SkillsSection.css'
 
 const pill: import('framer-motion').Variants = {
   hidden: { opacity: 0, scale: 0.8, y: 10 },
@@ -53,7 +54,7 @@ export default function SkillsSection() {
             variants={pill}
             whileHover={{ y: -3, transition: { duration: 0.15 } }}
             whileTap={{ scale: 0.95 }}
-            className="solid-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2.5"
+            className="skill-pill"
           >
             {skill.icon && (
               <img src={skill.icon} height="40" width="50" alt="" className="inline-block" aria-hidden="true" />

@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { fadeUp, staggerContainer, viewportOnce } from '../lib/animations'
-import { fetchContent } from '../api/content'
-import { useAnalytics } from '../hooks/useAnalytics'
+import { fadeUp, staggerContainer, viewportOnce } from '@/lib/animations'
+import { fetchContent } from '@/api/content'
+import { useAnalytics } from '@/hooks/useAnalytics'
+import './ContactSection.css'
 
 export default function ContactSection() {
   const [content, setContent] = useState<Record<string, string>>({})
@@ -46,7 +47,7 @@ export default function ContactSection() {
       <motion.h2
         id="contact-heading"
         variants={fadeUp}
-        className="font-display text-4xl sm:text-5xl md:text-[6rem] font-extrabold tracking-tighter leading-none"
+        className="contact-heading"
       >
         Let's build <br />
         <span className="text-primary-dim">together.</span>
@@ -59,13 +60,12 @@ export default function ContactSection() {
         {content.subtitle ?? 'Have a project in mind, or just want to talk shop? Reach out.'}
       </motion.p>
 
-      {/* ── Email CTA ──────────────────────────────────────────── */}
       <motion.div variants={fadeUp} className="flex flex-col items-center gap-3">
         <motion.button
           onClick={handleCopyEmail}
           whileHover={{ scale: 1.03, boxShadow: '0 0 30px rgba(56,189,248,0.15)' }}
           whileTap={{ scale: 0.97 }}
-          className="glass-card px-8 py-4 md:px-12 md:py-5 rounded-full flex items-center gap-3 group"
+          className="contact-email-btn group"
         >
           <AnimatePresence mode="wait">
             {copied ? (
@@ -105,7 +105,7 @@ export default function ContactSection() {
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="text-primary text-xs font-bold uppercase tracking-widest"
+              className="contact-copied-msg"
             >
               Copied to clipboard
             </motion.span>

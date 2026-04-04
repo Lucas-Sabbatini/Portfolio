@@ -1,0 +1,11 @@
+.research-card {
+  @apply glass-card p-10 md:p-20 rounded-[3rem] overflow-hidden relative;
+}
+
+.research-image-wrapper {
+  @apply relative rounded-[2rem] overflow-hidden glass-card;
+}
+
+.research-image {
+  @apply w-full h-auto object-contain opacity-80 group-hover:scale-105 transition-transform duration-1000;
+}

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, fadeIn, scaleIn, staggerContainer, viewportOnce } from '../lib/animations'
-import { fetchContent } from '../api/content'
-import Skeleton from './Skeleton'
+import { fadeUp, fadeIn, scaleIn, staggerContainer, viewportOnce } from '@/lib/animations'
+import { fetchContent } from '@/api/content'
+import Skeleton from '@/components/shared/Skeleton'
+import './ResearchSection.css'
 
 export default function ResearchSection() {
   const [content, setContent] = useState<Record<string, string>>({})
@@ -28,7 +29,7 @@ export default function ResearchSection() {
       <div className="absolute -inset-10 bg-primary/10 blur-[150px] rounded-full -z-10 opacity-30" />
 
       <motion.div
-        className="glass-card p-10 md:p-20 rounded-[3rem] overflow-hidden relative"
+        className="research-card"
         variants={scaleIn}
         initial="hidden"
         whileInView="visible"
@@ -86,7 +87,7 @@ export default function ResearchSection() {
           </motion.div>
 
           <motion.div
-            className="relative rounded-[2rem] overflow-hidden glass-card group"
+            className="research-image-wrapper group"
             variants={fadeIn}
             initial="hidden"
             whileInView="visible"
@@ -99,7 +100,7 @@ export default function ResearchSection() {
                 : 'https://lh3.googleusercontent.com/aida-public/AB6AXuC1t2vwe_ExDeathDRMChULSiv7l2yccCWvcV1gVuKLP3w7ednBTMBOS0MNmR_mttaEMQrzVwmwq5ru2B0epV5rBuqNzouCOv_rfsnzqk5GflgcBEkQqu7-UnvJO8o27faQQ2lkJ5JSWp0jthm925-ULoGkTuckUGkhUL9ewkgI2gJErqgZCtbPxdozoiOx37LI1AGo8tuwDorRajqbme34y5VO1e3i1hHTKB0qfkuXNXj70o_nki_IkfLsdbLGGt0m4ICOkTs-Iw'}
               alt="Neural Topology"
               loading="lazy"
-              className="w-full h-auto object-contain opacity-80 group-hover:scale-105 transition-transform duration-1000"
+              className="research-image"
             />
             <div className="absolute inset-0 bg-gradient-to-tr from-background/80 via-transparent to-transparent" />
           </motion.div>

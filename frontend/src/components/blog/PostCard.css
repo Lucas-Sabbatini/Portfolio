@@ -1,0 +1,71 @@
+/* ── Shared ──────────────────────────────────────────────────── */
+.tag-chip {
+  @apply inline-flex px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase border backdrop-blur-md;
+}
+
+/* ── Featured card ───────────────────────────────────────────── */
+.post-card-featured {
+  @apply glass-card rounded-[2.5rem] overflow-hidden relative cursor-pointer h-[480px] md:h-[560px];
+}
+
+.post-card-featured-image {
+  @apply absolute inset-0 w-full h-full object-cover opacity-30 grayscale
+         group-hover:opacity-50 group-hover:grayscale-0 transition-all duration-1000;
+}
+
+.post-card-featured-overlay {
+  @apply absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent;
+}
+
+.post-card-featured-watermark {
+  @apply absolute top-8 right-10 text-[120px] font-extrabold leading-none
+         text-white/[0.03] font-headline select-none;
+}
+
+.post-card-featured-content {
+  @apply absolute bottom-0 left-0 right-0 p-8 md:p-12 z-10;
+}
+
+.post-card-featured-title {
+  @apply font-headline font-extrabold text-3xl md:text-5xl tracking-tighter
+         text-on-surface leading-tight max-w-2xl mb-4;
+}
+
+.post-card-featured-excerpt {
+  @apply text-on-surface-variant text-base md:text-lg font-light leading-relaxed
+         max-w-2xl line-clamp-2 mb-6;
+}
+
+.post-card-featured-cta {
+  @apply flex items-center gap-2 text-primary font-bold text-[11px] uppercase
+         tracking-widest group-hover:gap-4 transition-all;
+}
+
+/* ── Medium card ─────────────────────────────────────────────── */
+.post-card-medium {
+  @apply glass-card rounded-[2rem] overflow-hidden relative cursor-pointer flex flex-col;
+}
+
+.post-card-medium-image {
+  @apply w-full h-full object-cover opacity-25 grayscale
+         group-hover:opacity-50 group-hover:grayscale-0 transition-all duration-700;
+}
+
+.post-card-medium-title {
+  @apply font-headline font-bold text-xl tracking-tight text-on-surface leading-tight mb-3
+         group-hover:text-primary transition-colors duration-300;
+}
+
+.post-card-medium-footer {
+  @apply flex items-center justify-between mt-5 pt-4 border-t border-white/5;
+}
+
+/* ── List row ────────────────────────────────────────────────── */
+.post-card-list {
+  @apply flex items-center gap-6 md:gap-10 py-6 border-b border-white/5 cursor-pointer;
+}
+
+.post-card-list-title {
+  @apply font-headline font-bold text-base md:text-lg tracking-tight text-on-surface
+         truncate group-hover:text-primary transition-colors duration-200;
+}

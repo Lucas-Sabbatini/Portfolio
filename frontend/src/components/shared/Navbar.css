@@ -1,0 +1,21 @@
+.nav-bar {
+  @apply fixed top-0 w-full z-50 bg-[#020202]/60 backdrop-blur-2xl border-b border-white/5;
+}
+
+.nav-inner {
+  @apply flex justify-between items-center px-8 py-5 max-w-7xl mx-auto;
+}
+
+.nav-link {
+  @apply text-on-surface/50 hover:text-primary transition-all px-2 py-1;
+}
+
+.nav-link-active {
+  @apply text-primary font-bold border-b-2 border-primary pb-1;
+}
+
+.nav-cta {
+  @apply bg-primary hover:bg-primary-dim text-on-primary font-bold tracking-wider text-[10px] uppercase
+         px-4 py-2 md:px-6 md:py-2.5 rounded-full transition-all
+         hover:shadow-[0_0_20px_rgba(56,189,248,0.3)];
+}

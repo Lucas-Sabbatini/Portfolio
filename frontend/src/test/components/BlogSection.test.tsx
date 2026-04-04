@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { http } from 'msw'
 import { server } from '../mocks/server'
-import BlogSection from '../../components/BlogSection'
+import BlogSection from '../../components/sections/BlogSection'
 
 const BASE = 'http://localhost:8000'
 

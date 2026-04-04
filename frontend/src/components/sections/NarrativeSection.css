@@ -1,0 +1,11 @@
+.narrative-stat-card {
+  @apply glass-card p-5 sm:p-7 md:p-8 rounded-[2rem] flex flex-col justify-between aspect-square overflow-hidden;
+}
+
+.narrative-stat-value-large {
+  @apply font-extrabold font-headline leading-none break-words text-2xl sm:text-4xl md:text-6xl;
+}
+
+.narrative-stat-value-small {
+  @apply font-extrabold font-headline leading-none break-words text-xl sm:text-3xl md:text-4xl;
+}

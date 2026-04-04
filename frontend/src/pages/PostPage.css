@@ -1,0 +1,7 @@
+.post-cover {
+  @apply rounded-[2rem] overflow-hidden aspect-[16/7];
+}
+
+.post-not-found {
+  @apply flex flex-col items-center justify-center min-h-[60vh] gap-6;
+}
