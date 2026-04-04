@@ -30,7 +30,9 @@ def create_access_token(data: dict[str, str]) -> str:
     return jwt.encode(to_encode, settings.secret_key, algorithm="HS256")
 
 
-async def authenticate_admin(session: AsyncSession, email: str, password: str) -> dict[str, str] | None:
+async def authenticate_admin(
+    session: AsyncSession, email: str, password: str
+) -> dict[str, str] | None:
     try:
         result = await session.execute(select(AdminUser).where(AdminUser.email == email))
         row = result.scalar_one_or_none()

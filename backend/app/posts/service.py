@@ -16,11 +16,7 @@ def compute_read_time(body: str) -> str:
 
 
 async def list_posts(session: AsyncSession, tag: str | None = None) -> list[dict]:
-    stmt = (
-        select(Post)
-        .where(Post.status == "published")
-        .order_by(Post.published_at.desc())
-    )
+    stmt = select(Post).where(Post.status == "published").order_by(Post.published_at.desc())
     if tag:
         stmt = stmt.where(Post.tag == tag)
     result = await session.execute(stmt)

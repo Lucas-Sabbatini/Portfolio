@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 async def get_content_section(session: AsyncSession, section: str) -> dict[str, str]:
-    result = await session.execute(
-        select(ContentBlock).where(ContentBlock.section == section)
-    )
+    result = await session.execute(select(ContentBlock).where(ContentBlock.section == section))
     return {row.key: row.value for row in result.scalars().all()}
 
 
@@ -38,9 +36,7 @@ async def upsert_content(session: AsyncSession, section: str, key: str, value: s
 
 
 async def list_experience(session: AsyncSession) -> list[dict]:
-    result = await session.execute(
-        select(ExperienceEntry).order_by(ExperienceEntry.sort_order)
-    )
+    result = await session.execute(select(ExperienceEntry).order_by(ExperienceEntry.sort_order))
     return [orm_to_dict(r) for r in result.scalars().all()]
 
 
@@ -75,9 +71,7 @@ async def update_experience(
     description: list[str],
     sort_order: int,
 ) -> dict | None:
-    result = await session.execute(
-        select(ExperienceEntry).where(ExperienceEntry.id == entry_id)
-    )
+    result = await session.execute(select(ExperienceEntry).where(ExperienceEntry.id == entry_id))
     entry = result.scalar_one_or_none()
     if entry is None:
         return None
@@ -94,9 +88,7 @@ async def update_experience(
 
 
 async def delete_experience(session: AsyncSession, entry_id: str) -> bool:
-    result = await session.execute(
-        delete(ExperienceEntry).where(ExperienceEntry.id == entry_id)
-    )
+    result = await session.execute(delete(ExperienceEntry).where(ExperienceEntry.id == entry_id))
     deleted = result.rowcount == 1
     if deleted:
         logger.info("Deleted experience entry: %s", entry_id)
