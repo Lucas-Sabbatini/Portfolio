@@ -86,6 +86,7 @@ cd frontend && npm run lint
 # Backend (Ruff — linter + formatter)
 cd backend && ruff format --check .
 cd backend && ruff format . 
+cd backend && ruff check --fix .
 ```
 
 > **Tip:** Install backend dev dependencies first with `pip install -r backend/requirements-dev.txt`.

@@ -1,7 +1,7 @@
 """Tests for posts update and publish toggle edge cases."""
 
 from datetime import UTC, datetime
-from unittest.mock import ANY, AsyncMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient

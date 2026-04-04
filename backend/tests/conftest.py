@@ -1,11 +1,10 @@
 """Pytest fixtures for backend tests."""
 
-import socket
-
 # ---------------------------------------------------------------------------
 # Settings override – supply dummy env vars before importing the app
 # ---------------------------------------------------------------------------
 import os
+import socket
 from collections.abc import AsyncGenerator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path

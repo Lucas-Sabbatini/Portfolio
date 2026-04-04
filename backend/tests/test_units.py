@@ -9,7 +9,6 @@ from app.auth.service import create_access_token, hash_password, verify_password
 from app.posts.schemas import slugify
 from app.posts.service import compute_read_time
 
-
 # ---------------------------------------------------------------------------
 # compute_read_time
 # ---------------------------------------------------------------------------
