@@ -185,7 +185,9 @@ async def test_list_posts_status_all_unauthenticated(client: AsyncClient, mock_d
 
 
 @pytest.mark.asyncio
-async def test_list_posts_status_draft_authenticated(client: AsyncClient, mock_db, auth_cookie: str):
+async def test_list_posts_status_draft_authenticated(
+    client: AsyncClient, mock_db, auth_cookie: str
+):
     """Authenticated admin can list only draft posts."""
     with patch("app.posts.service.list_posts", new_callable=AsyncMock) as mock_list:
         mock_list.return_value = [DRAFT_POST]
