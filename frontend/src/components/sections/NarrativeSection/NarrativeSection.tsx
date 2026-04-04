@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, scaleIn, staggerContainer, staggerFast, viewportOnce } from '../lib/animations'
-import { fetchContent } from '../api/content'
-import Skeleton from './Skeleton'
+import { fadeUp, scaleIn, staggerContainer, staggerFast, viewportOnce } from '@/lib/animations'
+import { fetchContent } from '@/api/content'
+import Skeleton from '@/components/shared/Skeleton'
+import './NarrativeSection.css'
 
 const defaultStats = [
   { label: 'Experience', value: '2+', sub: 'Circuits', small: false },
@@ -64,15 +65,13 @@ export default function NarrativeSection() {
             key={stat.label}
             variants={scaleIn}
             whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-            className="glass-card p-5 sm:p-7 md:p-8 rounded-[2rem] flex flex-col justify-between aspect-square overflow-hidden"
+            className="narrative-stat-card"
           >
             <span className="text-primary/60 text-[10px] uppercase font-bold tracking-widest">
               {stat.label}
             </span>
             <div className="flex flex-col">
-              <span
-                className={`font-extrabold font-headline leading-none break-words ${stat.small ? 'text-xl sm:text-3xl md:text-4xl' : 'text-2xl sm:text-4xl md:text-6xl'}`}
-              >
+              <span className={stat.small ? 'narrative-stat-value-small' : 'narrative-stat-value-large'}>
                 {stat.value}
                 {stat.small && (
                   <>

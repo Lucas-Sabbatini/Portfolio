@@ -1,0 +1,25 @@
+.blog-section-card {
+  @apply glass-card p-1 rounded-[3rem] aspect-[3/4] relative overflow-hidden cursor-pointer;
+}
+
+.blog-section-card-image {
+  @apply w-full h-full object-cover opacity-20 grayscale
+         group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000;
+}
+
+.blog-section-card-overlay {
+  @apply absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent z-10;
+}
+
+.blog-section-card-content {
+  @apply absolute bottom-0 left-0 p-10 z-20 w-full space-y-5;
+}
+
+.blog-section-tag-chip {
+  @apply px-4 py-1.5 backdrop-blur-md rounded-full text-[9px] font-black tracking-widest uppercase border;
+}
+
+.blog-section-view-all {
+  @apply text-on-surface-variant hover:text-primary transition-colors text-[10px]
+         font-bold uppercase tracking-widest min-h-[44px] flex items-center;
+}

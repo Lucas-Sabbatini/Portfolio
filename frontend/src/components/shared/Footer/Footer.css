@@ -1,0 +1,30 @@
+.social-icon-mask {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+.social-icon-img {
+  @apply object-contain;
+  width: 18px;
+  height: 18px;
+}
+
+.material-icon-sm {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.footer-link {
+  @apply text-on-surface/40 hover:text-primary transition-all flex items-center gap-1.5;
+}
+
+.footer-copyright {
+  @apply text-[10px] font-bold uppercase tracking-widest text-on-surface/40 text-center md:text-right md:flex-1 leading-loose;
+}

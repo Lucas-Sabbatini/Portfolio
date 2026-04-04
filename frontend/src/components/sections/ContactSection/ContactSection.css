@@ -1,0 +1,11 @@
+.contact-heading {
+  @apply font-display text-4xl sm:text-5xl md:text-[6rem] font-extrabold tracking-tighter leading-none;
+}
+
+.contact-email-btn {
+  @apply glass-card px-8 py-4 md:px-12 md:py-5 rounded-full flex items-center gap-3;
+}
+
+.contact-copied-msg {
+  @apply text-primary text-xs font-bold uppercase tracking-widest;
+}

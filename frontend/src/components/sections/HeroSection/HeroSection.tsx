@@ -1,9 +1,10 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { staggerContainer, fadeUp, fadeIn } from '../lib/animations'
-import { fetchContent } from '../api/content'
-import { useAnalytics } from '../hooks/useAnalytics'
-import Skeleton from './Skeleton'
+import { staggerContainer, fadeUp, fadeIn } from '@/lib/animations'
+import { fetchContent } from '@/api/content'
+import { useAnalytics } from '@/hooks/useAnalytics'
+import Skeleton from '@/components/shared/Skeleton'
+import './HeroSection.css'
 
 function styledHeadline(text: string): ReactNode {
   return text.split(/(\([^)]+\))/).map((part, i) =>
@@ -32,24 +33,18 @@ export default function HeroSection() {
       <motion.div
         variants={fadeIn}
         transition={{ delay: 0.6 }}
-        className="inline-flex items-center gap-2.5 px-4 py-2.5 min-h-[44px] rounded-full bg-primary/5 border border-primary/20 text-primary font-bold text-[10px] tracking-widest uppercase"
+        className="hero-status-badge"
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(56,189,248,0.8)] animate-pulse" />
+        <span className="hero-status-dot" />
         {loading ? <Skeleton /> : (content.status_badge ?? 'Operational')}
       </motion.div>
 
-      <motion.h1
-        variants={fadeUp}
-        className="font-display font-extrabold text-4xl sm:text-5xl md:text-[6rem] tracking-tighter max-w-5xl leading-[1.1] text-on-surface"
-      >
+      <motion.h1 variants={fadeUp} className="hero-title">
         {loading ? <Skeleton /> : styledHeadline(content.headline_line1 ?? 'Building')} <br />
         {loading ? <Skeleton /> : styledHeadline(content.headline_line2 ?? 'at scale')}<span className="text-primary-dim">.</span>
       </motion.h1>
 
-      <motion.div
-        variants={staggerContainer}
-        className="flex flex-wrap gap-6 mt-6"
-      >
+      <motion.div variants={staggerContainer} className="flex flex-wrap gap-6 mt-6">
         <motion.a
           href={loading ? undefined : (content.cta_primary_link ?? '#')}
           aria-disabled={loading}
@@ -60,7 +55,7 @@ export default function HeroSection() {
             if (loading) { e.preventDefault(); return }
             track('cta-click', { label: content.cta_primary ?? 'Explore Works' })
           }}
-          className={`flex items-center gap-2 glass-card px-6 py-3 md:px-10 md:py-5 rounded-full text-sm md:text-base text-on-surface font-semibold group hover:bg-white/5 ${loading ? 'pointer-events-none opacity-50' : ''}`}
+          className={`hero-cta-primary group${loading ? ' hero-cta-loading' : ''}`}
         >
           {loading ? <Skeleton /> : (content.cta_primary ?? 'Explore Works')}
           <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
@@ -77,7 +72,7 @@ export default function HeroSection() {
             if (loading) { e.preventDefault(); return }
             track('cta-click', { label: content.cta_secondary ?? 'Research Lab' })
           }}
-          className={`flex items-center gap-3 px-5 py-3 md:px-10 md:py-5 min-h-[44px] rounded-full text-on-surface-variant hover:text-primary transition-colors font-bold uppercase tracking-widest text-[10px] ${loading ? 'pointer-events-none opacity-50' : ''}`}
+          className={`hero-cta-secondary${loading ? ' hero-cta-loading' : ''}`}
         >
           {loading ? <Skeleton /> : (content.cta_secondary ?? 'Research Lab')}
         </motion.a>

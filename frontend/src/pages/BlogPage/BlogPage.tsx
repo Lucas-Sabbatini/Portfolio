@@ -1,19 +1,20 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import BlogFilter from '../components/blog/BlogFilter'
+import BlogFilter from '@/components/blog/BlogFilter'
 import {
   PostCardFeatured,
   PostCardMedium,
   PostCardList,
-} from '../components/blog/PostCard'
-import type { PostTag } from '../data/posts'
-import type { Post } from '../api/posts'
-import { fetchPosts } from '../api/posts'
-import { subscribe } from '../api/newsletter'
-import { ApiError } from '../api/client'
-import { useAnalytics } from '../hooks/useAnalytics'
-import { fadeUp, staggerContainer, staggerFast, viewportOnce } from '../lib/animations'
+} from '@/components/blog/PostCard/PostCard'
+import type { PostTag } from '@/data/posts'
+import type { Post } from '@/types/post'
+import { fetchPosts } from '@/api/posts'
+import { subscribe } from '@/api/newsletter'
+import { ApiError } from '@/api/client'
+import { useAnalytics } from '@/hooks/useAnalytics'
+import { fadeUp, staggerContainer, staggerFast, viewportOnce } from '@/lib/animations'
+import './BlogPage.css'
 
 type Filter = 'All' | PostTag
 
@@ -94,10 +95,7 @@ export default function BlogPage() {
             </motion.div>
 
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 border-b border-white/5 pb-10">
-              <motion.h1
-                variants={fadeUp}
-                className="font-headline font-extrabold text-6xl md:text-[8rem] tracking-tighter leading-[0.85] text-on-surface"
-              >
+              <motion.h1 variants={fadeUp} className="blog-page-heading">
                 Signal<br />
                 <span className="text-primary-dim">Archive.</span>
               </motion.h1>
@@ -110,7 +108,6 @@ export default function BlogPage() {
               </motion.p>
             </div>
 
-            {/* Filter */}
             <motion.div variants={fadeUp}>
               <BlogFilter
                 active={activeFilter}
@@ -120,7 +117,6 @@ export default function BlogPage() {
             </motion.div>
           </motion.header>
 
-          {/* ── Content ────────────────────────────────────────────────── */}
           {loading ? (
             <div className="space-y-8">
               <div className="glass-card rounded-[2rem] animate-pulse bg-white/5 h-[480px]" />
@@ -145,7 +141,7 @@ export default function BlogPage() {
                     variants={fadeUp}
                     initial="hidden"
                     animate="visible"
-                    className="glass-card rounded-[2rem] p-20 flex flex-col items-center justify-center gap-4 text-center"
+                    className="blog-empty-state"
                   >
                     <span className="material-symbols-outlined text-primary/30 text-5xl">
                       signal_disconnected
@@ -156,14 +152,12 @@ export default function BlogPage() {
                   </motion.div>
                 ) : (
                   <>
-                    {/* Featured */}
                     {featured && (
                       <Link to={`/blog/${featured.slug}`}>
                         <PostCardFeatured post={featured} />
                       </Link>
                     )}
 
-                    {/* Grid — up to 3 cards */}
                     {gridPosts.length > 0 && (
                       <motion.div
                         className={`grid gap-6 ${
@@ -186,7 +180,6 @@ export default function BlogPage() {
                       </motion.div>
                     )}
 
-                    {/* ── Separator ──────────────────────────────────────── */}
                     {listPosts.length > 0 && (
                       <motion.div
                         className="flex items-center gap-6 pt-4"
@@ -202,7 +195,6 @@ export default function BlogPage() {
                       </motion.div>
                     )}
 
-                    {/* List */}
                     {listPosts.length > 0 && (
                       <motion.div
                         variants={staggerContainer}
@@ -225,15 +217,13 @@ export default function BlogPage() {
             </AnimatePresence>
           )}
 
-          {/* ── Newsletter strip ──────────────────────────────────────── */}
           <motion.section
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={viewportOnce}
-            className="solid-card rounded-[2.5rem] p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden"
+            className="newsletter-section"
           >
-            {/* Glow */}
             <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
 
             <div className="space-y-2 relative z-10">
@@ -253,14 +243,14 @@ export default function BlogPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="flex-1 md:w-64 bg-white/5 border border-white/10 rounded-full px-5 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/40 outline-none focus:border-primary/40 transition-colors"
+                  className="newsletter-input"
                 />
                 <motion.button
                   type="submit"
                   disabled={submitting}
                   whileHover={{ scale: 1.04, boxShadow: '0 0 20px rgba(56,189,248,0.3)' }}
                   whileTap={{ scale: 0.97 }}
-                  className="bg-primary text-on-primary font-bold tracking-wider text-[10px] uppercase px-6 py-3 rounded-full flex-shrink-0 disabled:opacity-60"
+                  className="newsletter-btn"
                 >
                   {submitting ? 'Transmitting…' : 'Subscribe'}
                 </motion.button>

@@ -1,0 +1,4 @@
+.skill-pill {
+  @apply solid-card px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em]
+         flex items-center gap-2.5;
+}

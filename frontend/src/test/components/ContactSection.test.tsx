@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import ContactSection from '../../components/ContactSection'
+import ContactSection from '../../components/sections/ContactSection/ContactSection'
 
 describe('ContactSection', () => {
   it('renders section heading', () => {

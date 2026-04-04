@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
 import { server } from '../mocks/server'
-import BlogPage from '../../pages/BlogPage'
+import BlogPage from '../../pages/BlogPage/BlogPage'
 
 const BASE = 'http://localhost:8000'
 

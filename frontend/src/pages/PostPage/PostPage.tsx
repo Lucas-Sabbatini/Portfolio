@@ -3,11 +3,12 @@ import { useParams, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
-import type { PostDetail } from '../api/posts'
-import { fetchPost } from '../api/posts'
-import { ApiError } from '../api/client'
-import { TagChip } from '../components/blog/PostCard'
-import { useAnalytics } from '../hooks/useAnalytics'
+import type { PostDetail } from '@/types/post'
+import { fetchPost } from '@/api/posts'
+import { ApiError } from '@/api/client'
+import { TagChip } from '@/components/blog/PostCard/PostCard'
+import { useAnalytics } from '@/hooks/useAnalytics'
+import './PostPage.css'
 
 export default function PostPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -69,7 +70,7 @@ export default function PostPage() {
   if (notFound || !post) {
     return (
       <main className="min-h-screen pt-36 pb-24 px-6 md:px-12">
-        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+        <div className="post-not-found">
           <span className="material-symbols-outlined text-primary/30 text-6xl">signal_disconnected</span>
           <p className="text-on-surface-variant text-sm font-bold uppercase tracking-widest">
             Signal not found
@@ -89,7 +90,6 @@ export default function PostPage() {
   return (
     <main className="min-h-screen pt-36 pb-24 px-6 md:px-12">
       <article className="max-w-3xl mx-auto space-y-12">
-        {/* Header */}
         <header className="space-y-6">
           <Link to="/blog" className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest hover:text-primary transition-colors">
             ← Signal Archive
@@ -105,14 +105,12 @@ export default function PostPage() {
           </div>
         </header>
 
-        {/* Cover image */}
         {post.cover_image && (
-          <div className="rounded-[2rem] overflow-hidden aspect-[16/7]">
+          <div className="post-cover">
             <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover opacity-80" />
           </div>
         )}
 
-        {/* Body */}
         <div className="prose prose-invert prose-lg max-w-none
                         prose-headings:font-headline prose-headings:tracking-tight
                         prose-a:text-primary prose-a:no-underline hover:prose-a:underline

@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
 import { server } from '../mocks/server'
-import PostPage from '../../pages/PostPage'
+import PostPage from '../../pages/PostPage/PostPage'
 
 const BASE = 'http://localhost:8000'
 
