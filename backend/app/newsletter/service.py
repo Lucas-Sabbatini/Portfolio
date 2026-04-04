@@ -1,28 +1,29 @@
 import logging
 
 import resend
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.database import get_pool
+from app.models import NewsletterSubscriber
+from app.utils import orm_to_dict
 
 logger = logging.getLogger(__name__)
 
 
-async def subscribe(email: str) -> dict:
+async def subscribe(session: AsyncSession, email: str) -> dict:
     """Insert subscriber and send confirmation email. Raises ValueError on duplicate."""
+    subscriber = NewsletterSubscriber(email=email)
+    session.add(subscriber)
     try:
-        pool = await get_pool()
-        row = await pool.fetchrow(
-            "INSERT INTO newsletter_subscribers (email) VALUES ($1) RETURNING *",
-            email,
-        )
-        logger.info("New newsletter subscriber: %s", email)
-    except Exception as exc:
-        # asyncpg raises asyncpg.UniqueViolationError for duplicates
-        if "unique" in str(exc).lower() or "duplicate" in str(exc).lower():
-            raise ValueError("already_subscribed") from exc
-        logger.error("Database error subscribing: %s", email, exc_info=True)
-        raise
+        await session.flush()
+    except IntegrityError as exc:
+        await session.rollback()
+        raise ValueError("already_subscribed") from exc
+
+    await session.refresh(subscriber)
+    logger.info("New newsletter subscriber: %s", email)
 
     # Send confirmation email (best-effort)
     try:
@@ -40,16 +41,11 @@ async def subscribe(email: str) -> dict:
     except Exception:
         logger.error("Failed to send confirmation email to: %s", email, exc_info=True)
 
-    return dict(row)
+    return orm_to_dict(subscriber)
 
 
-async def list_subscribers() -> list[dict]:
-    try:
-        pool = await get_pool()
-        rows = await pool.fetch(
-            "SELECT id, email, created_at FROM newsletter_subscribers ORDER BY created_at DESC"
-        )
-        return [dict(r) for r in rows]
-    except Exception:
-        logger.error("Database error listing subscribers", exc_info=True)
-        raise
+async def list_subscribers(session: AsyncSession) -> list[dict]:
+    result = await session.execute(
+        select(NewsletterSubscriber).order_by(NewsletterSubscriber.created_at.desc())
+    )
+    return [orm_to_dict(r) for r in result.scalars().all()]

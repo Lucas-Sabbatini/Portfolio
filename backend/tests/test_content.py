@@ -1,7 +1,7 @@
 """Tests for content endpoints."""
 
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, patch
+from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient
@@ -40,7 +40,7 @@ async def test_patch_content_upserts(client: AsyncClient, mock_db, auth_cookie: 
         )
 
     assert response.status_code == 200
-    mock_upsert.assert_called_once_with("hero", "title", "New Title")
+    mock_upsert.assert_called_once_with(ANY, "hero", "title", "New Title")
 
 
 @pytest.mark.asyncio

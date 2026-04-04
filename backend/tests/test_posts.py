@@ -1,7 +1,7 @@
 """Tests for posts endpoints."""
 
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, patch
+from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient
@@ -45,7 +45,7 @@ async def test_list_posts_tag_filter(client: AsyncClient, mock_db):
         response = await client.get("/api/posts?tag=Research")
 
     assert response.status_code == 200
-    mock_list.assert_called_once_with(tag="Research")
+    mock_list.assert_called_once_with(ANY, tag="Research")
 
 
 @pytest.mark.asyncio
@@ -152,6 +152,6 @@ async def test_read_time_auto_computed(client: AsyncClient, mock_db, auth_cookie
     assert response.status_code == 201
     # Verify service was called (it handles read_time computation)
     mock_create.assert_called_once()
-    call_arg = mock_create.call_args[0][0]
+    call_arg = mock_create.call_args[0][1]
     # read_time was not provided in request
     assert call_arg.read_time is None

@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_admin
 from app.content import service
@@ -18,6 +19,7 @@ from app.content.schemas import (
     SocialLinkResponse,
     SocialLinkUpdate,
 )
+from app.database import get_session
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +30,12 @@ router = APIRouter(prefix="/api", tags=["content"])
 
 
 @router.get("/content/{section}")
-async def get_content(section: str) -> dict[str, str]:
+async def get_content(
+    section: str,
+    session: AsyncSession = Depends(get_session),
+) -> dict[str, str]:
     try:
-        return await service.get_content_section(section)
+        return await service.get_content_section(session, section)
     except Exception as exc:
         logger.error("Error getting content section", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
@@ -42,9 +47,10 @@ async def patch_content(
     key: str,
     body: ContentUpdate,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> dict[str, str]:
     try:
-        await service.upsert_content(section, key, body.value)
+        await service.upsert_content(session, section, key, body.value)
         return {"section": section, "key": key, "value": body.value}
     except Exception as exc:
         logger.error("Error patching content", exc_info=True)
@@ -55,9 +61,11 @@ async def patch_content(
 
 
 @router.get("/experience", response_model=list[ExperienceResponse])
-async def list_experience() -> list[ExperienceResponse]:
+async def list_experience(
+    session: AsyncSession = Depends(get_session),
+) -> list[ExperienceResponse]:
     try:
-        rows = await service.list_experience()
+        rows = await service.list_experience(session)
         return [
             ExperienceResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows
         ]
@@ -70,10 +78,11 @@ async def list_experience() -> list[ExperienceResponse]:
 async def create_experience(
     body: ExperienceCreate,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> ExperienceResponse:
     try:
         row = await service.create_experience(
-            body.role, body.company, body.period, body.description, body.sort_order
+            session, body.role, body.company, body.period, body.description, body.sort_order
         )
         return ExperienceResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
     except Exception as exc:
@@ -86,10 +95,11 @@ async def update_experience(
     entry_id: UUID,
     body: ExperienceUpdate,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> ExperienceResponse:
     try:
         row = await service.update_experience(
-            str(entry_id), body.role, body.company, body.period, body.description, body.sort_order
+            session, str(entry_id), body.role, body.company, body.period, body.description, body.sort_order
         )
     except Exception as exc:
         logger.error("Error updating experience", exc_info=True)
@@ -103,9 +113,10 @@ async def update_experience(
 async def delete_experience(
     entry_id: UUID,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> Response:
     try:
-        deleted = await service.delete_experience(str(entry_id))
+        deleted = await service.delete_experience(session, str(entry_id))
     except Exception as exc:
         logger.error("Error deleting experience", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
@@ -118,9 +129,11 @@ async def delete_experience(
 
 
 @router.get("/skills", response_model=list[SkillResponse])
-async def list_skills() -> list[SkillResponse]:
+async def list_skills(
+    session: AsyncSession = Depends(get_session),
+) -> list[SkillResponse]:
     try:
-        rows = await service.list_skills()
+        rows = await service.list_skills(session)
         return [SkillResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows]
     except Exception as exc:
         logger.error("Error listing skills", exc_info=True)
@@ -131,9 +144,10 @@ async def list_skills() -> list[SkillResponse]:
 async def create_skill(
     body: SkillCreate,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> SkillResponse:
     try:
-        row = await service.create_skill(body.name, body.category, body.icon, body.sort_order)
+        row = await service.create_skill(session, body.name, body.category, body.icon, body.sort_order)
         return SkillResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
     except Exception as exc:
         logger.error("Error creating skill", exc_info=True)
@@ -145,10 +159,11 @@ async def update_skill(
     skill_id: UUID,
     body: SkillUpdate,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> SkillResponse:
     try:
         row = await service.update_skill(
-            str(skill_id), body.name, body.category, body.icon, body.sort_order
+            session, str(skill_id), body.name, body.category, body.icon, body.sort_order
         )
     except Exception as exc:
         logger.error("Error updating skill", exc_info=True)
@@ -162,9 +177,10 @@ async def update_skill(
 async def delete_skill(
     skill_id: UUID,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> Response:
     try:
-        deleted = await service.delete_skill(str(skill_id))
+        deleted = await service.delete_skill(session, str(skill_id))
     except Exception as exc:
         logger.error("Error deleting skill", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
@@ -177,9 +193,11 @@ async def delete_skill(
 
 
 @router.get("/social-links", response_model=list[SocialLinkResponse])
-async def list_social_links() -> list[SocialLinkResponse]:
+async def list_social_links(
+    session: AsyncSession = Depends(get_session),
+) -> list[SocialLinkResponse]:
     try:
-        rows = await service.list_social_links()
+        rows = await service.list_social_links(session)
         return [
             SocialLinkResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows
         ]
@@ -192,10 +210,11 @@ async def list_social_links() -> list[SocialLinkResponse]:
 async def create_social_link(
     body: SocialLinkCreate,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> SocialLinkResponse:
     try:
         row = await service.create_social_link(
-            body.platform, body.url, body.label, body.icon, body.color, body.sort_order
+            session, body.platform, body.url, body.label, body.icon, body.color, body.sort_order
         )
         return SocialLinkResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
     except Exception as exc:
@@ -208,9 +227,11 @@ async def update_social_link(
     link_id: UUID,
     body: SocialLinkUpdate,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> SocialLinkResponse:
     try:
         row = await service.update_social_link(
+            session,
             str(link_id),
             body.platform,
             body.url,
@@ -231,9 +252,10 @@ async def update_social_link(
 async def delete_social_link(
     link_id: UUID,
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> Response:
     try:
-        deleted = await service.delete_social_link(str(link_id))
+        deleted = await service.delete_social_link(session, str(link_id))
     except Exception as exc:
         logger.error("Error deleting social link", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc

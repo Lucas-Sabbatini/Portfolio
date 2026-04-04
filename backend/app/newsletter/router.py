@@ -3,8 +3,10 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_admin
+from app.database import get_session
 from app.newsletter import service
 
 logger = logging.getLogger(__name__)
@@ -23,9 +25,12 @@ class SubscriberResponse(BaseModel):
 
 
 @router.post("/subscribe", status_code=201)
-async def subscribe(body: SubscribeRequest) -> dict:
+async def subscribe(
+    body: SubscribeRequest,
+    session: AsyncSession = Depends(get_session),
+) -> dict:
     try:
-        row = await service.subscribe(str(body.email))
+        row = await service.subscribe(session, str(body.email))
         return {"id": str(row["id"]), "email": row["email"]}
     except ValueError as exc:
         if "already_subscribed" in str(exc):
@@ -39,9 +44,10 @@ async def subscribe(body: SubscribeRequest) -> dict:
 @router.get("/subscribers", response_model=list[SubscriberResponse])
 async def list_subscribers(
     _admin: dict[str, str] = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session),
 ) -> list[SubscriberResponse]:
     try:
-        rows = await service.list_subscribers()
+        rows = await service.list_subscribers(session)
         return [
             SubscriberResponse(id=str(r["id"]), email=r["email"], created_at=r.get("created_at"))
             for r in rows

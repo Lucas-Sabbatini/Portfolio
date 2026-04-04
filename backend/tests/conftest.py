@@ -48,17 +48,24 @@ async def client(app, mock_db) -> AsyncGenerator[AsyncClient, None]:
 
 @pytest.fixture
 def mock_db():
-    """Patch asyncpg pool."""
-    mock_pool = MagicMock()
-    mock_pool.fetchrow = AsyncMock(return_value=None)
-    mock_pool.fetch = AsyncMock(return_value=[])
-    mock_pool.execute = AsyncMock(return_value="DELETE 0")
+    """Patch SQLAlchemy async session."""
+    from sqlalchemy.ext.asyncio import AsyncSession
 
-    with (
-        patch("app.database._pool", mock_pool),
-        patch("app.database.get_pool", AsyncMock(return_value=mock_pool)),
-    ):
-        yield {"pool": mock_pool}
+    mock_session = MagicMock(spec=AsyncSession)
+    mock_session.execute = AsyncMock(return_value=MagicMock())
+    mock_session.commit = AsyncMock()
+    mock_session.rollback = AsyncMock()
+    mock_session.flush = AsyncMock()
+    mock_session.refresh = AsyncMock()
+    mock_session.add = MagicMock()
+    mock_session.__aenter__ = AsyncMock(return_value=mock_session)
+    mock_session.__aexit__ = AsyncMock(return_value=False)
+
+    async def fake_get_session():
+        yield mock_session
+
+    with patch("app.database.get_session", fake_get_session):
+        yield {"session": mock_session}
 
 
 @pytest.fixture
