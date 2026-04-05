@@ -1,3 +1,68 @@
+/* ── Prose / Markdown body ──────────────────────────────── */
+.post-prose { @apply text-base md:text-lg text-on-surface/90 leading-relaxed; }
+.post-prose h1 { @apply text-3xl md:text-4xl font-headline font-extrabold tracking-tight mt-14 mb-4 text-on-surface; }
+.post-prose h2 { @apply text-2xl md:text-3xl font-headline font-bold tracking-tight mt-12 mb-3 text-on-surface; }
+.post-prose h3 { @apply text-xl md:text-2xl font-headline font-bold tracking-tight mt-10 mb-3 text-on-surface; }
+.post-prose h4 { @apply text-lg md:text-xl font-headline font-semibold tracking-tight mt-8 mb-2 text-on-surface; }
+.post-prose h5 { @apply text-base md:text-lg font-headline font-semibold mt-6 mb-2 text-on-surface; }
+.post-prose h6 { @apply text-sm md:text-base font-headline font-semibold uppercase tracking-widest mt-6 mb-2 text-on-surface-variant; }
+
+.post-prose p { @apply mb-6 leading-relaxed; }
+.post-prose ul,
+.post-prose ol { @apply mb-6 pl-6; }
+.post-prose li { @apply mb-2; }
+.post-prose blockquote { @apply border-l-4 border-primary pl-5 my-6 text-on-surface-variant italic; }
+.post-prose hr { @apply my-10 border-on-surface/10; }
+
+.post-prose a { @apply text-primary no-underline hover:underline; }
+
+/* ── Inline code ───────────────────────────────────────── */
+.post-prose :not(pre) > code {
+  @apply text-primary bg-on-surface/[0.06] rounded px-1.5 py-0.5 text-[0.875em] font-mono;
+}
+
+/* ── Code blocks ───────────────────────────────────────── */
+.post-prose pre {
+  @apply my-8 rounded-2xl border border-on-surface/[0.08] overflow-x-auto;
+  background: #0d1117 !important;
+}
+.post-prose pre code {
+  @apply block p-6 text-sm leading-relaxed font-mono;
+  background: transparent !important;
+}
+
+/* ── Code copy button ──────────────────────────────────── */
+.code-block {
+  @apply relative;
+}
+.code-copy-btn {
+  @apply absolute top-3 right-3 flex items-center gap-1.5
+         text-[10px] font-bold uppercase tracking-widest
+         text-on-surface-variant/50 hover:text-on-surface
+         bg-on-surface/[0.08] hover:bg-on-surface/[0.14]
+         rounded-lg px-2.5 py-1.5 transition-colors;
+}
+
+/* ── Tables ────────────────────────────────────────────── */
+.post-prose table {
+  @apply w-full my-8 text-sm border-collapse;
+}
+.post-prose thead th {
+  @apply text-left font-bold text-on-surface uppercase text-xs tracking-wider
+         px-4 py-3 border-b-2 border-on-surface/10;
+}
+.post-prose tbody td {
+  @apply px-4 py-3 border-b border-on-surface/[0.06] text-on-surface-variant;
+}
+.post-prose tbody tr:hover {
+  @apply bg-on-surface/[0.03];
+}
+
+/* ── Images inside prose ───────────────────────────────── */
+.post-prose img {
+  @apply rounded-2xl my-8;
+}
+
 .post-cover {
   @apply rounded-[2rem] overflow-hidden aspect-[16/7];
 }

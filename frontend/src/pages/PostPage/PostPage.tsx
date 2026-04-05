@@ -1,9 +1,13 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback, type HTMLAttributes } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import remarkEmoji from 'remark-emoji'
 import rehypeRaw from 'rehype-raw'
-import rehypeSanitize from 'rehype-sanitize'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
+import rehypeHighlight from 'rehype-highlight'
+import rehypeKatex from 'rehype-katex'
 import { motion } from 'framer-motion'
 import type { Post, PostDetail } from '@/types/post'
 import { fetchPost, fetchPosts } from '@/api/posts'
@@ -12,7 +16,56 @@ import { ApiError } from '@/api/client'
 import { TagChip } from '@/components/blog/PostCard/PostCard'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { fadeUp, viewportOnce } from '@/lib/animations'
+import 'highlight.js/styles/github-dark.min.css'
+import 'katex/dist/katex.min.css'
 import './PostPage.css'
+
+const sanitizeSchema = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    code: [...(defaultSchema.attributes?.code ?? []), 'className'],
+    span: [...(defaultSchema.attributes?.span ?? []), 'className', 'style'],
+    div: [...(defaultSchema.attributes?.div ?? []), 'className', 'style'],
+    math: [...(defaultSchema.attributes?.math ?? []), 'xmlns'],
+    svg: [...(defaultSchema.attributes?.svg ?? []), 'xmlns', 'viewBox', 'width', 'height'],
+    sup: [...(defaultSchema.attributes?.sup ?? []), 'id'],
+    a: [...(defaultSchema.attributes?.a ?? []), 'id', 'href', 'className'],
+    li: [...(defaultSchema.attributes?.li ?? []), 'id'],
+    section: [...(defaultSchema.attributes?.section ?? []), 'className'],
+  },
+  tagNames: [
+    ...(defaultSchema.tagNames ?? []),
+    'math', 'semantics', 'mrow', 'mi', 'mo', 'mn', 'msup', 'msub',
+    'mfrac', 'mover', 'munder', 'msqrt', 'mtable', 'mtr', 'mtd',
+    'mtext', 'annotation', 'svg', 'path', 'line', 'section',
+  ],
+}
+
+function CodeBlock({ children, ...props }: HTMLAttributes<HTMLPreElement>) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = useCallback(() => {
+    const code = (typeof children === 'object' && children !== null && 'props' in (children as React.ReactElement))
+      ? ((children as React.ReactElement).props as { children?: string }).children ?? ''
+      : String(children ?? '')
+    navigator.clipboard.writeText(code).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }, [children])
+
+  return (
+    <pre {...props} className={`${props.className ?? ''} code-block`}>
+      <button type="button" onClick={handleCopy} className="code-copy-btn" aria-label="Copy code">
+        <span className="material-symbols-outlined text-[16px]">
+          {copied ? 'check' : 'content_copy'}
+        </span>
+      </button>
+      {children}
+    </pre>
+  )
+}
 
 export default function PostPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -53,7 +106,11 @@ export default function PostPage() {
 
   const renderedBody = useMemo(
     () => post ? (
-      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeSanitize]}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath, remarkEmoji]}
+        rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeKatex, [rehypeSanitize, sanitizeSchema]]}
+        components={{ pre: CodeBlock }}
+      >
         {post.body}
       </ReactMarkdown>
     ) : null,
@@ -169,12 +226,7 @@ export default function PostPage() {
           </div>
         )}
 
-        <div className="prose prose-invert prose-lg max-w-none
-                        prose-headings:font-headline prose-headings:tracking-tight
-                        prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                        prose-code:text-primary prose-code:bg-on-surface/5 prose-code:rounded prose-code:px-1
-                        prose-pre:solid-card prose-pre:rounded-[1rem]
-                        prose-blockquote:border-primary prose-blockquote:text-on-surface-variant">
+        <div className="post-prose max-w-none">
           {renderedBody}
         </div>
 

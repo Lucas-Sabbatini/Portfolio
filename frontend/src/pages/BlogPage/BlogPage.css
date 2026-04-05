@@ -1,5 +1,5 @@
 .blog-page-heading {
-  @apply font-headline font-extrabold text-5xl sm:text-6xl md:text-[8rem] tracking-tighter leading-[0.85] text-on-surface;
+  @apply font-display font-extrabold text-5xl sm:text-6xl md:text-[6rem] tracking-tighter leading-[0.85] text-on-surface;
 }
 
 .newsletter-section {
