@@ -51,6 +51,12 @@ function Layout() {
 
   return (
     <div className="dark">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded-full focus:text-sm focus:font-bold"
+      >
+        Skip to content
+      </a>
       <Navbar minimal={pathname === '/blog' || isPostPage} />
       <Routes>
         <Route path="/" element={<HomePage />} />

@@ -44,7 +44,7 @@ export function PostCardFeatured({ post }: { post: Post }) {
       {post.cover_image ? (
         <img
           src={post.cover_image}
-          alt={post.title}
+          alt=""
           className="post-card-featured-image"
         />
       ) : (
@@ -86,7 +86,8 @@ export function PostCardMedium({ post, index }: { post: Post; index: number }) {
         {post.cover_image ? (
           <img
             src={post.cover_image}
-            alt={post.title}
+            alt=""
+            loading="lazy"
             className="post-card-medium-image"
           />
         ) : (
@@ -101,7 +102,7 @@ export function PostCardMedium({ post, index }: { post: Post; index: number }) {
       <div className="p-6 flex flex-col flex-1">
         <div className="flex items-center gap-3 mb-4">
           <TagChip tag={post.tag} />
-          <span className="text-on-surface-variant text-[9px] font-bold uppercase tracking-widest">
+          <span className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">
             {post.read_time}
           </span>
         </div>

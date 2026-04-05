@@ -1,6 +1,6 @@
 /* ── Shared ──────────────────────────────────────────────────── */
 .tag-chip {
-  @apply inline-flex px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase border backdrop-blur-md;
+  @apply inline-flex px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border backdrop-blur-md;
 }
 
 /* ── Featured card ───────────────────────────────────────────── */
@@ -19,7 +19,7 @@
 
 .post-card-featured-watermark {
   @apply absolute top-8 right-10 text-[120px] font-extrabold leading-none
-         text-white/[0.03] font-headline select-none;
+         text-on-surface/[0.03] font-headline select-none;
 }
 
 .post-card-featured-content {
@@ -57,12 +57,12 @@
 }
 
 .post-card-medium-footer {
-  @apply flex items-center justify-between mt-5 pt-4 border-t border-white/5;
+  @apply flex items-center justify-between mt-5 pt-4 border-t border-on-surface/5;
 }
 
 /* ── List row ────────────────────────────────────────────────── */
 .post-card-list {
-  @apply flex items-center gap-6 md:gap-10 py-6 border-b border-white/5 cursor-pointer;
+  @apply flex items-center gap-6 md:gap-10 py-6 border-b border-on-surface/5 cursor-pointer;
 }
 
 .post-card-list-title {
