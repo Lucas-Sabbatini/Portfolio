@@ -123,4 +123,3 @@ def downgrade() -> None:
     op.drop_table("content_blocks")
     op.drop_table("posts")
     op.drop_table("admin_users")
-    
