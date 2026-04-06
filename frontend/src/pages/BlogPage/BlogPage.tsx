@@ -60,7 +60,7 @@ export default function BlogPage() {
     try {
       await subscribe(email)
       setEmail('')
-      setNewsletterMsg({ text: 'Signal received.', cls: 'text-primary text-xs' })
+      setNewsletterMsg({ text: 'You\'re subscribed.', cls: 'text-primary text-xs' })
       track('newsletter-subscribe')
     } catch (err) {
       if (err instanceof ApiError && err.status === 409) {
@@ -74,8 +74,7 @@ export default function BlogPage() {
   }
 
   return (
-    <>
-      <main id="main-content" className="min-h-screen pt-36 pb-24 px-6 md:px-12">
+    <main id="main-content" className="min-h-screen pt-36 pb-24 px-6 md:px-12">
         <div className="max-w-7xl mx-auto space-y-20">
 
           {/* ── Masthead ───────────────────────────────────────────────── */}
@@ -85,29 +84,16 @@ export default function BlogPage() {
             initial="hidden"
             animate="visible"
           >
-            <motion.div variants={fadeUp} className="flex items-end justify-between">
-              <p className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
-                05 / Intelligence
-              </p>
-              <div className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                <span className="text-xs font-bold uppercase tracking-widest text-on-surface-variant/40">
-                  {posts.length} Signals indexed
-                </span>
-              </div>
-            </motion.div>
-
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 border-b border-on-surface/5 pb-10">
               <motion.h1 variants={fadeUp} className="blog-page-heading">
-                Signal<br />
-                <span className="text-primary-dim">Archive.</span>
+                Blog.
               </motion.h1>
 
               <motion.p
                 variants={fadeUp}
                 className="text-on-surface-variant font-light text-lg max-w-sm leading-relaxed md:pb-3"
               >
-                Dispatches on AI systems, infrastructure, and the machinery of intelligence.
+                On AI systems, infrastructure, and the machinery of intelligence.
               </motion.p>
             </div>
 
@@ -121,13 +107,13 @@ export default function BlogPage() {
           </motion.header>
 
           {loading ? (
-            <div className="space-y-8" role="status" aria-busy="true">
+            <div className="space-y-6" role="status" aria-busy="true">
               <span className="sr-only">Loading posts</span>
-              <div className="solid-card rounded-[2rem] animate-pulse h-[480px]" />
+              <div className="hidden md:block solid-card rounded-3xl animate-pulse h-[400px]" />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="solid-card rounded-[2rem] animate-pulse h-[320px]" />
-                <div className="solid-card rounded-[2rem] animate-pulse h-[320px]" />
-                <div className="solid-card rounded-[2rem] animate-pulse h-[320px]" />
+                <div className="solid-card rounded-3xl animate-pulse h-[260px] md:h-[320px]" />
+                <div className="solid-card rounded-3xl animate-pulse h-[260px] md:h-[320px]" />
+                <div className="solid-card rounded-3xl animate-pulse h-[260px] md:h-[320px]" />
               </div>
             </div>
           ) : (
@@ -147,57 +133,42 @@ export default function BlogPage() {
                     animate="visible"
                     className="blog-empty-state"
                   >
-                    <span className="material-symbols-outlined text-primary/30 text-5xl" aria-hidden="true">
-                      signal_disconnected
-                    </span>
                     <p className="text-on-surface-variant text-sm font-bold uppercase tracking-widest">
-                      No signals in this category
+                      No posts in this category
                     </p>
                   </motion.div>
                 ) : (
                   <>
                     {featured && (
-                      <Link to={`/blog/${featured.slug}`} aria-label={featured.title}>
+                      <Link to={`/blog/${featured.slug}`} aria-label={featured.title} className="hidden md:block">
                         <PostCardFeatured post={featured} />
                       </Link>
                     )}
 
-                    {gridPosts.length > 0 && (
-                      <motion.div
-                        className={`grid gap-6 ${
-                          gridPosts.length === 1
-                            ? 'grid-cols-1'
-                            : gridPosts.length === 2
-                              ? 'grid-cols-1 md:grid-cols-2'
-                              : 'grid-cols-1 md:grid-cols-3'
-                        }`}
-                        variants={staggerFast}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={viewportOnce}
-                      >
-                        {gridPosts.map((post, i) => (
-                          <Link key={post.id} to={`/blog/${post.slug}`} aria-label={post.title}>
-                            <PostCardMedium post={post} index={i + 1} />
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-
-                    {listPosts.length > 0 && (
-                      <motion.div
-                        className="flex items-center gap-6 pt-4"
-                        variants={fadeUp}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={viewportOnce}
-                      >
-                        <span className="text-xs font-bold uppercase tracking-[0.6em] text-primary/40">
-                          Archive
-                        </span>
-                        <div className="flex-1 h-[1px] bg-on-surface/5" />
-                      </motion.div>
-                    )}
+                    <motion.div
+                      className={`grid gap-6 grid-cols-1 ${
+                        gridPosts.length === 1 && !featured
+                          ? 'md:grid-cols-1'
+                          : gridPosts.length === 2 && !featured
+                            ? 'md:grid-cols-2'
+                            : 'md:grid-cols-3'
+                      }`}
+                      variants={staggerFast}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={viewportOnce}
+                    >
+                      {featured && (
+                        <Link key={featured.id} to={`/blog/${featured.slug}`} aria-label={featured.title} className="md:hidden">
+                          <PostCardMedium post={featured} />
+                        </Link>
+                      )}
+                      {gridPosts.map((post) => (
+                        <Link key={post.id} to={`/blog/${post.slug}`} aria-label={post.title}>
+                          <PostCardMedium post={post} />
+                        </Link>
+                      ))}
+                    </motion.div>
 
                     {listPosts.length > 0 && (
                       <motion.div
@@ -207,9 +178,9 @@ export default function BlogPage() {
                         viewport={viewportOnce}
                       >
                         <div className="border-t border-on-surface/5">
-                          {listPosts.map((post, i) => (
+                          {listPosts.map((post) => (
                             <Link key={post.id} to={`/blog/${post.slug}`} aria-label={post.title}>
-                              <PostCardList post={post} index={i + gridPosts.length + 1} />
+                              <PostCardList post={post} />
                             </Link>
                           ))}
                         </div>
@@ -231,15 +202,15 @@ export default function BlogPage() {
           >
             <div className="space-y-2">
               <h2 className="font-headline font-extrabold text-2xl md:text-3xl tracking-tight text-on-surface">
-                Stay on the signal.
+                Stay updated.
               </h2>
               <p className="text-on-surface-variant text-sm font-light">
-                New dispatches land in your inbox. No noise.
+                New posts delivered to your inbox.
               </p>
             </div>
 
             <div className="flex flex-col gap-2 w-full md:w-auto">
-              <form onSubmit={handleSubscribe} className="flex gap-3">
+              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
                   placeholder="your@email.com"
@@ -256,7 +227,7 @@ export default function BlogPage() {
                   whileTap={{ scale: 0.97 }}
                   className="newsletter-btn"
                 >
-                  {submitting ? 'Transmitting…' : 'Subscribe'}
+                  {submitting ? 'Sending…' : 'Subscribe'}
                 </motion.button>
               </form>
               {newsletterMsg && (
@@ -267,6 +238,5 @@ export default function BlogPage() {
 
         </div>
       </main>
-    </>
   )
 }

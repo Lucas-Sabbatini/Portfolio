@@ -1,11 +1,11 @@
 /* ── Shared ──────────────────────────────────────────────────── */
 .tag-chip {
-  @apply inline-flex px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border backdrop-blur-md;
+  @apply inline-flex px-3 py-1 rounded-full text-xs font-black tracking-widest uppercase border backdrop-blur-md;
 }
 
 /* ── Featured card ───────────────────────────────────────────── */
 .post-card-featured {
-  @apply glass-card rounded-[2.5rem] overflow-hidden relative cursor-pointer h-[480px] md:h-[560px];
+  @apply glass-card rounded-3xl overflow-hidden relative cursor-pointer h-[400px] md:h-[480px];
 }
 
 .post-card-featured-image {
@@ -15,11 +15,6 @@
 
 .post-card-featured-overlay {
   @apply absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent;
-}
-
-.post-card-featured-watermark {
-  @apply absolute top-8 right-10 text-[120px] font-extrabold leading-none
-         text-on-surface/[0.03] font-headline select-none;
 }
 
 .post-card-featured-content {
@@ -37,13 +32,13 @@
 }
 
 .post-card-featured-cta {
-  @apply flex items-center gap-2 text-primary font-bold text-[11px] uppercase
-         tracking-widest group-hover:gap-4 transition-all;
+  @apply flex items-center gap-2 text-primary font-bold text-xs uppercase
+         tracking-widest group-hover:gap-3 transition-all;
 }
 
 /* ── Medium card ─────────────────────────────────────────────── */
 .post-card-medium {
-  @apply glass-card rounded-[2rem] overflow-hidden relative cursor-pointer flex flex-col;
+  @apply glass-card rounded-3xl overflow-hidden relative cursor-pointer flex flex-col h-full;
 }
 
 .post-card-medium-image {

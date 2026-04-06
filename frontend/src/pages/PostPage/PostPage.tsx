@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, type HTMLAttributes } from 'react'
+import { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef, type HTMLAttributes, type ReactNode, type CSSProperties } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -8,11 +8,11 @@ import rehypeRaw from 'rehype-raw'
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import type { Post, PostDetail } from '@/types/post'
 import { fetchPost, fetchPosts } from '@/api/posts'
 import { subscribe } from '@/api/newsletter'
-import { ApiError } from '@/api/client'
+import { ApiError, resolveImageUrl } from '@/api/client'
 import { TagChip } from '@/components/blog/PostCard/PostCard'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { fadeUp, viewportOnce } from '@/lib/animations'
@@ -56,15 +56,58 @@ function CodeBlock({ children, ...props }: HTMLAttributes<HTMLPreElement>) {
   }, [children])
 
   return (
-    <pre {...props} className={`${props.className ?? ''} code-block`}>
+    <div className="code-block">
       <button type="button" onClick={handleCopy} className="code-copy-btn" aria-label="Copy code">
         <span className="material-symbols-outlined text-[16px]">
           {copied ? 'check' : 'content_copy'}
         </span>
       </button>
-      {children}
-    </pre>
+      <pre {...props}>
+        {children}
+      </pre>
+    </div>
   )
+}
+
+interface Heading {
+  level: number
+  text: string
+  id: string
+}
+
+function getTextContent(node: ReactNode): string {
+  if (typeof node === 'string') return node
+  if (typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(getTextContent).join('')
+  if (node && typeof node === 'object' && 'props' in node) {
+    return getTextContent((node as React.ReactElement).props.children)
+  }
+  return ''
+}
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^\w]+/g, '-').replace(/(^-|-$)/g, '')
+}
+
+function HeadingWithId({ level, children, ...props }: HTMLAttributes<HTMLHeadingElement> & { level: number }) {
+  const id = slugify(getTextContent(children))
+  switch (level) {
+    case 1: return <h1 id={id} {...props}>{children}</h1>
+    case 2: return <h2 id={id} {...props}>{children}</h2>
+    case 3: return <h3 id={id} {...props}>{children}</h3>
+    case 4: return <h4 id={id} {...props}>{children}</h4>
+    case 5: return <h5 id={id} {...props}>{children}</h5>
+    default: return <h6 id={id} {...props}>{children}</h6>
+  }
+}
+
+const headingComponents = {
+  h1: (props: HTMLAttributes<HTMLHeadingElement>) => <HeadingWithId level={1} {...props} />,
+  h2: (props: HTMLAttributes<HTMLHeadingElement>) => <HeadingWithId level={2} {...props} />,
+  h3: (props: HTMLAttributes<HTMLHeadingElement>) => <HeadingWithId level={3} {...props} />,
+  h4: (props: HTMLAttributes<HTMLHeadingElement>) => <HeadingWithId level={4} {...props} />,
+  h5: (props: HTMLAttributes<HTMLHeadingElement>) => <HeadingWithId level={5} {...props} />,
+  h6: (props: HTMLAttributes<HTMLHeadingElement>) => <HeadingWithId level={6} {...props} />,
 }
 
 export default function PostPage() {
@@ -77,6 +120,101 @@ export default function PostPage() {
   const [submitting, setSubmitting] = useState(false)
   const [newsletterMsg, setNewsletterMsg] = useState<{ text: string; cls: string } | null>(null)
   const { track } = useAnalytics()
+  const reducedMotion = useReducedMotion()
+  const [activeId, setActiveId] = useState('')
+  const headerRef = useRef<HTMLElement>(null)
+  const proseRef = useRef<HTMLDivElement>(null)
+  const [tocStyle, setTocStyle] = useState<CSSProperties>({ display: 'none' })
+
+  const headings = useMemo<Heading[]>(() => {
+    if (!post?.body) return []
+    const regex = /^(#{1,6})\s+(.+)$/gm
+    const results: Heading[] = []
+    let match
+    while ((match = regex.exec(post.body)) !== null) {
+      const level = match[1].length
+      if (level === 1) continue
+      const text = match[2].replace(/[*_`~[\]]/g, '')
+      const id = slugify(text)
+      results.push({ level, text, id })
+    }
+    return results
+  }, [post?.body])
+
+  useEffect(() => {
+    if (!headings.length) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id)
+          }
+        }
+      },
+      { rootMargin: '0px 0px -80% 0px' },
+    )
+
+    headings.forEach(({ id }) => {
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
+    })
+
+    return () => observer.disconnect()
+  }, [headings])
+
+  useLayoutEffect(() => {
+    if (!proseRef.current || !headerRef.current || !headings.length) return
+
+    let ticking = false
+    const tocWidth = 200
+    const gap = 48
+    const stickyTop = 40
+
+    const update = () => {
+      if (!proseRef.current || !headerRef.current) return
+      const proseRect = proseRef.current.getBoundingClientRect()
+      const headerRect = headerRef.current.getBoundingClientRect()
+      const hasSpace = window.innerWidth - proseRect.right >= tocWidth + gap
+      const inView = proseRect.bottom > stickyTop && headerRect.top < window.innerHeight
+
+      if (hasSpace && inView) {
+        const top = Math.max(stickyTop, headerRect.top)
+        const bottomMargin = 40
+        const availableFromViewport = window.innerHeight - top - bottomMargin
+        const availableFromProse = proseRect.bottom - top
+        const maxHeight = Math.max(0, Math.min(availableFromViewport, availableFromProse))
+        setTocStyle({
+          position: 'fixed',
+          top: `${top}px`,
+          left: `${proseRect.right + gap}px`,
+          width: `${tocWidth}px`,
+          maxHeight: `${maxHeight}px`,
+          overflowY: 'auto',
+        })
+      } else {
+        setTocStyle({ display: 'none' })
+      }
+    }
+
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        update()
+        ticking = false
+      })
+    }
+
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', update, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', update)
+    }
+  }, [headings])
 
   useEffect(() => {
     if (!slug) return
@@ -109,7 +247,15 @@ export default function PostPage() {
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath, remarkEmoji]}
         rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeKatex, [rehypeSanitize, sanitizeSchema]]}
-        components={{ pre: CodeBlock }}
+        components={{
+          pre: CodeBlock,
+          table: ({ children, ...props }) => (
+            <div className="table-wrapper">
+              <table {...props}>{children}</table>
+            </div>
+          ),
+          ...headingComponents,
+        }}
       >
         {post.body}
       </ReactMarkdown>
@@ -202,7 +348,7 @@ export default function PostPage() {
   return (
     <main id="main-content" className="min-h-screen pt-36 pb-24 px-6 md:px-12">
       <article className="max-w-3xl mx-auto space-y-12">
-        <header className="space-y-6">
+        <header ref={headerRef} className="space-y-6">
           <div className="flex items-center gap-4">
             <Link to="/blog" className="inline-flex items-center min-h-[44px] text-on-surface-variant text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors">
               ← Signal Archive
@@ -222,13 +368,47 @@ export default function PostPage() {
 
         {post.cover_image && (
           <div className="post-cover">
-            <img src={post.cover_image} alt={post.title} loading="lazy" className="w-full h-full object-cover opacity-80" />
+            <img src={resolveImageUrl(post.cover_image)} alt={post.title} loading="lazy" className="w-full h-auto opacity-80" />
           </div>
         )}
 
-        <div className="post-prose max-w-none">
+        <div ref={proseRef} className="post-prose max-w-none">
           {renderedBody}
         </div>
+
+        {headings.length > 0 && (
+          <nav className="post-toc" style={tocStyle} aria-label="Table of contents">
+            <span className="post-toc-label">On this page</span>
+            <ul>
+              {headings.map(({ id, text, level }) => (
+                <li key={id} className="post-toc-item">
+                  {activeId === id && (
+                    <motion.div
+                      layoutId="toc-indicator"
+                      className="post-toc-indicator"
+                      transition={
+                        reducedMotion
+                          ? { duration: 0 }
+                          : { type: 'spring', stiffness: 350, damping: 30 }
+                      }
+                    />
+                  )}
+                  <a
+                    href={`#${id}`}
+                    className={`post-toc-link ${activeId === id ? 'post-toc-link-active' : ''}`}
+                    style={{ paddingLeft: `${12 + (level - 2) * 12}px` }}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+                    }}
+                  >
+                    {text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
 
         <div className="h-[1px] bg-on-surface/5" />
 
@@ -283,7 +463,7 @@ export default function PostPage() {
             </p>
           </div>
           <div className="flex flex-col gap-2 w-full md:w-auto">
-            <form onSubmit={handleSubscribe} className="flex gap-3">
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
               <input
                 type="email"
                 placeholder="your@email.com"
@@ -322,6 +502,7 @@ export default function PostPage() {
           </button>
         </div>
       </article>
+
     </main>
   )
 }

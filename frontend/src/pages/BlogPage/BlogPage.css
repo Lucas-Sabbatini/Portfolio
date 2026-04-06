@@ -1,21 +1,21 @@
 .blog-page-heading {
-  @apply font-display font-extrabold text-5xl sm:text-6xl md:text-[6rem] tracking-tighter leading-[0.85] text-on-surface;
+  @apply font-display font-extrabold text-5xl sm:text-6xl md:text-7xl tracking-tighter leading-[0.85] text-on-surface;
 }
 
 .newsletter-section {
-  @apply solid-card rounded-[2.5rem] p-10 md:p-16 flex flex-col md:flex-row
-         items-center justify-between gap-8 relative overflow-hidden
+  @apply solid-card rounded-3xl p-6 sm:p-10 md:p-16 flex flex-col md:flex-row
+         items-start md:items-center justify-between gap-6 md:gap-8 relative overflow-hidden
          border-on-surface/[0.06];
 }
 
 .newsletter-input {
-  @apply flex-1 md:w-64 bg-on-surface/5 border border-on-surface/10 rounded-full px-5 py-3
+  @apply w-full sm:w-auto sm:flex-1 md:w-64 bg-on-surface/5 border border-on-surface/10 rounded-full px-5 py-3
          text-sm text-on-surface placeholder:text-on-surface-variant/40
          outline-none focus:border-primary/40 transition-colors min-h-[44px];
 }
 
 .newsletter-btn {
-  @apply bg-primary text-on-primary font-bold tracking-wider text-xs uppercase
+  @apply w-full sm:w-auto bg-primary text-on-primary font-bold tracking-wider text-xs uppercase
          px-6 py-3 rounded-full flex-shrink-0 disabled:opacity-60 min-h-[44px]
          transition-shadow duration-300;
 }
@@ -25,5 +25,5 @@
 }
 
 .blog-empty-state {
-  @apply solid-card rounded-[2rem] p-20 flex flex-col items-center justify-center gap-4 text-center;
+  @apply solid-card rounded-3xl p-20 flex items-center justify-center text-center;
 }

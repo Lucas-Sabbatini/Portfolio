@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import MDEditor from '@uiw/react-md-editor'
 import type { PostCreate } from '../../api/posts'
 import { fetchPost, createPost, updatePost, uploadCoverImage } from '../../api/posts'
+import { resolveImageUrl } from '../../api/client'
 
 const slugify = (title: string) =>
   title.toLowerCase().trim()
@@ -151,7 +152,7 @@ export default function AdminPostEditPage() {
             className="w-full text-sm text-on-surface-variant"
           />
           {coverImage && (
-            <img src={coverImage} alt="Cover preview" className="rounded-[1rem] max-h-48 object-cover mt-2" />
+            <img src={resolveImageUrl(coverImage)} alt="Cover preview" className="rounded-[1rem] max-h-48 object-cover mt-2" />
           )}
         </div>
       </div>
