@@ -1,7 +1,7 @@
 import { apiFetch } from './client'
-import type { Post, PostDetail, PostCreate } from '@/types/post'
+import type { Post, PostDetail, PostCreate, PostImage } from '@/types/post'
 
-export type { Post, PostDetail, PostCreate }
+export type { Post, PostDetail, PostCreate, PostImage }
 
 export const fetchPosts = (tag?: string, status?: string): Promise<Post[]> => {
   const params = new URLSearchParams()
@@ -25,6 +25,23 @@ export const publishPost = (slug: string): Promise<Post> =>
 
 export const deletePost = (slug: string): Promise<void> =>
   apiFetch(`/api/posts/${slug}`, { method: 'DELETE' })
+
+export const fetchPostImages = (postId: string): Promise<PostImage[]> =>
+  apiFetch(`/api/posts/${postId}/images`)
+
+export const uploadPostImage = (postId: string, file: File, key?: string): Promise<PostImage> => {
+  const form = new FormData()
+  form.append('file', file)
+  if (key) form.append('key', key)
+  return apiFetch(`/api/posts/${postId}/images`, {
+    method: 'POST',
+    body: form,
+    headers: {},
+  })
+}
+
+export const deletePostImage = (postId: string, imageId: string): Promise<void> =>
+  apiFetch(`/api/posts/${postId}/images/${imageId}`, { method: 'DELETE' })
 
 export const uploadCoverImage = (file: File): Promise<{ url: string }> => {
   const form = new FormData()

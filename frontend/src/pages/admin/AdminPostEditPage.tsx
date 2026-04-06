@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import MDEditor from '@uiw/react-md-editor'
 import type { PostCreate } from '../../api/posts'
 import { fetchPost, createPost, updatePost, uploadCoverImage } from '../../api/posts'
+import { resolveImageUrl } from '../../api/client'
+import PostImagePanel from '../../components/admin/PostImagePanel'
 
 const slugify = (title: string) =>
   title.toLowerCase().trim()
@@ -24,12 +26,14 @@ export default function AdminPostEditPage() {
   const [body, setBody] = useState('')
   const [coverImage, setCoverImage] = useState('')
   const [readTime, setReadTime] = useState('')
+  const [postId, setPostId] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
     if (!slug) return
     fetchPost(slug).then(p => {
+      setPostId(p.id)
       setTitle(p.title)
       setPostSlug(p.slug)
       setTag(p.tag)
@@ -151,10 +155,16 @@ export default function AdminPostEditPage() {
             className="w-full text-sm text-on-surface-variant"
           />
           {coverImage && (
-            <img src={coverImage} alt="Cover preview" className="rounded-[1rem] max-h-48 object-cover mt-2" />
+            <img src={resolveImageUrl(coverImage)} alt="Cover preview" className="rounded-[1rem] max-h-48 object-cover mt-2" />
           )}
         </div>
       </div>
+
+      {postId ? (
+        <PostImagePanel postId={postId} onInsert={(snippet) => setBody((prev) => prev + '\n' + snippet)} />
+      ) : !isNew ? null : (
+        <p className="text-xs text-on-surface-variant/60">Save the post first to upload inline images.</p>
+      )}
 
       <div className="space-y-2">
         <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Body</label>

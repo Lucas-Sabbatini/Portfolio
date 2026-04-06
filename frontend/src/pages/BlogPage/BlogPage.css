@@ -1,23 +1,29 @@
 .blog-page-heading {
-  @apply font-headline font-extrabold text-6xl md:text-[8rem] tracking-tighter leading-[0.85] text-on-surface;
+  @apply font-display font-extrabold text-5xl sm:text-6xl md:text-7xl tracking-tighter leading-[0.85] text-on-surface;
 }
 
 .newsletter-section {
-  @apply solid-card rounded-[2.5rem] p-10 md:p-16 flex flex-col md:flex-row
-         items-center justify-between gap-8 relative overflow-hidden;
+  @apply solid-card rounded-3xl p-6 sm:p-10 md:p-16 flex flex-col md:flex-row
+         items-start md:items-center justify-between gap-6 md:gap-8 relative overflow-hidden
+         border-on-surface/[0.06];
 }
 
 .newsletter-input {
-  @apply flex-1 md:w-64 bg-white/5 border border-white/10 rounded-full px-5 py-3
+  @apply w-full sm:w-auto sm:flex-1 md:w-64 bg-on-surface/5 border border-on-surface/10 rounded-full px-5 py-3
          text-sm text-on-surface placeholder:text-on-surface-variant/40
-         outline-none focus:border-primary/40 transition-colors;
+         outline-none focus:border-primary/40 transition-colors min-h-[44px];
 }
 
 .newsletter-btn {
-  @apply bg-primary text-on-primary font-bold tracking-wider text-[10px] uppercase
-         px-6 py-3 rounded-full flex-shrink-0 disabled:opacity-60;
+  @apply w-full sm:w-auto bg-primary text-on-primary font-bold tracking-wider text-xs uppercase
+         px-6 py-3 rounded-full flex-shrink-0 disabled:opacity-60 min-h-[44px]
+         transition-shadow duration-300;
+}
+
+.newsletter-btn:hover {
+  box-shadow: 0 4px 24px theme('colors.primary / 0.15');
 }
 
 .blog-empty-state {
-  @apply glass-card rounded-[2rem] p-20 flex flex-col items-center justify-center gap-4 text-center;
+  @apply solid-card rounded-3xl p-20 flex items-center justify-center text-center;
 }

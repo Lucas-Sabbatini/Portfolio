@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { fadeUp, staggerContainer, viewportOnce } from '@/lib/animations'
 import type { Post } from '@/types/post'
 import { fetchPosts } from '@/api/posts'
+import { resolveImageUrl } from '@/api/client'
 import { tagColors } from '@/data/posts'
 import './BlogSection.css'
 
@@ -78,7 +79,7 @@ export default function BlogSection() {
                 >
                   {post.cover_image ? (
                     <img
-                      src={post.cover_image}
+                      src={resolveImageUrl(post.cover_image)}
                       alt={post.title}
                       className="blog-section-card-image"
                     />

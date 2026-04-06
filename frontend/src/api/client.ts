@@ -6,6 +6,10 @@ export class ApiError extends Error {
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
+export function resolveImageUrl(url: string): string {
+  return url.startsWith('/') ? `${BASE}${url}` : url
+}
+
 export async function apiFetch<T>(
   path: string,
   init?: RequestInit,

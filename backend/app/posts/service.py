@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Post
+from app.models import Post, PostImage
 from app.posts.schemas import PostCreate, PostUpdate, slugify
 from app.utils import orm_to_dict
 
@@ -36,7 +36,14 @@ async def list_posts(
 async def get_post_by_slug(session: AsyncSession, slug: str) -> dict | None:
     result = await session.execute(select(Post).where(Post.slug == slug))
     row = result.scalar_one_or_none()
-    return orm_to_dict(row) if row else None
+    if row is None:
+        return None
+    data = orm_to_dict(row)
+    img_result = await session.execute(
+        select(PostImage).where(PostImage.post_id == row.id).order_by(PostImage.created_at)
+    )
+    data["images"] = [{"key": img.key, "url": img.url} for img in img_result.scalars().all()]
+    return data
 
 
 async def create_post(session: AsyncSession, data: PostCreate) -> dict:

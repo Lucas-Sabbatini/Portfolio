@@ -33,6 +33,11 @@ class PostUpdate(BaseModel):
     status: str = "draft"
 
 
+class PostImageItem(BaseModel):
+    key: str
+    url: str
+
+
 class PostResponse(BaseModel):
     id: str
     slug: str
@@ -46,6 +51,7 @@ class PostResponse(BaseModel):
     published_at: datetime | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
+    images: list[PostImageItem] = []
 
 
 class PostListItem(BaseModel):

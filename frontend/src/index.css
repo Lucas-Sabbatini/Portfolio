@@ -24,37 +24,41 @@
 
 @layer components {
   .glass-card {
-    background: rgba(255, 255, 255, 0.01);
+    background: theme('colors.on-surface / 0.01');
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid theme('colors.on-surface / 0.08');
     transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .glass-card:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: theme('colors.on-surface / 0.03');
     border-color: theme('colors.primary / 0.2');
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 40px theme('colors.surface-container-lowest / 0.5');
   }
 
   .mesh-gradient {
     background:
-      radial-gradient(circle at 50% -20%, rgba(56, 189, 248, 0.12) 0%, transparent 60%),
-      radial-gradient(circle at 100% 100%, rgba(129, 140, 248, 0.05) 0%, transparent 50%);
+      radial-gradient(circle at 50% -20%, theme('colors.primary / 0.12') 0%, transparent 60%),
+      radial-gradient(circle at 100% 100%, theme('colors.tertiary / 0.05') 0%, transparent 50%);
   }
 
   .solid-card {
     background: theme('colors.surface-container-high');
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    border: 1px solid theme('colors.on-surface / 0.04');
     transition: background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .solid-card:hover {
     background: theme('colors.surface-bright');
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: theme('colors.on-surface / 0.08');
+  }
+
+  .filter-pill-active {
+    box-shadow: 0 0 20px theme('colors.primary / 0.25');
   }
 
   .material-symbols-outlined {

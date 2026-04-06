@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUp, fadeIn, scaleIn, staggerContainer, viewportOnce } from '@/lib/animations'
 import { fetchContent } from '@/api/content'
+import { resolveImageUrl } from '@/api/client'
 import Skeleton from '@/components/shared/Skeleton'
 import './ResearchSection.css'
 
@@ -96,7 +97,7 @@ export default function ResearchSection() {
           >
             <img
               src={content.image_url
-                ? (content.image_url.startsWith('/') ? `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}${content.image_url}` : content.image_url)
+                ? resolveImageUrl(content.image_url)
                 : 'https://lh3.googleusercontent.com/aida-public/AB6AXuC1t2vwe_ExDeathDRMChULSiv7l2yccCWvcV1gVuKLP3w7ednBTMBOS0MNmR_mttaEMQrzVwmwq5ru2B0epV5rBuqNzouCOv_rfsnzqk5GflgcBEkQqu7-UnvJO8o27faQQ2lkJ5JSWp0jthm925-ULoGkTuckUGkhUL9ewkgI2gJErqgZCtbPxdozoiOx37LI1AGo8tuwDorRajqbme34y5VO1e3i1hHTKB0qfkuXNXj70o_nki_IkfLsdbLGGt0m4ICOkTs-Iw'}
               alt="Neural Topology"
               loading="lazy"
