@@ -123,5 +123,4 @@ def downgrade() -> None:
     op.drop_table("content_blocks")
     op.drop_table("posts")
     op.drop_table("admin_users")
-    # Note: Generally, extensions aren't dropped in downgrades to avoid cascade issues,
-    # but you can add op.execute('DROP EXTENSION IF EXISTS "pgcrypto";') if you strictly want to.
+    
