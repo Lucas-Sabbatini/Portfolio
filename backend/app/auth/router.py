@@ -38,11 +38,15 @@ async def login(
 
     token = create_access_token({"email": admin["email"], "id": admin["id"]})
     response = JSONResponse(content={"message": "ok"})
+    from app.config import get_settings as _get_settings
+    _settings = _get_settings()
     response.set_cookie(
         key="access_token",
         value=token,
         httponly=True,
+        secure=True,
         samesite="strict",
+        max_age=_settings.access_token_expire_hours * 3600,
         path="/",
     )
     logger.info("Login successful for %s", admin["email"])

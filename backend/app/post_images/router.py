@@ -1,8 +1,11 @@
 import re
 import uuid
 from pathlib import Path
+from typing import Annotated
 
+import aiofiles
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_admin
 from app.config import get_settings
@@ -12,6 +15,9 @@ from app.post_images.schemas import PostImageResponse
 from app.upload.router import ALLOWED_MIME_TYPES, MAX_SIZE_BYTES, detect_mime
 
 router = APIRouter(prefix="/api/posts/{post_id}/images", tags=["post-images"])
+
+DbSession = Annotated[AsyncSession, Depends(get_session)]
+AdminDep = Annotated[dict[str, str], Depends(get_current_admin)]
 
 
 def _sanitize_key(filename: str) -> str:
@@ -24,10 +30,11 @@ def _sanitize_key(filename: str) -> str:
 @router.get("", response_model=list[PostImageResponse])
 async def list_post_images(
     post_id: str,
-    session=Depends(get_session),
-    _admin: dict[str, str] = Depends(get_current_admin),
+    session: DbSession,
+    _admin: AdminDep,
 ):
-    return await service.list_images(session, post_id)
+    rows = await service.list_images(session, post_id)
+    return [PostImageResponse.model_validate(r) for r in rows]
 
 
 @router.post("", response_model=PostImageResponse, status_code=201)
@@ -35,8 +42,8 @@ async def upload_post_image(
     post_id: str,
     file: UploadFile = File(...),
     key: str | None = Form(None),
-    session=Depends(get_session),
-    _admin: dict[str, str] = Depends(get_current_admin),
+    session: DbSession = None,  # type: ignore[assignment]
+    _admin: AdminDep = None,  # type: ignore[assignment]
 ):
     contents = await file.read()
 
@@ -58,27 +65,32 @@ async def upload_post_image(
     images_dir = Path(settings.upload_dir) / "post-images"
     images_dir.mkdir(parents=True, exist_ok=True)
     dest = images_dir / filename
-    dest.write_bytes(contents)
+    async with aiofiles.open(dest, "wb") as f:
+        await f.write(contents)
 
     url = f"/uploads/post-images/{filename}"
-    return await service.create_image(session, post_id, key, url)
+    row = await service.create_image(session, post_id, key, url)
+    return PostImageResponse.model_validate(row)
 
 
 @router.delete("/{image_id}", status_code=204)
 async def delete_post_image(
     post_id: str,
     image_id: str,
-    session=Depends(get_session),
-    _admin: dict[str, str] = Depends(get_current_admin),
+    session: DbSession,
+    _admin: AdminDep,
 ):
-    url = await service.delete_image(session, image_id)
+    url = await service.delete_image(session, post_id, image_id)
     if url is None:
         raise HTTPException(status_code=404, detail="Image not found")
 
     # Remove file from disk — url is like /uploads/post-images/uuid.ext
     settings = get_settings()
     relative = url.removeprefix("/uploads/")
-    file_path = Path(settings.upload_dir) / relative
+    upload_root = Path(settings.upload_dir).resolve()
+    file_path = (upload_root / relative).resolve()
+    if not str(file_path).startswith(str(upload_root)):
+        raise HTTPException(status_code=400, detail="Invalid path")
     if file_path.exists():
         file_path.unlink()
 
