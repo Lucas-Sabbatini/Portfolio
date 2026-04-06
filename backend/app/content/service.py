@@ -92,7 +92,9 @@ async def list_skills(session: AsyncSession) -> list[dict]:
 
 
 async def create_skill(session: AsyncSession, body: SkillCreate) -> dict:
-    skill = Skill(name=body.name, category=body.category, icon=body.icon, sort_order=body.sort_order)
+    skill = Skill(
+        name=body.name, category=body.category, icon=body.icon, sort_order=body.sort_order
+    )
     session.add(skill)
     await session.flush()
     await session.refresh(skill)
