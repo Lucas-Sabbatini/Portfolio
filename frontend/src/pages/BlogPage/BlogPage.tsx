@@ -10,6 +10,7 @@ import {
 import type { PostTag } from '@/data/posts'
 import type { Post } from '@/types/post'
 import { fetchPosts } from '@/api/posts'
+import { fetchContent } from '@/api/content'
 import { subscribe } from '@/api/newsletter'
 import { ApiError } from '@/api/client'
 import { useAnalytics } from '@/hooks/useAnalytics'
@@ -25,10 +26,12 @@ export default function BlogPage() {
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [newsletterMsg, setNewsletterMsg] = useState<{ text: string; cls: string } | null>(null)
+  const [blogContent, setBlogContent] = useState<Record<string, string>>({})
   const { track } = useAnalytics()
 
   useEffect(() => {
     fetchPosts().then(setPosts).catch(console.error).finally(() => setLoading(false))
+    fetchContent('blog').then(setBlogContent).catch(console.error)
   }, [])
 
   const tagCounts = useMemo(
@@ -86,14 +89,14 @@ export default function BlogPage() {
           >
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 border-b border-on-surface/5 pb-10">
               <motion.h1 variants={fadeUp} className="blog-page-heading">
-                Blog.
+                {blogContent.title ?? 'Blog.'}
               </motion.h1>
 
               <motion.p
                 variants={fadeUp}
                 className="text-on-surface-variant font-light text-lg max-w-sm leading-relaxed md:pb-3"
               >
-                On AI systems, infrastructure, and the machinery of intelligence.
+                {blogContent.subtitle ?? 'On AI systems, infrastructure, and the machinery of intelligence.'}
               </motion.p>
             </div>
 
@@ -202,10 +205,10 @@ export default function BlogPage() {
           >
             <div className="space-y-2">
               <h2 className="font-headline font-extrabold text-2xl md:text-3xl tracking-tight text-on-surface">
-                Stay updated.
+                {blogContent.newsletter_title ?? 'Stay updated.'}
               </h2>
               <p className="text-on-surface-variant text-sm font-light">
-                New posts delivered to your inbox.
+                {blogContent.newsletter_subtitle ?? 'New posts delivered to your inbox.'}
               </p>
             </div>
 

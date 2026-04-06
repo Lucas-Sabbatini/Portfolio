@@ -49,8 +49,8 @@ export default function ContactSection() {
         variants={fadeUp}
         className="contact-heading"
       >
-        Let's build <br />
-        <span className="text-primary-dim">together.</span>
+        {content.heading ?? "Let's build"} <br />
+        <span className="text-primary-dim">{content.heading_dim ?? 'together.'}</span>
       </motion.h2>
 
       <motion.p

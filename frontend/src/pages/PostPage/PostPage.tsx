@@ -11,6 +11,7 @@ import rehypeKatex from 'rehype-katex'
 import { motion, useReducedMotion } from 'framer-motion'
 import type { Post, PostDetail } from '@/types/post'
 import { fetchPost, fetchPosts } from '@/api/posts'
+import { fetchContent } from '@/api/content'
 import { subscribe } from '@/api/newsletter'
 import { ApiError, resolveImageUrl } from '@/api/client'
 import { resolvePostImageKeys } from '@/utils/resolvePostImages'
@@ -120,6 +121,7 @@ export default function PostPage() {
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [newsletterMsg, setNewsletterMsg] = useState<{ text: string; cls: string } | null>(null)
+  const [postContent, setPostContent] = useState<Record<string, string>>({})
   const { track } = useAnalytics()
   const reducedMotion = useReducedMotion()
   const [activeId, setActiveId] = useState('')
@@ -216,6 +218,10 @@ export default function PostPage() {
       window.removeEventListener('resize', update)
     }
   }, [headings])
+
+  useEffect(() => {
+    fetchContent('post').then(setPostContent).catch(console.error)
+  }, [])
 
   useEffect(() => {
     if (!slug) return
@@ -457,10 +463,10 @@ export default function PostPage() {
         >
           <div className="space-y-2">
             <h2 className="font-headline font-extrabold text-xl md:text-2xl tracking-tight text-on-surface">
-              Stay on the signal.
+              {postContent.newsletter_title ?? 'Stay on the signal.'}
             </h2>
             <p className="text-on-surface-variant text-sm font-light">
-              New dispatches land in your inbox. No noise.
+              {postContent.newsletter_subtitle ?? 'New dispatches land in your inbox. No noise.'}
             </p>
           </div>
           <div className="flex flex-col gap-2 w-full md:w-auto">

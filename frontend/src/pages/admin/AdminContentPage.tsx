@@ -151,6 +151,10 @@ export default function AdminContentPage() {
   const [hero, setHero] = useState<Record<string, string>>({})
   const [narrative, setNarrative] = useState<Record<string, string>>({})
   const [research, setResearch] = useState<Record<string, string>>({})
+  const [contact, setContact] = useState<Record<string, string>>({})
+  const [blog, setBlog] = useState<Record<string, string>>({})
+  const [post, setPost] = useState<Record<string, string>>({})
+  const [footer, setFooter] = useState<Record<string, string>>({})
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -158,7 +162,14 @@ export default function AdminContentPage() {
       fetchContent('hero'),
       fetchContent('narrative'),
       fetchContent('research'),
-    ]).then(([h, n, r]) => { setHero(h); setNarrative(n); setResearch(r) })
+      fetchContent('contact'),
+      fetchContent('blog'),
+      fetchContent('post'),
+      fetchContent('footer'),
+    ]).then(([h, n, r, c, b, p, f]) => {
+      setHero(h); setNarrative(n); setResearch(r)
+      setContact(c); setBlog(b); setPost(p); setFooter(f)
+    })
       .catch((err) => setError(err.message))
   }, [])
 
@@ -190,6 +201,30 @@ export default function AdminContentPage() {
         keys={['title_line1', 'title_line2', 'body', 'stat_citations_value', 'stat_citations_label', 'stat_pubs_value', 'stat_pubs_label']}
         imageKeys={['image_url']}
         data={research}
+      />
+      <SectionPanel
+        title="Contact"
+        section="contact"
+        keys={['heading', 'heading_dim', 'email', 'subtitle']}
+        data={contact}
+      />
+      <SectionPanel
+        title="Blog"
+        section="blog"
+        keys={['title', 'subtitle', 'newsletter_title', 'newsletter_subtitle']}
+        data={blog}
+      />
+      <SectionPanel
+        title="Post"
+        section="post"
+        keys={['newsletter_title', 'newsletter_subtitle']}
+        data={post}
+      />
+      <SectionPanel
+        title="Footer"
+        section="footer"
+        keys={['copyright', 'tagline']}
+        data={footer}
       />
     </div>
   )
