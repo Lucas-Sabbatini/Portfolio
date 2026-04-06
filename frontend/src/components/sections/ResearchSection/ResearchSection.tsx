@@ -95,7 +95,6 @@ export default function ResearchSection() {
             viewport={viewportOnce}
             whileHover={{ y: -4, transition: { duration: 0.4 } }}
           >
-            {console.log(content.image_url)}
             <img
               src={content.image_url
                 ? resolveImageUrl(content.image_url)
