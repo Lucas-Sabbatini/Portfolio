@@ -12,8 +12,17 @@ export interface Post {
   updated_at: string
 }
 
+export interface PostImage {
+  id: string
+  key: string
+  url: string
+  post_id: string
+  created_at: string
+}
+
 export interface PostDetail extends Post {
   body: string
+  images?: PostImage[]
 }
 
 export interface PostCreate {

@@ -1,5 +1,13 @@
+from uuid import UUID
+
 from app.models import Base
 
 
 def orm_to_dict(obj: Base) -> dict:
-    return {c.name: getattr(obj, c.name) for c in obj.__table__.columns}
+    result = {}
+    for c in obj.__table__.columns:
+        val = getattr(obj, c.name)
+        if isinstance(val, UUID):
+            val = str(val)
+        result[c.name] = val
+    return result

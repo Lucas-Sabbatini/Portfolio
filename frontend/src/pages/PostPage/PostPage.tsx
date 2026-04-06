@@ -13,6 +13,7 @@ import type { Post, PostDetail } from '@/types/post'
 import { fetchPost, fetchPosts } from '@/api/posts'
 import { subscribe } from '@/api/newsletter'
 import { ApiError, resolveImageUrl } from '@/api/client'
+import { resolvePostImageKeys } from '@/utils/resolvePostImages'
 import { TagChip } from '@/components/blog/PostCard/PostCard'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { fadeUp, viewportOnce } from '@/lib/animations'
@@ -257,7 +258,7 @@ export default function PostPage() {
           ...headingComponents,
         }}
       >
-        {post.body}
+        {resolvePostImageKeys(post.body, post.images ?? [])}
       </ReactMarkdown>
     ) : null,
     [post],
