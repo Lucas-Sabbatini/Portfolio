@@ -44,7 +44,7 @@ const sanitizeSchema = {
   ],
 }
 
-function CodeBlock({ children, ...props }: HTMLAttributes<HTMLPreElement>) {
+function CodeBlock({ children, onCopy, ...props }: HTMLAttributes<HTMLPreElement> & { onCopy?: () => void }) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = useCallback(() => {
@@ -53,9 +53,10 @@ function CodeBlock({ children, ...props }: HTMLAttributes<HTMLPreElement>) {
       : String(children ?? '')
     navigator.clipboard.writeText(code).then(() => {
       setCopied(true)
+      onCopy?.()
       setTimeout(() => setCopied(false), 2000)
     })
-  }, [children])
+  }, [children, onCopy])
 
   return (
     <div className="code-block">
@@ -255,7 +256,7 @@ export default function PostPage() {
         remarkPlugins={[remarkGfm, remarkMath, remarkEmoji]}
         rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeKatex, [rehypeSanitize, sanitizeSchema]]}
         components={{
-          pre: CodeBlock,
+          pre: (preProps) => <CodeBlock {...preProps} onCopy={() => track('code-copy', { slug: post.slug })} />,
           table: ({ children, ...props }) => (
             <div className="table-wrapper">
               <table {...props}>{children}</table>
@@ -267,7 +268,7 @@ export default function PostPage() {
         {resolvePostImageKeys(post.body, post.images ?? [])}
       </ReactMarkdown>
     ) : null,
-    [post],
+    [post, track],
   )
 
   const formattedDate = post?.published_at
@@ -406,6 +407,7 @@ export default function PostPage() {
                     style={{ paddingLeft: `${12 + (level - 2) * 12}px` }}
                     onClick={(e) => {
                       e.preventDefault()
+                      track('toc-click', { heading: text, slug: post.slug })
                       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
                     }}
                   >
@@ -430,7 +432,7 @@ export default function PostPage() {
             className="post-nav"
           >
             {prevPost ? (
-              <Link to={`/blog/${prevPost.slug}`} className="post-nav-link group">
+              <Link to={`/blog/${prevPost.slug}`} className="post-nav-link group" onClick={() => track('post-navigate', { direction: 'previous', slug: prevPost.slug })}>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">
                   ← Previous
                 </span>
@@ -440,7 +442,7 @@ export default function PostPage() {
               </Link>
             ) : <div />}
             {nextPost ? (
-              <Link to={`/blog/${nextPost.slug}`} className="post-nav-link group text-right">
+              <Link to={`/blog/${nextPost.slug}`} className="post-nav-link group text-right" onClick={() => track('post-navigate', { direction: 'next', slug: nextPost.slug })}>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/50">
                   Next →
                 </span>

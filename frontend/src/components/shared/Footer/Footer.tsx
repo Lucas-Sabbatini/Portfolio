@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { fadeUp, viewportOnce } from '@/lib/animations'
 import type { SocialLink } from '@/types/social'
 import { fetchSocialLinks, fetchContent } from '@/api/content'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import './Footer.css'
 
 function SocialIcon({ icon, color }: { icon: string; color?: string }) {
@@ -38,6 +39,7 @@ function SocialIcon({ icon, color }: { icon: string; color?: string }) {
 export default function Footer() {
   const [links, setLinks] = useState<SocialLink[]>([])
   const [content, setContent] = useState<Record<string, string>>({})
+  const { track } = useAnalytics()
 
   useEffect(() => {
     fetchSocialLinks()
@@ -59,7 +61,7 @@ export default function Footer() {
 
         <div className="flex gap-10 text-[10px] font-bold uppercase tracking-[0.2em]">
           {links.map((link) => (
-            <a key={link.id} href={link.url} className="footer-link">
+            <a key={link.id} href={link.url} className="footer-link" onClick={() => track('social-click', { platform: link.label })}>
               {link.icon && <SocialIcon icon={link.icon} color={link.color} />}
               {link.label && <span>{link.label}</span>}
             </a>
