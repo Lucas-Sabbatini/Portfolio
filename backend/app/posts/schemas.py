@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 def slugify(title: str) -> str:
@@ -22,15 +22,8 @@ class PostCreate(BaseModel):
     status: str = "draft"
 
 
-class PostUpdate(BaseModel):
-    title: str
-    excerpt: str
-    body: str = ""
-    tag: str
-    slug: str | None = None
-    cover_image: str | None = None
-    read_time: str | None = None
-    status: str = "draft"
+# PostCreate and PostUpdate are identical — use PostCreate for both
+PostUpdate = PostCreate
 
 
 class PostImageItem(BaseModel):
@@ -39,6 +32,8 @@ class PostImageItem(BaseModel):
 
 
 class PostResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     slug: str
     title: str
@@ -55,6 +50,8 @@ class PostResponse(BaseModel):
 
 
 class PostListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     slug: str
     title: str

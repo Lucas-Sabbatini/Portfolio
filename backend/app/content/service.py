@@ -5,6 +5,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.content.schemas import ExperienceCreate, SkillCreate, SocialLinkCreate
 from app.models import ContentBlock, ExperienceEntry, Skill, SocialLink
 from app.utils import orm_to_dict
 
@@ -40,46 +41,33 @@ async def list_experience(session: AsyncSession) -> list[dict]:
     return [orm_to_dict(r) for r in result.scalars().all()]
 
 
-async def create_experience(
-    session: AsyncSession,
-    role: str,
-    company: str,
-    period: str,
-    description: list[str],
-    sort_order: int,
-) -> dict:
+async def create_experience(session: AsyncSession, body: ExperienceCreate) -> dict:
     entry = ExperienceEntry(
-        role=role,
-        company=company,
-        period=period,
-        description=description,
-        sort_order=sort_order,
+        role=body.role,
+        company=body.company,
+        period=body.period,
+        description=body.description,
+        sort_order=body.sort_order,
     )
     session.add(entry)
     await session.flush()
     await session.refresh(entry)
-    logger.info("Created experience entry: %s at %s", role, company)
+    logger.info("Created experience entry: %s at %s", body.role, body.company)
     return orm_to_dict(entry)
 
 
 async def update_experience(
-    session: AsyncSession,
-    entry_id: str,
-    role: str,
-    company: str,
-    period: str,
-    description: list[str],
-    sort_order: int,
+    session: AsyncSession, entry_id: str, body: ExperienceCreate
 ) -> dict | None:
     result = await session.execute(select(ExperienceEntry).where(ExperienceEntry.id == entry_id))
     entry = result.scalar_one_or_none()
     if entry is None:
         return None
-    entry.role = role
-    entry.company = company
-    entry.period = period
-    entry.description = description
-    entry.sort_order = sort_order
+    entry.role = body.role
+    entry.company = body.company
+    entry.period = body.period
+    entry.description = body.description
+    entry.sort_order = body.sort_order
     entry.updated_at = datetime.now(UTC)
     await session.flush()
     await session.refresh(entry)
@@ -103,33 +91,26 @@ async def list_skills(session: AsyncSession) -> list[dict]:
     return [orm_to_dict(r) for r in result.scalars().all()]
 
 
-async def create_skill(
-    session: AsyncSession, name: str, category: str, icon: str | None, sort_order: int
-) -> dict:
-    skill = Skill(name=name, category=category, icon=icon, sort_order=sort_order)
+async def create_skill(session: AsyncSession, body: SkillCreate) -> dict:
+    skill = Skill(
+        name=body.name, category=body.category, icon=body.icon, sort_order=body.sort_order
+    )
     session.add(skill)
     await session.flush()
     await session.refresh(skill)
-    logger.info("Created skill: %s", name)
+    logger.info("Created skill: %s", body.name)
     return orm_to_dict(skill)
 
 
-async def update_skill(
-    session: AsyncSession,
-    skill_id: str,
-    name: str,
-    category: str,
-    icon: str | None,
-    sort_order: int,
-) -> dict | None:
+async def update_skill(session: AsyncSession, skill_id: str, body: SkillCreate) -> dict | None:
     result = await session.execute(select(Skill).where(Skill.id == skill_id))
     skill = result.scalar_one_or_none()
     if skill is None:
         return None
-    skill.name = name
-    skill.category = category
-    skill.icon = icon
-    skill.sort_order = sort_order
+    skill.name = body.name
+    skill.category = body.category
+    skill.icon = body.icon
+    skill.sort_order = body.sort_order
     await session.flush()
     await session.refresh(skill)
     logger.info("Updated skill: %s", skill_id)
@@ -152,50 +133,35 @@ async def list_social_links(session: AsyncSession) -> list[dict]:
     return [orm_to_dict(r) for r in result.scalars().all()]
 
 
-async def create_social_link(
-    session: AsyncSession,
-    platform: str,
-    url: str,
-    label: str,
-    icon: str | None,
-    color: str | None,
-    sort_order: int,
-) -> dict:
+async def create_social_link(session: AsyncSession, body: SocialLinkCreate) -> dict:
     link = SocialLink(
-        platform=platform,
-        url=url,
-        label=label,
-        icon=icon,
-        color=color,
-        sort_order=sort_order,
+        platform=body.platform,
+        url=body.url,
+        label=body.label,
+        icon=body.icon,
+        color=body.color,
+        sort_order=body.sort_order,
     )
     session.add(link)
     await session.flush()
     await session.refresh(link)
-    logger.info("Created social link: %s", platform)
+    logger.info("Created social link: %s", body.platform)
     return orm_to_dict(link)
 
 
 async def update_social_link(
-    session: AsyncSession,
-    link_id: str,
-    platform: str,
-    url: str,
-    label: str,
-    icon: str | None,
-    color: str | None,
-    sort_order: int,
+    session: AsyncSession, link_id: str, body: SocialLinkCreate
 ) -> dict | None:
     result = await session.execute(select(SocialLink).where(SocialLink.id == link_id))
     link = result.scalar_one_or_none()
     if link is None:
         return None
-    link.platform = platform
-    link.url = url
-    link.label = label
-    link.icon = icon
-    link.color = color
-    link.sort_order = sort_order
+    link.platform = body.platform
+    link.url = body.url
+    link.label = body.label
+    link.icon = body.icon
+    link.color = body.color
+    link.sort_order = body.sort_order
     await session.flush()
     await session.refresh(link)
     logger.info("Updated social link: %s", link_id)

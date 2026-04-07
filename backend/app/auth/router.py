@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import get_current_admin
 from app.auth.service import authenticate_admin, create_access_token
+from app.config import get_settings
 from app.database import get_session
 
 logger = logging.getLogger(__name__)
@@ -36,13 +37,16 @@ async def login(
     if admin is None:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
+    settings = get_settings()
     token = create_access_token({"email": admin["email"], "id": admin["id"]})
     response = JSONResponse(content={"message": "ok"})
     response.set_cookie(
         key="access_token",
         value=token,
         httponly=True,
+        secure=True,
         samesite="strict",
+        max_age=settings.access_token_expire_hours * 3600,
         path="/",
     )
     logger.info("Login successful for %s", admin["email"])
