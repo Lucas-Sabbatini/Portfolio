@@ -103,4 +103,3 @@ cd frontend && npx vitest run
 
 TODO: CSS Opacity problem related to rendering of each Stat in Narrative Section.
 TODO: Scrolling is broken
-TODO: Improve backend test coverage.
