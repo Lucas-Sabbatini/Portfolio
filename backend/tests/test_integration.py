@@ -169,3 +169,26 @@ async def test_newsletter_duplicate_returns_409(client: AsyncClient, mock_db):
         mock_sub.side_effect = ValueError("already_subscribed")
         resp2 = await client.post("/api/newsletter/subscribe", json={"email": "test@example.com"})
     assert resp2.status_code == 409
+
+
+# ---------------------------------------------------------------------------
+# Middleware
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_cache_control_header_on_uploads_path(client: AsyncClient, mock_db):
+    """Requests to /uploads/* should include Cache-Control header."""
+    response = await client.get("/uploads/nonexistent.jpg")
+    # Even if the file doesn't exist (404), the middleware adds the header
+    assert "cache-control" in response.headers
+    assert "max-age=31536000" in response.headers["cache-control"]
+    assert "immutable" in response.headers["cache-control"]
+
+
+@pytest.mark.asyncio
+async def test_no_cache_control_header_on_api_path(client: AsyncClient, mock_db):
+    """API paths should NOT have Cache-Control header."""
+    response = await client.get("/health")
+    assert response.status_code == 200
+    assert "cache-control" not in response.headers

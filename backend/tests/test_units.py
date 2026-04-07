@@ -1,13 +1,18 @@
 """Unit tests for pure functions — no HTTP, no database."""
 
+import uuid
 from datetime import UTC, datetime
+from unittest.mock import patch
 
 import pytest
 from jose import jwt
 
 from app.auth.service import create_access_token, hash_password, verify_password
+from app.post_images.router import _sanitize_key
 from app.posts.schemas import slugify
 from app.posts.service import compute_read_time
+from app.upload.router import detect_mime
+from app.utils import orm_to_dict
 
 # ---------------------------------------------------------------------------
 # compute_read_time
@@ -143,3 +148,161 @@ def test_create_access_token_expiry_is_in_future():
 
     now = datetime.now(UTC).timestamp()
     assert payload["exp"] > now
+
+
+# ---------------------------------------------------------------------------
+# _sanitize_key
+# ---------------------------------------------------------------------------
+
+
+def test_sanitize_key_basic():
+    assert _sanitize_key("My Photo.jpg") == "my-photo"
+
+
+def test_sanitize_key_special_chars():
+    assert _sanitize_key("hello@world!.png") == "helloworld"
+
+
+def test_sanitize_key_underscores_and_spaces():
+    assert _sanitize_key("my_cool  image.jpg") == "my-cool-image"
+
+
+def test_sanitize_key_leading_trailing_dashes():
+    assert _sanitize_key("---hello---.jpg") == "hello"
+
+
+def test_sanitize_key_dot_only_filename():
+    # Path(".jpg").stem is ".jpg", after sanitization becomes "jpg"
+    assert _sanitize_key(".jpg") == "jpg"
+
+
+def test_sanitize_key_empty_fallback():
+    # Only non-word/non-space chars → stripped to "" → fallback "image"
+    assert _sanitize_key("@!#.png") == "image"
+
+
+def test_sanitize_key_already_clean():
+    assert _sanitize_key("good-name.png") == "good-name"
+
+
+# ---------------------------------------------------------------------------
+# detect_mime
+# ---------------------------------------------------------------------------
+
+
+def test_detect_mime_jpeg():
+    assert detect_mime(b"\xff\xd8\xff\xe0" + b"\x00" * 100) == "image/jpeg"
+
+
+def test_detect_mime_png():
+    assert detect_mime(b"\x89PNG" + b"\x00" * 100) == "image/png"
+
+
+def test_detect_mime_webp():
+    assert detect_mime(b"RIFF\x00\x00\x00\x00WEBP" + b"\x00" * 100) == "image/webp"
+
+
+def test_detect_mime_unknown():
+    assert detect_mime(b"random bytes here") is None
+
+
+def test_detect_mime_empty():
+    assert detect_mime(b"") is None
+
+
+def test_detect_mime_partial_webp():
+    assert detect_mime(b"RIFF") is None
+
+
+# ---------------------------------------------------------------------------
+# orm_to_dict
+# ---------------------------------------------------------------------------
+
+
+def test_orm_to_dict_converts_uuid():
+    from app.models import Skill
+
+    obj = Skill(id=uuid.uuid4(), name="Python", category="Lang", sort_order=1)
+    result = orm_to_dict(obj)
+    assert isinstance(result["id"], str)
+    assert result["name"] == "Python"
+
+
+def test_orm_to_dict_preserves_other_types():
+    from app.models import Skill
+
+    obj = Skill(id=uuid.uuid4(), name="Go", category="Lang", icon=None, sort_order=0)
+    result = orm_to_dict(obj)
+    assert result["icon"] is None
+    assert isinstance(result["sort_order"], int)
+
+
+# ---------------------------------------------------------------------------
+# Settings properties
+# ---------------------------------------------------------------------------
+
+
+def test_async_database_url_conversion():
+    from app.config import Settings
+
+    with patch.dict(
+        "os.environ",
+        {
+            "DATABASE_URL": "postgresql://user:pass@localhost/db",
+            "SECRET_KEY": "test",
+            "RESEND_API_KEY": "k",
+            "RESEND_FROM_EMAIL": "a@b.com",
+        },
+    ):
+        s = Settings()
+        assert s.async_database_url == "postgresql+asyncpg://user:pass@localhost/db"
+
+
+def test_async_database_url_already_async():
+    from app.config import Settings
+
+    with patch.dict(
+        "os.environ",
+        {
+            "DATABASE_URL": "postgresql+asyncpg://user:pass@localhost/db",
+            "SECRET_KEY": "test",
+            "RESEND_API_KEY": "k",
+            "RESEND_FROM_EMAIL": "a@b.com",
+        },
+    ):
+        s = Settings()
+        assert s.async_database_url == "postgresql+asyncpg://user:pass@localhost/db"
+
+
+def test_allowed_origins_list_multiple():
+    from app.config import Settings
+
+    with patch.dict(
+        "os.environ",
+        {
+            "DATABASE_URL": "postgresql://x",
+            "SECRET_KEY": "test",
+            "RESEND_API_KEY": "k",
+            "RESEND_FROM_EMAIL": "a@b.com",
+            "ALLOWED_ORIGINS": "http://a, http://b, http://c",
+        },
+    ):
+        s = Settings()
+        assert s.allowed_origins_list == ["http://a", "http://b", "http://c"]
+
+
+def test_allowed_origins_list_empty_entries():
+    from app.config import Settings
+
+    with patch.dict(
+        "os.environ",
+        {
+            "DATABASE_URL": "postgresql://x",
+            "SECRET_KEY": "test",
+            "RESEND_API_KEY": "k",
+            "RESEND_FROM_EMAIL": "a@b.com",
+            "ALLOWED_ORIGINS": "http://a,,http://b, ,http://c",
+        },
+    ):
+        s = Settings()
+        assert s.allowed_origins_list == ["http://a", "http://b", "http://c"]
