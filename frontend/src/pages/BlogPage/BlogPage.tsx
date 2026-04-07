@@ -143,7 +143,7 @@ export default function BlogPage() {
                 ) : (
                   <>
                     {featured && (
-                      <Link to={`/blog/${featured.slug}`} aria-label={featured.title} className="hidden md:block">
+                      <Link to={`/blog/${featured.slug}`} aria-label={featured.title} className="hidden md:block" onClick={() => track('post-click', { slug: featured.slug, variant: 'featured' })}>
                         <PostCardFeatured post={featured} />
                       </Link>
                     )}
@@ -162,12 +162,12 @@ export default function BlogPage() {
                       viewport={viewportOnce}
                     >
                       {featured && (
-                        <Link key={featured.id} to={`/blog/${featured.slug}`} aria-label={featured.title} className="md:hidden">
+                        <Link key={featured.id} to={`/blog/${featured.slug}`} aria-label={featured.title} className="md:hidden" onClick={() => track('post-click', { slug: featured.slug, variant: 'featured' })}>
                           <PostCardMedium post={featured} />
                         </Link>
                       )}
                       {gridPosts.map((post) => (
-                        <Link key={post.id} to={`/blog/${post.slug}`} aria-label={post.title}>
+                        <Link key={post.id} to={`/blog/${post.slug}`} aria-label={post.title} onClick={() => track('post-click', { slug: post.slug, variant: 'grid' })}>
                           <PostCardMedium post={post} />
                         </Link>
                       ))}
@@ -182,7 +182,7 @@ export default function BlogPage() {
                       >
                         <div className="border-t border-on-surface/5">
                           {listPosts.map((post) => (
-                            <Link key={post.id} to={`/blog/${post.slug}`} aria-label={post.title}>
+                            <Link key={post.id} to={`/blog/${post.slug}`} aria-label={post.title} onClick={() => track('post-click', { slug: post.slug, variant: 'list' })}>
                               <PostCardList post={post} />
                             </Link>
                           ))}

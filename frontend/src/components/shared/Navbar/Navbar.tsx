@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Link, useLocation } from 'react-router-dom'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import './Navbar.css'
 
 const navLinks = [
@@ -12,6 +13,7 @@ const navLinks = [
 
 export default function Navbar({ minimal = false }: { minimal?: boolean }) {
   const { pathname } = useLocation()
+  const { track } = useAnalytics()
 
   return (
     <motion.nav
@@ -46,6 +48,7 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                   <Link
                     key={link.href}
                     to={link.href}
+                    onClick={() => track('nav-click', { label: link.label })}
                     className={
                       isActive && link.href === '/blog' ? 'nav-link-active' : 'nav-link'
                     }

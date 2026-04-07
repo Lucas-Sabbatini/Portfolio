@@ -6,6 +6,7 @@ import type { Post } from '@/types/post'
 import { fetchPosts } from '@/api/posts'
 import { resolveImageUrl } from '@/api/client'
 import { tagColors } from '@/data/posts'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import './BlogSection.css'
 
 const card: import('framer-motion').Variants = {
@@ -27,6 +28,7 @@ export default function BlogSection() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const { track } = useAnalytics()
 
   useEffect(() => {
     fetchPosts()
@@ -71,7 +73,7 @@ export default function BlogSection() {
               />
             ))
           : posts.map((post, idx) => (
-              <Link key={post.id} to={`/blog/${post.slug}`}>
+              <Link key={post.id} to={`/blog/${post.slug}`} onClick={() => track('post-click', { slug: post.slug, variant: 'home' })}>
                 <motion.div
                   variants={card}
                   whileHover={{ y: -4, transition: { duration: 0.3, ease: 'easeOut' } }}
