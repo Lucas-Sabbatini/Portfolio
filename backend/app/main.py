@@ -1,7 +1,9 @@
 import logging
 import time
+from contextlib import asynccontextmanager
 from pathlib import Path
 
+import resend
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -23,14 +25,24 @@ logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
-app = FastAPI(title="Blog API")
+# Set resend API key once at startup (not per-request)
+resend.api_key = settings.resend_api_key
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await close_engine()
+
+
+app = FastAPI(title="Blog API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Cookie"],
 )
 
 
@@ -50,11 +62,6 @@ async def log_requests(request: Request, call_next):
     if request.url.path.startswith("/uploads/"):
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     return response
-
-
-@app.on_event("shutdown")
-async def shutdown() -> None:
-    await close_engine()
 
 
 @app.get("/health")

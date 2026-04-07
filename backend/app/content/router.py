@@ -1,4 +1,5 @@
 import logging
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -25,6 +26,9 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["content"])
 
+DbSession = Annotated[AsyncSession, Depends(get_session)]
+AdminDep = Annotated[dict[str, str], Depends(get_current_admin)]
+
 
 # --- Content blocks ---
 
@@ -32,13 +36,9 @@ router = APIRouter(prefix="/api", tags=["content"])
 @router.get("/content/{section}")
 async def get_content(
     section: str,
-    session: AsyncSession = Depends(get_session),
+    session: DbSession,
 ) -> dict[str, str]:
-    try:
-        return await service.get_content_section(session, section)
-    except Exception as exc:
-        logger.error("Error getting content section", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    return await service.get_content_section(session, section)
 
 
 @router.patch("/content/{section}/{key}")
@@ -46,15 +46,11 @@ async def patch_content(
     section: str,
     key: str,
     body: ContentUpdate,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> dict[str, str]:
-    try:
-        await service.upsert_content(session, section, key, body.value)
-        return {"section": section, "key": key, "value": body.value}
-    except Exception as exc:
-        logger.error("Error patching content", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    await service.upsert_content(session, section, key, body.value)
+    return {"section": section, "key": key, "value": body.value}
 
 
 # --- Experience ---
@@ -62,70 +58,42 @@ async def patch_content(
 
 @router.get("/experience", response_model=list[ExperienceResponse])
 async def list_experience(
-    session: AsyncSession = Depends(get_session),
+    session: DbSession,
 ) -> list[ExperienceResponse]:
-    try:
-        rows = await service.list_experience(session)
-        return [
-            ExperienceResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows
-        ]
-    except Exception as exc:
-        logger.error("Error listing experience", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    rows = await service.list_experience(session)
+    return [ExperienceResponse.model_validate(r) for r in rows]
 
 
 @router.post("/experience", response_model=ExperienceResponse, status_code=201)
 async def create_experience(
     body: ExperienceCreate,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> ExperienceResponse:
-    try:
-        row = await service.create_experience(
-            session, body.role, body.company, body.period, body.description, body.sort_order
-        )
-        return ExperienceResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
-    except Exception as exc:
-        logger.error("Error creating experience", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    row = await service.create_experience(session, body)
+    return ExperienceResponse.model_validate(row)
 
 
 @router.put("/experience/{entry_id}", response_model=ExperienceResponse)
 async def update_experience(
     entry_id: UUID,
     body: ExperienceUpdate,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> ExperienceResponse:
-    try:
-        row = await service.update_experience(
-            session,
-            str(entry_id),
-            body.role,
-            body.company,
-            body.period,
-            body.description,
-            body.sort_order,
-        )
-    except Exception as exc:
-        logger.error("Error updating experience", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    row = await service.update_experience(session, str(entry_id), body)
     if row is None:
         raise HTTPException(status_code=404, detail="Not found")
-    return ExperienceResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
+    return ExperienceResponse.model_validate(row)
 
 
 @router.delete("/experience/{entry_id}", status_code=204)
 async def delete_experience(
     entry_id: UUID,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> Response:
-    try:
-        deleted = await service.delete_experience(session, str(entry_id))
-    except Exception as exc:
-        logger.error("Error deleting experience", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    deleted = await service.delete_experience(session, str(entry_id))
     if not deleted:
         raise HTTPException(status_code=404, detail="Not found")
     return Response(status_code=204)
@@ -136,62 +104,42 @@ async def delete_experience(
 
 @router.get("/skills", response_model=list[SkillResponse])
 async def list_skills(
-    session: AsyncSession = Depends(get_session),
+    session: DbSession,
 ) -> list[SkillResponse]:
-    try:
-        rows = await service.list_skills(session)
-        return [SkillResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows]
-    except Exception as exc:
-        logger.error("Error listing skills", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    rows = await service.list_skills(session)
+    return [SkillResponse.model_validate(r) for r in rows]
 
 
 @router.post("/skills", response_model=SkillResponse, status_code=201)
 async def create_skill(
     body: SkillCreate,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> SkillResponse:
-    try:
-        row = await service.create_skill(
-            session, body.name, body.category, body.icon, body.sort_order
-        )
-        return SkillResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
-    except Exception as exc:
-        logger.error("Error creating skill", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    row = await service.create_skill(session, body)
+    return SkillResponse.model_validate(row)
 
 
 @router.put("/skills/{skill_id}", response_model=SkillResponse)
 async def update_skill(
     skill_id: UUID,
     body: SkillUpdate,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> SkillResponse:
-    try:
-        row = await service.update_skill(
-            session, str(skill_id), body.name, body.category, body.icon, body.sort_order
-        )
-    except Exception as exc:
-        logger.error("Error updating skill", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    row = await service.update_skill(session, str(skill_id), body)
     if row is None:
         raise HTTPException(status_code=404, detail="Not found")
-    return SkillResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
+    return SkillResponse.model_validate(row)
 
 
 @router.delete("/skills/{skill_id}", status_code=204)
 async def delete_skill(
     skill_id: UUID,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> Response:
-    try:
-        deleted = await service.delete_skill(session, str(skill_id))
-    except Exception as exc:
-        logger.error("Error deleting skill", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    deleted = await service.delete_skill(session, str(skill_id))
     if not deleted:
         raise HTTPException(status_code=404, detail="Not found")
     return Response(status_code=204)
@@ -202,71 +150,42 @@ async def delete_skill(
 
 @router.get("/social-links", response_model=list[SocialLinkResponse])
 async def list_social_links(
-    session: AsyncSession = Depends(get_session),
+    session: DbSession,
 ) -> list[SocialLinkResponse]:
-    try:
-        rows = await service.list_social_links(session)
-        return [
-            SocialLinkResponse(id=str(r["id"]), **{k: r[k] for k in r if k != "id"}) for r in rows
-        ]
-    except Exception as exc:
-        logger.error("Error listing social links", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    rows = await service.list_social_links(session)
+    return [SocialLinkResponse.model_validate(r) for r in rows]
 
 
 @router.post("/social-links", response_model=SocialLinkResponse, status_code=201)
 async def create_social_link(
     body: SocialLinkCreate,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> SocialLinkResponse:
-    try:
-        row = await service.create_social_link(
-            session, body.platform, body.url, body.label, body.icon, body.color, body.sort_order
-        )
-        return SocialLinkResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
-    except Exception as exc:
-        logger.error("Error creating social link", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    row = await service.create_social_link(session, body)
+    return SocialLinkResponse.model_validate(row)
 
 
 @router.put("/social-links/{link_id}", response_model=SocialLinkResponse)
 async def update_social_link(
     link_id: UUID,
     body: SocialLinkUpdate,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> SocialLinkResponse:
-    try:
-        row = await service.update_social_link(
-            session,
-            str(link_id),
-            body.platform,
-            body.url,
-            body.label,
-            body.icon,
-            body.color,
-            body.sort_order,
-        )
-    except Exception as exc:
-        logger.error("Error updating social link", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    row = await service.update_social_link(session, str(link_id), body)
     if row is None:
         raise HTTPException(status_code=404, detail="Not found")
-    return SocialLinkResponse(id=str(row["id"]), **{k: row[k] for k in row if k != "id"})
+    return SocialLinkResponse.model_validate(row)
 
 
 @router.delete("/social-links/{link_id}", status_code=204)
 async def delete_social_link(
     link_id: UUID,
-    _admin: dict[str, str] = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session),
+    _admin: AdminDep,
+    session: DbSession,
 ) -> Response:
-    try:
-        deleted = await service.delete_social_link(session, str(link_id))
-    except Exception as exc:
-        logger.error("Error deleting social link", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+    deleted = await service.delete_social_link(session, str(link_id))
     if not deleted:
         raise HTTPException(status_code=404, detail="Not found")
     return Response(status_code=204)

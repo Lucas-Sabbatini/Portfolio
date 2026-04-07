@@ -26,19 +26,15 @@ def create_access_token(data: dict[str, str]) -> str:
     settings = get_settings()
     to_encode = data.copy()
     expire = datetime.now(UTC) + timedelta(hours=settings.access_token_expire_hours)
-    to_encode["exp"] = expire.timestamp()
+    to_encode["exp"] = int(expire.timestamp())
     return jwt.encode(to_encode, settings.secret_key, algorithm="HS256")
 
 
 async def authenticate_admin(
     session: AsyncSession, email: str, password: str
 ) -> dict[str, str] | None:
-    try:
-        result = await session.execute(select(AdminUser).where(AdminUser.email == email))
-        row = result.scalar_one_or_none()
-    except Exception:
-        logger.error("Database error during authentication", exc_info=True)
-        return None
+    result = await session.execute(select(AdminUser).where(AdminUser.email == email))
+    row = result.scalar_one_or_none()
 
     if row is None:
         logger.warning("Failed login attempt for unknown email: %s", email)

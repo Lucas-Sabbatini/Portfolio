@@ -2,6 +2,7 @@ import logging
 import uuid
 from pathlib import Path
 
+import aiofiles
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from app.auth.dependencies import get_current_admin
@@ -48,7 +49,8 @@ async def upload_file(
         covers_dir = Path(settings.upload_dir) / "covers"
         covers_dir.mkdir(parents=True, exist_ok=True)
         dest = covers_dir / filename
-        dest.write_bytes(contents)
+        async with aiofiles.open(dest, "wb") as f:
+            await f.write(contents)
         logger.info("Uploaded file: %s", filename)
         return {"url": f"/uploads/covers/{filename}"}
     except Exception as exc:
