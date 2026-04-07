@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUp, viewportOnce } from '@/lib/animations'
 import type { SocialLink } from '@/types/social'
-import { fetchSocialLinks } from '@/api/content'
+import { fetchSocialLinks, fetchContent } from '@/api/content'
 import './Footer.css'
 
 function SocialIcon({ icon, color }: { icon: string; color?: string }) {
@@ -37,11 +37,13 @@ function SocialIcon({ icon, color }: { icon: string; color?: string }) {
 
 export default function Footer() {
   const [links, setLinks] = useState<SocialLink[]>([])
+  const [content, setContent] = useState<Record<string, string>>({})
 
   useEffect(() => {
     fetchSocialLinks()
       .then(all => setLinks([...all].sort((a, b) => a.sort_order - b.sort_order).slice(0, 3)))
       .catch(console.error)
+    fetchContent('footer').then(setContent).catch(console.error)
   }, [])
 
   return (
@@ -65,7 +67,7 @@ export default function Footer() {
         </div>
 
         <p className="footer-copyright">
-          © 2024 Lucas Janot. <br /> Built on Obsidian Principles.
+          {content.copyright ?? '© 2024 Lucas Janot.'} <br /> {content.tagline ?? 'Built on Obsidian Principles.'}
         </p>
       </div>
     </motion.footer>
