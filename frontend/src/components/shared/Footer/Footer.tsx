@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, viewportOnce } from '@/lib/animations'
+import { fadeUp } from '@/lib/animations'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 import type { SocialLink } from '@/types/social'
 import { fetchSocialLinks, fetchContent } from '@/api/content'
 import { useAnalytics } from '@/hooks/useAnalytics'
@@ -48,13 +49,15 @@ export default function Footer() {
     fetchContent('footer').then(setContent).catch(console.error)
   }, [])
 
+  const reveal = useScrollReveal()
+
   return (
     <motion.footer
+      ref={reveal.ref}
       className="w-full py-16 border-t border-white/5 bg-[#020202]"
       variants={fadeUp}
       initial="hidden"
-      whileInView="visible"
-      viewport={viewportOnce}
+      animate={reveal.animate}
     >
       <div className="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto gap-10">
         <div className="text-xl font-black text-on-surface md:flex-1">lucas.janot</div>

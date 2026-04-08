@@ -14,7 +14,8 @@ import { fetchContent } from '@/api/content'
 import { subscribe } from '@/api/newsletter'
 import { ApiError } from '@/api/client'
 import { useAnalytics } from '@/hooks/useAnalytics'
-import { fadeUp, staggerContainer, staggerFast, viewportOnce } from '@/lib/animations'
+import { fadeUp, staggerContainer, staggerFast } from '@/lib/animations'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 import './BlogPage.css'
 
 type Filter = 'All' | PostTag
@@ -28,6 +29,9 @@ export default function BlogPage() {
   const [newsletterMsg, setNewsletterMsg] = useState<{ text: string; cls: string } | null>(null)
   const [blogContent, setBlogContent] = useState<Record<string, string>>({})
   const { track } = useAnalytics()
+  const revealGrid = useScrollReveal()
+  const revealList = useScrollReveal()
+  const revealNewsletter = useScrollReveal()
 
   useEffect(() => {
     fetchPosts().then(setPosts).catch(console.error).finally(() => setLoading(false))
@@ -156,10 +160,10 @@ export default function BlogPage() {
                             ? 'md:grid-cols-2'
                             : 'md:grid-cols-3'
                       }`}
+                      ref={revealGrid.ref}
                       variants={staggerFast}
                       initial="hidden"
-                      whileInView="visible"
-                      viewport={viewportOnce}
+                      animate={revealGrid.animate}
                     >
                       {featured && (
                         <Link key={featured.id} to={`/blog/${featured.slug}`} aria-label={featured.title} className="md:hidden" onClick={() => track('post-click', { slug: featured.slug, variant: 'featured' })}>
@@ -175,10 +179,10 @@ export default function BlogPage() {
 
                     {listPosts.length > 0 && (
                       <motion.div
+                        ref={revealList.ref}
                         variants={staggerContainer}
                         initial="hidden"
-                        whileInView="visible"
-                        viewport={viewportOnce}
+                        animate={revealList.animate}
                       >
                         <div className="border-t border-on-surface/5">
                           {listPosts.map((post) => (
@@ -196,11 +200,11 @@ export default function BlogPage() {
           )}
 
           <motion.section
+            ref={revealNewsletter.ref}
             aria-label="Newsletter signup"
             variants={fadeUp}
             initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
+            animate={revealNewsletter.animate}
             className="newsletter-section"
           >
             <div className="space-y-2">

@@ -100,6 +100,3 @@ cd frontend && npx vitest run
 # Backend
 (.venv) cd backend && python -m pytest
 ```
-
-TODO: CSS Opacity problem related to rendering of each Stat in Narrative Section.
-TODO: Scrolling is broken

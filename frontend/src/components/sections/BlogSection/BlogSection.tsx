@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { fadeUp, staggerContainer, viewportOnce } from '@/lib/animations'
+import { fadeUp, staggerContainer } from '@/lib/animations'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 import type { Post } from '@/types/post'
 import { fetchPosts } from '@/api/posts'
 import { resolveImageUrl } from '@/api/client'
@@ -29,6 +30,8 @@ export default function BlogSection() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const { track } = useAnalytics()
+  const reveal1 = useScrollReveal()
+  const reveal2 = useScrollReveal()
 
   useEffect(() => {
     fetchPosts()
@@ -40,11 +43,11 @@ export default function BlogSection() {
   return (
     <section className="space-y-16" id="blog" aria-label="Blog posts">
       <motion.div
+        ref={reveal1.ref}
         className="flex justify-between items-center"
         variants={fadeUp}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate={reveal1.animate}
       >
         <p className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
           05 / Intelligence
@@ -59,11 +62,11 @@ export default function BlogSection() {
       )}
 
       <motion.div
+        ref={reveal2.ref}
         className="grid grid-cols-1 md:grid-cols-3 gap-8"
         variants={staggerContainer}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate={reveal2.animate}
       >
         {loading
           ? [0, 1, 2].map((i) => (
