@@ -10,10 +10,10 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import jwt
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from jose import jwt
 
 os.environ.setdefault("TEST_DATABASE_URL", "postgresql://test:test@localhost/test")
 os.environ.setdefault("DATABASE_URL", "postgresql://test:test@localhost/test")

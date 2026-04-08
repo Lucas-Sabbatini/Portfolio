@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     umami_api_key: str = ""
     umami_website_id: str = ""
 
+    # Security
+    admin_ip_whitelist: str = ""
+    trust_proxy: bool = False
+
     # CORS
     allowed_origins: str = "http://localhost:5173"
 
