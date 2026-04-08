@@ -1,7 +1,7 @@
 import logging
 from datetime import UTC, datetime, timedelta
 
-from jose import jwt
+import jwt
 from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,6 +30,15 @@ def create_access_token(data: dict[str, str]) -> str:
     return jwt.encode(to_encode, settings.secret_key, algorithm="HS256")
 
 
+def create_mfa_token(data: dict[str, str]) -> str:
+    settings = get_settings()
+    to_encode = data.copy()
+    to_encode["purpose"] = "mfa"
+    expire = datetime.now(UTC) + timedelta(minutes=5)
+    to_encode["exp"] = int(expire.timestamp())
+    return jwt.encode(to_encode, settings.secret_key, algorithm="HS256")
+
+
 async def authenticate_admin(
     session: AsyncSession, email: str, password: str
 ) -> dict[str, str] | None:
@@ -45,4 +54,4 @@ async def authenticate_admin(
         return None
 
     logger.info("Successful login for email: %s", email)
-    return {"id": str(row.id), "email": row.email}
+    return {"id": str(row.id), "email": row.email, "totp_secret": row.totp_secret}

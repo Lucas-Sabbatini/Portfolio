@@ -7,6 +7,8 @@ import resend
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.auth.router import router as auth_router
 from app.config import get_settings
@@ -15,6 +17,7 @@ from app.database import close_engine
 from app.newsletter.router import router as newsletter_router
 from app.post_images.router import router as post_images_router
 from app.posts.router import router as posts_router
+from app.rate_limit import limiter
 from app.upload.router import router as upload_router
 
 logging.basicConfig(
@@ -36,6 +39,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Blog API", lifespan=lifespan)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -61,6 +67,10 @@ async def log_requests(request: Request, call_next):
     )
     if request.url.path.startswith("/uploads/"):
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
     return response
 
 

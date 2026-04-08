@@ -4,8 +4,8 @@ import uuid
 from datetime import UTC, datetime
 from unittest.mock import patch
 
+import jwt
 import pytest
-from jose import jwt
 
 from app.auth.service import create_access_token, hash_password, verify_password
 from app.post_images.router import _sanitize_key

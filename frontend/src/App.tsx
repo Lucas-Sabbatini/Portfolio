@@ -14,6 +14,7 @@ import AdminExperiencePage from '@/pages/admin/AdminExperiencePage'
 import AdminSkillsPage from '@/pages/admin/AdminSkillsPage'
 import AdminSocialLinksPage from '@/pages/admin/AdminSocialLinksPage'
 import AdminNewsletterPage from '@/pages/admin/AdminNewsletterPage'
+import AdminSecurityPage from '@/pages/admin/AdminSecurityPage'
 import { getMe } from '@/api/auth'
 
 function AdminRoute() {
@@ -36,6 +37,7 @@ function AdminRoute() {
         <Route path="skills" element={<AdminSkillsPage />} />
         <Route path="social-links" element={<AdminSocialLinksPage />} />
         <Route path="newsletter" element={<AdminNewsletterPage />} />
+        <Route path="security" element={<AdminSecurityPage />} />
         <Route index element={<Navigate to="posts" replace />} />
       </Route>
     </Routes>

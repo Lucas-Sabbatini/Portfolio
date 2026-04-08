@@ -8,6 +8,7 @@ const navItems = [
   { label: 'Skills', path: '/admin/skills' },
   { label: 'Social Links', path: '/admin/social-links' },
   { label: 'Newsletter', path: '/admin/newsletter' },
+  { label: 'Security', path: '/admin/security' },
 ]
 
 export default function AdminLayout() {

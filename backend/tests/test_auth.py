@@ -3,9 +3,9 @@
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
+import jwt
 import pytest
 from httpx import AsyncClient
-from jose import jwt
 
 ADMIN_ROW = {
     "id": "00000000-0000-0000-0000-000000000001",
