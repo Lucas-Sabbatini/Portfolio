@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, staggerFast, viewportOnce } from '@/lib/animations'
+import { fadeUp, staggerFast } from '@/lib/animations'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 import type { Skill } from '@/types/skill'
 import { fetchSkills } from '@/api/content'
 import './SkillsSection.css'
@@ -18,6 +19,8 @@ const pill: import('framer-motion').Variants = {
 export default function SkillsSection() {
   const [skills, setSkills] = useState<Skill[]>([])
   const [error, setError] = useState(false)
+  const reveal1 = useScrollReveal()
+  const reveal2 = useScrollReveal()
 
   useEffect(() => {
     fetchSkills()
@@ -28,10 +31,10 @@ export default function SkillsSection() {
   return (
     <section className="space-y-12">
       <motion.p
+        ref={reveal1.ref}
         variants={fadeUp}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate={reveal1.animate}
         className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60"
       >
         04 / Core Stack
@@ -42,11 +45,11 @@ export default function SkillsSection() {
       )}
 
       <motion.div
+        ref={reveal2.ref}
         className="flex flex-wrap gap-4 justify-center"
         variants={staggerFast}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate={reveal2.animate}
       >
         {skills.map((skill) => (
           <motion.span

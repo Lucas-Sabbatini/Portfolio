@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { fadeUp, staggerContainer, viewportOnce } from '@/lib/animations'
+import { fadeUp, staggerContainer } from '@/lib/animations'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { fetchContent } from '@/api/content'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import './ContactSection.css'
@@ -27,15 +28,17 @@ export default function ContactSection() {
     }
   }, [email, track])
 
+  const reveal = useScrollReveal()
+
   return (
     <motion.section
+      ref={reveal.ref}
       className="flex flex-col items-center text-center py-20 space-y-14"
       id="contact"
       aria-labelledby="contact-heading"
       variants={staggerContainer}
       initial="hidden"
-      whileInView="visible"
-      viewport={viewportOnce}
+      animate={reveal.animate}
     >
       <motion.p
         variants={fadeUp}

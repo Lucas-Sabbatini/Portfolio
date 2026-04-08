@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, slideLeft, staggerContainer, viewportOnce } from '@/lib/animations'
+import { fadeUp, slideLeft, staggerContainer } from '@/lib/animations'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 import type { ExperienceEntry } from '@/types/experience'
 import { fetchExperience } from '@/api/content'
 import './ExperienceSection.css'
@@ -8,6 +9,8 @@ import './ExperienceSection.css'
 export default function ExperienceSection() {
   const [experiences, setExperiences] = useState<ExperienceEntry[]>([])
   const [error, setError] = useState(false)
+  const reveal1 = useScrollReveal()
+  const reveal2 = useScrollReveal()
 
   useEffect(() => {
     fetchExperience()
@@ -20,11 +23,11 @@ export default function ExperienceSection() {
   return (
     <section className="space-y-16" id="experience" aria-label="Experience timeline">
       <motion.div
+        ref={reveal1.ref}
         className="flex justify-between items-end border-b border-white/5 pb-8"
         variants={fadeUp}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate={reveal1.animate}
       >
         <p className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
           02 / Timeline
@@ -39,11 +42,11 @@ export default function ExperienceSection() {
       )}
 
       <motion.div
+        ref={reveal2.ref}
         className="experience-timeline"
         variants={staggerContainer}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate={reveal2.animate}
       >
         {sorted.map((entry, idx) => {
           const isActive = idx === 0

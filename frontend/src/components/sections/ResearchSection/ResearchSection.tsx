@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, fadeIn, scaleIn, staggerContainer, viewportOnce } from '@/lib/animations'
+import { fadeUp, fadeIn, scaleIn, staggerContainer } from '@/lib/animations'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { fetchContent } from '@/api/content'
 import { resolveImageUrl } from '@/api/client'
 import Skeleton from '@/components/shared/Skeleton'
@@ -9,6 +10,9 @@ import './ResearchSection.css'
 export default function ResearchSection() {
   const [content, setContent] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
+  const reveal1 = useScrollReveal()
+  const reveal2 = useScrollReveal()
+  const reveal3 = useScrollReveal()
 
   useEffect(() => {
     fetchContent('research').then(setContent).catch(console.error).finally(() => setLoading(false))
@@ -30,19 +34,19 @@ export default function ResearchSection() {
       <div className="absolute -inset-10 bg-primary/10 blur-[150px] rounded-full -z-10 opacity-30" />
 
       <motion.div
+        ref={reveal1.ref}
         className="research-card"
         variants={scaleIn}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate={reveal1.animate}
       >
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <motion.div
+            ref={reveal2.ref}
             className="space-y-10"
             variants={staggerContainer}
             initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
+            animate={reveal2.animate}
           >
             <motion.p
               variants={fadeUp}
@@ -88,11 +92,11 @@ export default function ResearchSection() {
           </motion.div>
 
           <motion.div
+            ref={reveal3.ref}
             className="research-image-wrapper group"
             variants={fadeIn}
             initial="hidden"
-            whileInView="visible"
-            viewport={viewportOnce}
+            animate={reveal3.animate}
             whileHover={{ y: -4, transition: { duration: 0.4 } }}
           >
             <img

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp, scaleIn, staggerContainer, staggerFast, viewportOnce } from '@/lib/animations'
+import { fadeUp, scaleIn, staggerContainer, staggerFast } from '@/lib/animations'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { fetchContent } from '@/api/content'
 import Skeleton from '@/components/shared/Skeleton'
 import './NarrativeSection.css'
@@ -24,6 +25,8 @@ function buildStats(content: Record<string, string>) {
 export default function NarrativeSection() {
   const [content, setContent] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
+  const reveal1 = useScrollReveal()
+  const reveal2 = useScrollReveal()
 
   useEffect(() => {
     fetchContent('narrative').then(setContent).catch(console.error).finally(() => setLoading(false))
@@ -32,11 +35,11 @@ export default function NarrativeSection() {
   return (
     <section className="grid grid-cols-1 lg:grid-cols-12 gap-12" id="work" aria-labelledby="work-heading">
       <motion.div
+        ref={reveal1.ref}
         className="lg:col-span-7 flex flex-col justify-center space-y-10"
         variants={staggerContainer}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate={reveal1.animate}
       >
         <motion.p
           variants={fadeUp}
@@ -54,11 +57,11 @@ export default function NarrativeSection() {
       </motion.div>
 
       <motion.div
+        ref={reveal2.ref}
         className="lg:col-span-5 grid grid-cols-2 gap-4"
         variants={staggerFast}
         initial="hidden"
-        whileInView="visible"
-        viewport={viewportOnce}
+        animate={reveal2.animate}
       >
         {buildStats(content).map((stat) => (
           <motion.div
