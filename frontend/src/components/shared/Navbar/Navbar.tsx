@@ -59,16 +59,6 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
               })}
             </motion.div>
 
-            <motion.button
-              className="nav-cta"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Resume
-            </motion.button>
           </>
         )}
       </div>

@@ -17,8 +17,7 @@ import { ApiError, resolveImageUrl } from '@/api/client'
 import { resolvePostImageKeys } from '@/utils/resolvePostImages'
 import { TagChip } from '@/components/blog/PostCard/PostCard'
 import { useAnalytics } from '@/hooks/useAnalytics'
-import { fadeUp } from '@/lib/animations'
-import { useScrollReveal } from '@/hooks/useScrollReveal'
+import { fadeUp, viewportOnce } from '@/lib/animations'
 import 'highlight.js/styles/github-dark.min.css'
 import 'katex/dist/katex.min.css'
 import './PostPage.css'
@@ -126,8 +125,6 @@ export default function PostPage() {
   const [postContent, setPostContent] = useState<Record<string, string>>({})
   const { track } = useAnalytics()
   const reducedMotion = useReducedMotion()
-  const revealNav = useScrollReveal()
-  const revealNewsletter = useScrollReveal()
   const [activeId, setActiveId] = useState('')
   const headerRef = useRef<HTMLElement>(null)
   const proseRef = useRef<HTMLDivElement>(null)
@@ -427,11 +424,11 @@ export default function PostPage() {
         {/* ── Prev / Next navigation ─────────────────────────────── */}
         {(prevPost || nextPost) && (
           <motion.nav
-            ref={revealNav.ref}
             aria-label="Post navigation"
             variants={fadeUp}
             initial="hidden"
-            animate={revealNav.animate}
+            whileInView="visible"
+            viewport={viewportOnce}
             className="post-nav"
           >
             {prevPost ? (
@@ -459,11 +456,11 @@ export default function PostPage() {
 
         {/* ── Newsletter CTA ─────────────────────────────────────── */}
         <motion.section
-          ref={revealNewsletter.ref}
           aria-label="Newsletter signup"
           variants={fadeUp}
           initial="hidden"
-          animate={revealNewsletter.animate}
+          whileInView="visible"
+          viewport={viewportOnce}
           className="post-newsletter"
         >
           <div className="space-y-2">
