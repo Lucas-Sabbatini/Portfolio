@@ -20,6 +20,9 @@ async def main() -> None:
         print("ERROR: ADMIN_EMAIL, ADMIN_PASSWORD, and DATABASE_URL must be set")
         sys.exit(1)
 
+    # Strip SQLAlchemy async driver prefix so asyncpg can connect
+    database_url = database_url.replace("postgresql+asyncpg://", "postgresql://")
+
     password_hash = pwd_context.hash(password)
 
     conn = await asyncpg.connect(dsn=database_url)
