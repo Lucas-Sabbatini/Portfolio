@@ -74,39 +74,38 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_TAILSCALE_IP }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          tailscale ssh ec2-user@$EC2_HOST << DEPLOY_SCRIPT
-            set -euo pipefail
-            cd /opt/blog
+          cat > /tmp/deploy.sh << 'EOF'
+          set -euo pipefail
+          cd /opt/blog
 
-            # Set image tag for this deployment
-            export IMAGE_TAG=${IMAGE_TAG}
+          # Pull latest images
+          docker compose -f docker-compose.prod.yml pull frontend backend
 
-            # Pull latest images
-            docker compose -f docker-compose.prod.yml pull frontend backend
+          # Rolling restart
+          docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
-            # Rolling restart
-            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+          # Run database migrations
+          docker compose -f docker-compose.prod.yml exec -T backend alembic upgrade head
 
-            # Run database migrations
-            docker compose -f docker-compose.prod.yml exec -T backend alembic upgrade head
+          # Health check with retry
+          echo "Waiting for backend health check..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+              echo "Backend is healthy!"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "ERROR: Health check failed after 60 seconds"
+              docker compose -f docker-compose.prod.yml logs backend --tail=50
+              exit 1
+            fi
+            sleep 2
+          done
 
-            # Health check with retry
-            echo "Waiting for backend health check..."
-            for i in \$(seq 1 30); do
-              if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
-                echo "Backend is healthy!"
-                break
-              fi
-              if [ "\$i" -eq 30 ]; then
-                echo "ERROR: Health check failed after 60 seconds"
-                docker compose -f docker-compose.prod.yml logs backend --tail=50
-                exit 1
-              fi
-              sleep 2
-            done
+          # Clean up old images
+          docker image prune -f
 
-            # Clean up old images
-            docker image prune -f
+          echo "Deployment complete!"
+          EOF
 
-            echo "Deployment complete: ${IMAGE_TAG}"
-          DEPLOY_SCRIPT
+          tailscale ssh ec2-user@${EC2_HOST} "export IMAGE_TAG=${IMAGE_TAG} && bash -s" < /tmp/deploy.sh
