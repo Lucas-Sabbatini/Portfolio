@@ -74,7 +74,7 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_TAILSCALE_IP }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          tailscale ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST << DEPLOY_SCRIPT
+          tailscale ssh ec2-user@$EC2_HOST << DEPLOY_SCRIPT
             set -euo pipefail
             cd /opt/blog
 
