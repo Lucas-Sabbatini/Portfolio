@@ -58,7 +58,7 @@ jobs:
     name: Deploy to Production
     needs: [build-and-push]
     runs-on: ubuntu-latest
-    environment: production
+    environment: CD
     steps:
       - uses: actions/checkout@v4
 
