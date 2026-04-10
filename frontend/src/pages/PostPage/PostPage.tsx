@@ -376,7 +376,13 @@ export default function PostPage() {
 
         {post.cover_image && (
           <div className="post-cover">
-            <img src={resolveImageUrl(post.cover_image)} alt={post.title} loading="lazy" className="w-full h-auto opacity-80" />
+            <img
+              src={resolveImageUrl(post.cover_image)}
+              alt={post.title}
+              loading="lazy"
+              className="w-full h-auto opacity-80"
+              onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none' }}
+            />
           </div>
         )}
 

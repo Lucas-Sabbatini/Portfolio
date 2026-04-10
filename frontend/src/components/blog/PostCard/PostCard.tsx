@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import type { Post } from '@/types/post'
 import type { PostTag } from '@/data/posts'
@@ -34,6 +35,8 @@ export function TagChip({ tag }: { tag: PostTag }) {
 
 // ─── Featured (full-width hero card) ─────────────────────────────────────────
 export function PostCardFeatured({ post }: { post: Post }) {
+  const [imgError, setImgError] = useState(false)
+
   return (
     <motion.article
       variants={scaleIn}
@@ -42,11 +45,12 @@ export function PostCardFeatured({ post }: { post: Post }) {
       whileHover={{ scale: 1.005, transition: { duration: 0.4 } }}
       className="post-card-featured group"
     >
-      {post.cover_image ? (
+      {post.cover_image && !imgError ? (
         <img
           src={resolveImageUrl(post.cover_image)}
           alt=""
           className="post-card-featured-image"
+          onError={() => setImgError(true)}
         />
       ) : (
         <div className={`absolute inset-0 bg-gradient-to-br ${gradientFor(post.id)}`} />
@@ -74,6 +78,8 @@ export function PostCardFeatured({ post }: { post: Post }) {
 
 // ─── Standard grid card ───────────────────────────────────────────────────────
 export function PostCardMedium({ post }: { post: Post }) {
+  const [imgError, setImgError] = useState(false)
+
   return (
     <motion.article
       variants={fadeUp}
@@ -81,12 +87,13 @@ export function PostCardMedium({ post }: { post: Post }) {
       className="post-card-medium group"
     >
       <div className="relative h-32 md:h-48 overflow-hidden flex-shrink-0 flex-1">
-        {post.cover_image ? (
+        {post.cover_image && !imgError ? (
           <img
             src={resolveImageUrl(post.cover_image)}
             alt=""
             loading="lazy"
             className="post-card-medium-image"
+            onError={() => setImgError(true)}
           />
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${gradientFor(post.id)}`} />
