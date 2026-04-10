@@ -22,7 +22,7 @@ def _mock_aiofiles_open():
 
 @pytest.mark.asyncio
 async def test_upload_cover_success_jpeg(client: AsyncClient, mock_db, auth_cookie: str):
-    with _mock_aiofiles_open(), patch("app.upload.router.Path.mkdir"):
+    with _mock_aiofiles_open(), patch("pathlib.Path.mkdir"):
         response = await client.post(
             "/api/upload",
             files={"file": ("photo.jpg", JPEG_BYTES, "image/jpeg")},
@@ -36,7 +36,7 @@ async def test_upload_cover_success_jpeg(client: AsyncClient, mock_db, auth_cook
 
 @pytest.mark.asyncio
 async def test_upload_cover_success_png(client: AsyncClient, mock_db, auth_cookie: str):
-    with _mock_aiofiles_open(), patch("app.upload.router.Path.mkdir"):
+    with _mock_aiofiles_open(), patch("pathlib.Path.mkdir"):
         response = await client.post(
             "/api/upload",
             files={"file": ("photo.png", PNG_BYTES, "image/png")},
@@ -49,7 +49,7 @@ async def test_upload_cover_success_png(client: AsyncClient, mock_db, auth_cooki
 
 @pytest.mark.asyncio
 async def test_upload_cover_success_webp(client: AsyncClient, mock_db, auth_cookie: str):
-    with _mock_aiofiles_open(), patch("app.upload.router.Path.mkdir"):
+    with _mock_aiofiles_open(), patch("pathlib.Path.mkdir"):
         response = await client.post(
             "/api/upload",
             files={"file": ("photo.webp", WEBP_BYTES, "image/webp")},

@@ -1,8 +1,8 @@
 import logging
 import uuid
-from pathlib import Path
 
-import aiofiles
+import boto3
+from botocore.exceptions import ClientError
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from app.auth.dependencies import get_current_admin
@@ -26,6 +26,11 @@ def detect_mime(data: bytes) -> str | None:
     return None
 
 
+def _get_s3_client():
+    settings = get_settings()
+    return boto3.client("s3", region_name=settings.aws_default_region)
+
+
 @router.post("")
 async def upload_file(
     file: UploadFile = File(...),
@@ -43,16 +48,60 @@ async def upload_file(
     ext_map = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
     ext = ext_map[mime]
     filename = f"{uuid.uuid4()}.{ext}"
+    s3_key = f"covers/{filename}"
 
-    try:
-        settings = get_settings()
+    settings = get_settings()
+
+    if settings.s3_bucket_name:
+        try:
+            s3 = _get_s3_client()
+            s3.put_object(
+                Bucket=settings.s3_bucket_name,
+                Key=s3_key,
+                Body=contents,
+                ContentType=mime,
+            )
+            logger.info("Uploaded to S3: %s", s3_key)
+        except ClientError as exc:
+            logger.error("S3 upload failed", exc_info=True)
+            raise HTTPException(status_code=500, detail="internal server error") from exc
+    else:
+        # Fallback to local filesystem (development)
+        from pathlib import Path
+
+        import aiofiles
+
         covers_dir = Path(settings.upload_dir) / "covers"
         covers_dir.mkdir(parents=True, exist_ok=True)
         dest = covers_dir / filename
         async with aiofiles.open(dest, "wb") as f:
             await f.write(contents)
-        logger.info("Uploaded file: %s", filename)
-        return {"url": f"/uploads/covers/{filename}"}
-    except Exception as exc:
-        logger.error("Error saving uploaded file", exc_info=True)
-        raise HTTPException(status_code=500, detail="internal server error") from exc
+        logger.info("Uploaded locally: %s", filename)
+
+    return {"url": f"/uploads/covers/{filename}"}
+
+
+@router.get("/covers/{filename}")
+async def serve_upload(filename: str) -> bytes:
+    """Serve uploaded files from S3 or local filesystem."""
+    settings = get_settings()
+
+    if settings.s3_bucket_name:
+        try:
+            s3 = _get_s3_client()
+            response = s3.get_object(
+                Bucket=settings.s3_bucket_name,
+                Key=f"covers/{filename}",
+            )
+            from fastapi.responses import Response
+
+            return Response(
+                content=response["Body"].read(),
+                media_type=response["ContentType"],
+                headers={"Cache-Control": "public, max-age=31536000, immutable"},
+            )
+        except ClientError as exc:
+            raise HTTPException(status_code=404, detail="File not found") from exc
+    else:
+        # Local fallback handled by StaticFiles mount
+        raise HTTPException(status_code=404, detail="File not found")
