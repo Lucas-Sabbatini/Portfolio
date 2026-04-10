@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { http, HttpResponse } from 'msw'
 import { server } from '../mocks/server'
@@ -55,5 +55,34 @@ describe('PostPage', () => {
       const heading = screen.getByRole('heading', { name: 'Hello' })
       expect(heading).toBeInTheDocument()
     })
+  })
+
+  it('hides cover image container when image fails to load', async () => {
+    server.use(
+      http.get(`${BASE}/api/posts/cover-post`, () =>
+        HttpResponse.json({
+          id: '50',
+          slug: 'cover-post',
+          title: 'Cover Post',
+          excerpt: 'Has a broken cover',
+          tag: 'System Entry',
+          status: 'published',
+          body: 'Content here',
+          cover_image: '/uploads/covers/broken.webp',
+          read_time: '2 min',
+          published_at: '2024-01-01T00:00:00Z',
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        })
+      )
+    )
+    renderPostPage('cover-post')
+    await waitFor(() => screen.getByText('Cover Post'))
+
+    const img = screen.getByRole('img', { name: 'Cover Post' })
+    const container = img.parentElement!
+    fireEvent.error(img)
+
+    expect(container.style.display).toBe('none')
   })
 })

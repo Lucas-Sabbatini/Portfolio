@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type ImgHTMLAttributes } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { fadeUp, staggerContainer } from '@/lib/animations'
@@ -24,6 +24,12 @@ const gradientFallbacks = [
   'from-tertiary-container via-surface-container-low to-background',
   'from-secondary-container via-surface-container-low to-background',
 ]
+
+function CoverImg({ fallbackClass, ...props }: ImgHTMLAttributes<HTMLImageElement> & { fallbackClass: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) return <div className={fallbackClass} />
+  return <img {...props} onError={() => setFailed(true)} />
+}
 
 export default function BlogSection() {
   const [posts, setPosts] = useState<Post[]>([])
@@ -83,10 +89,11 @@ export default function BlogSection() {
                   className="blog-section-card group"
                 >
                   {post.cover_image ? (
-                    <img
+                    <CoverImg
                       src={resolveImageUrl(post.cover_image)}
                       alt={post.title}
                       className="blog-section-card-image"
+                      fallbackClass={`w-full h-full bg-gradient-to-br ${gradientFallbacks[idx % gradientFallbacks.length]}`}
                     />
                   ) : (
                     <div
