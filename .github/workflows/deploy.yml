@@ -69,6 +69,13 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
 
+      - name: Sync config files
+        env:
+          EC2_HOST: ${{ secrets.EC2_TAILSCALE_IP }}
+        run: |
+          tailscale ssh ec2-user@${EC2_HOST} "cat > /opt/blog/docker-compose.prod.yml" < docker-compose.prod.yml
+          tailscale ssh ec2-user@${EC2_HOST} "mkdir -p /opt/blog/nginx && cat > /opt/blog/nginx/nginx.conf" < nginx/nginx.conf
+
       - name: Deploy via Tailscale SSH
         env:
           EC2_HOST: ${{ secrets.EC2_TAILSCALE_IP }}
