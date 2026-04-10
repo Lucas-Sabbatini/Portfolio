@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     umami_api_key: str = ""
     umami_website_id: str = ""
 
+    # S3
+    s3_bucket_name: str = ""
+    aws_default_region: str = "us-east-1"
+
     # Security
     admin_ip_whitelist: str = ""
     trust_proxy: bool = False

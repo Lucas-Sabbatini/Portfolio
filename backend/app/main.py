@@ -86,7 +86,8 @@ app.include_router(newsletter_router)
 app.include_router(post_images_router)
 app.include_router(upload_router)
 
-# Serve uploaded files
-_upload_dir = Path(settings.upload_dir)
-_upload_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=str(_upload_dir)), name="uploads")
+# Serve uploaded files locally (dev only; production uses S3 via upload router)
+if not settings.s3_bucket_name:
+    _upload_dir = Path(settings.upload_dir)
+    _upload_dir.mkdir(parents=True, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=str(_upload_dir)), name="uploads")

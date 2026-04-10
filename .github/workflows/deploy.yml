@@ -1,0 +1,108 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  # Reuse existing CI pipeline
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  # Build and push Docker images to GHCR
+  build-and-push:
+    name: Build ${{ matrix.image }}
+    needs: [ci]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - context: frontend
+            image: blog-frontend
+          - context: backend
+            image: blog-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.context }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.image }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.image }}:latest
+          build-args: |
+            VITE_API_URL=https://${{ vars.DOMAIN }}
+            VITE_UMAMI_URL=https://${{ vars.DOMAIN }}/umami
+            VITE_UMAMI_WEBSITE_ID=${{ secrets.UMAMI_WEBSITE_ID }}
+
+  # Deploy to EC2 via Tailscale
+  deploy:
+    name: Deploy to Production
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Deploy via Tailscale SSH
+        env:
+          EC2_HOST: ${{ secrets.EC2_TAILSCALE_IP }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          tailscale ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST << DEPLOY_SCRIPT
+            set -euo pipefail
+            cd /opt/blog
+
+            # Set image tag for this deployment
+            export IMAGE_TAG=${IMAGE_TAG}
+
+            # Pull latest images
+            docker compose -f docker-compose.prod.yml pull frontend backend
+
+            # Rolling restart
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            # Run database migrations
+            docker compose -f docker-compose.prod.yml exec -T backend alembic upgrade head
+
+            # Health check with retry
+            echo "Waiting for backend health check..."
+            for i in \$(seq 1 30); do
+              if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+                echo "Backend is healthy!"
+                break
+              fi
+              if [ "\$i" -eq 30 ]; then
+                echo "ERROR: Health check failed after 60 seconds"
+                docker compose -f docker-compose.prod.yml logs backend --tail=50
+                exit 1
+              fi
+              sleep 2
+            done
+
+            # Clean up old images
+            docker image prune -f
+
+            echo "Deployment complete: ${IMAGE_TAG}"
+          DEPLOY_SCRIPT
