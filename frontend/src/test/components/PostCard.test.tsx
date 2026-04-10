@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { PostCardFeatured, PostCardMedium } from '../../components/blog/PostCard/PostCard'
 import type { Post } from '../../types/post'
