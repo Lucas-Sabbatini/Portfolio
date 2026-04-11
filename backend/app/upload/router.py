@@ -82,8 +82,18 @@ async def upload_file(
 
 
 @router.get("/covers/{filename}")
-async def serve_upload(filename: str) -> bytes:
-    """Serve uploaded files from S3 or local filesystem."""
+async def serve_cover(filename: str) -> bytes:
+    """Serve cover images from S3 or local filesystem."""
+    return await _serve_s3_file(f"covers/{filename}")
+
+
+@router.get("/post-images/{filename}")
+async def serve_post_image(filename: str) -> bytes:
+    """Serve post images from S3 or local filesystem."""
+    return await _serve_s3_file(f"post-images/{filename}")
+
+
+async def _serve_s3_file(s3_key: str):
     settings = get_settings()
 
     if settings.s3_bucket_name:
@@ -91,7 +101,7 @@ async def serve_upload(filename: str) -> bytes:
             s3 = _get_s3_client()
             response = s3.get_object(
                 Bucket=settings.s3_bucket_name,
-                Key=f"covers/{filename}",
+                Key=s3_key,
             )
             from fastapi.responses import Response
 
