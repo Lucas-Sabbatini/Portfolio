@@ -62,8 +62,10 @@ async def test_upload_post_image_success(client: AsyncClient, mock_db, auth_cook
     with (
         _mock_aiofiles_open(),
         patch("app.post_images.router.Path.mkdir"),
+        patch("app.post_images.router.get_settings") as mock_settings,
         patch("app.post_images.service.create_image", new_callable=AsyncMock) as mock_create,
     ):
+        mock_settings.return_value = MagicMock(s3_bucket_name="", upload_dir="./uploads")
         mock_create.return_value = IMAGE_ROW
         response = await client.post(
             f"/api/posts/{POST_ID}/images",
@@ -85,8 +87,10 @@ async def test_upload_post_image_derives_key_from_filename(
     with (
         _mock_aiofiles_open(),
         patch("app.post_images.router.Path.mkdir"),
+        patch("app.post_images.router.get_settings") as mock_settings,
         patch("app.post_images.service.create_image", new_callable=AsyncMock) as mock_create,
     ):
+        mock_settings.return_value = MagicMock(s3_bucket_name="", upload_dir="./uploads")
         mock_create.return_value = row
         response = await client.post(
             f"/api/posts/{POST_ID}/images",
@@ -156,7 +160,7 @@ async def test_delete_post_image_success(client: AsyncClient, mock_db, auth_cook
         patch("app.post_images.router.get_settings") as mock_settings,
     ):
         mock_del.return_value = "/uploads/post-images/abc.jpg"
-        mock_settings.return_value = MagicMock(upload_dir=str(upload_dir))
+        mock_settings.return_value = MagicMock(upload_dir=str(upload_dir), s3_bucket_name="")
         response = await client.delete(
             f"/api/posts/{POST_ID}/images/{IMAGE_ID}",
             cookies={"access_token": auth_cookie},
@@ -197,7 +201,7 @@ async def test_delete_post_image_file_not_on_disk(
         patch("app.post_images.router.get_settings") as mock_settings,
     ):
         mock_del.return_value = "/uploads/post-images/missing.jpg"
-        mock_settings.return_value = MagicMock(upload_dir=str(upload_dir))
+        mock_settings.return_value = MagicMock(upload_dir=str(upload_dir), s3_bucket_name="")
         response = await client.delete(
             f"/api/posts/{POST_ID}/images/{IMAGE_ID}",
             cookies={"access_token": auth_cookie},
