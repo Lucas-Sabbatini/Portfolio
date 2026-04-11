@@ -51,7 +51,7 @@ jobs:
           build-args: |
             VITE_API_URL=https://${{ vars.DOMAIN }}
             VITE_UMAMI_URL=https://${{ vars.DOMAIN }}/umami
-            VITE_UMAMI_WEBSITE_ID=${{ secrets.UMAMI_WEBSITE_ID }}
+            VITE_UMAMI_WEBSITE_ID=${{ vars.UMAMI_WEBSITE_ID }}
 
   # Build Umami with BASE_PATH and push to GHCR
   build-umami:
