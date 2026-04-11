@@ -41,7 +41,10 @@ services:
     restart: unless-stopped
 
   umami:
-    image: ghcr.io/umami-software/umami:postgresql-latest
+    build:
+      context: https://github.com/umami-software/umami.git#v3.0.3
+      args:
+        BASE_PATH: /umami
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
@@ -49,5 +52,4 @@ services:
     environment:
       DATABASE_URL: ${UMAMI_DATABASE_URL}
       DATABASE_TYPE: postgresql
-      BASE_PATH: /umami
     restart: unless-stopped
