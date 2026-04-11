@@ -41,10 +41,7 @@ services:
     restart: unless-stopped
 
   umami:
-    build:
-      context: https://github.com/umami-software/umami.git#v3.0.3
-      args:
-        BASE_PATH: /umami
+    image: ghcr.io/${GHCR_OWNER}/blog-umami:latest
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
