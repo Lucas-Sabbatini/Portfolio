@@ -44,6 +44,8 @@ services:
     image: ghcr.io/umami-software/umami:postgresql-latest
     ports:
       - "127.0.0.1:3000:3000"
+    volumes:
+      - ./rds-ca-bundle.pem:/app/rds-ca-bundle.pem:ro
     environment:
       DATABASE_URL: ${UMAMI_DATABASE_URL}
       DATABASE_TYPE: postgresql
