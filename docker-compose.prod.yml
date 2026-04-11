@@ -47,4 +47,5 @@ services:
     environment:
       DATABASE_URL: ${UMAMI_DATABASE_URL}
       DATABASE_TYPE: postgresql
+      BASE_PATH: /umami
     restart: unless-stopped
