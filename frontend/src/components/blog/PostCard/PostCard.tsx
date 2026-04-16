@@ -83,6 +83,8 @@ export function PostCardMedium({ post }: { post: Post }) {
   return (
     <motion.article
       variants={fadeUp}
+      initial="hidden"
+      animate="visible"
       whileHover={{ y: -4, transition: { duration: 0.25, ease: 'easeOut' } }}
       className="post-card-medium group"
     >
