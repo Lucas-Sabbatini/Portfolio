@@ -120,6 +120,9 @@ jobs:
           # Rolling restart
           docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
+          # Reload nginx to pick up any nginx.conf changes (bind mount doesn't auto-reload)
+          docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload
+
           # Run database migrations
           docker compose -f docker-compose.prod.yml exec -T backend alembic upgrade head
 
