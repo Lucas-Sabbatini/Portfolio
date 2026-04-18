@@ -24,6 +24,16 @@ export const uploadImage = (file: File): Promise<{ url: string }> => {
   })
 }
 
+export const uploadCv = (file: File): Promise<{ url: string }> => {
+  const form = new FormData()
+  form.append('file', file)
+  return apiFetch('/api/upload/cv', {
+    method: 'POST',
+    body: form,
+    headers: {},
+  })
+}
+
 export const fetchExperience = (): Promise<ExperienceEntry[]> =>
   apiFetch('/api/experience')
 

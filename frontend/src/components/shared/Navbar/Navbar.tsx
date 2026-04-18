@@ -11,6 +11,8 @@ const navLinks = [
   { label: 'Contact', href: '/#contact' },
 ]
 
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+
 export default function Navbar({ minimal = false }: { minimal?: boolean }) {
   const { pathname } = useLocation()
   const { track } = useAnalytics()
@@ -33,14 +35,14 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
           </Link>
         </motion.div>
 
-        {!minimal && (
-          <>
-            <motion.div
-              className="hidden md:flex gap-10 font-medium tracking-tight"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
+        <motion.div
+          className="flex items-center gap-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          {!minimal && (
+            <div className="hidden md:flex gap-10 font-medium tracking-tight">
               {navLinks.map((link) => {
                 const isActive =
                   link.href === '/blog' ? pathname === '/blog' : pathname === '/'
@@ -57,10 +59,19 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                   </Link>
                 )
               })}
-            </motion.div>
+            </div>
+          )}
 
-          </>
-        )}
+          <a
+            href={`${API_BASE}/api/cv`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => track('cv-click')}
+            className="nav-cv"
+          >
+            CV
+          </a>
+        </motion.div>
       </div>
     </motion.nav>
   )

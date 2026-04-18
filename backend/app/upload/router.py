@@ -15,6 +15,15 @@ router = APIRouter(prefix="/api/upload", tags=["upload"])
 ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
 
+ALLOWED_CV_MIME = "application/pdf"
+MAX_CV_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
+CV_S3_KEY = "cv/cv.pdf"
+CV_DOWNLOAD_FILENAME = "lucas-janot-cv.pdf"
+
+
+def _is_pdf(data: bytes) -> bool:
+    return data[:5] == b"%PDF-"
+
 
 def detect_mime(data: bytes) -> str | None:
     if data[:3] == b"\xff\xd8\xff":
@@ -79,6 +88,47 @@ async def upload_file(
         logger.info("Uploaded locally: %s", filename)
 
     return {"url": f"/uploads/covers/{filename}"}
+
+
+@router.post("/cv")
+async def upload_cv(
+    file: UploadFile = File(...),
+    _admin: dict[str, str] = Depends(get_current_admin),
+) -> dict[str, str]:
+    contents = await file.read()
+
+    if len(contents) > MAX_CV_SIZE_BYTES:
+        raise HTTPException(status_code=422, detail="File exceeds 10 MB limit")
+    if not _is_pdf(contents):
+        raise HTTPException(status_code=422, detail="Invalid file type. Expected PDF")
+
+    settings = get_settings()
+
+    if settings.s3_bucket_name:
+        try:
+            s3 = _get_s3_client()
+            s3.put_object(
+                Bucket=settings.s3_bucket_name,
+                Key=CV_S3_KEY,
+                Body=contents,
+                ContentType=ALLOWED_CV_MIME,
+            )
+            logger.info("Uploaded CV to S3: %s", CV_S3_KEY)
+        except ClientError as exc:
+            logger.error("S3 CV upload failed", exc_info=True)
+            raise HTTPException(status_code=500, detail="internal server error") from exc
+    else:
+        from pathlib import Path
+
+        import aiofiles
+
+        cv_dir = Path(settings.upload_dir) / "cv"
+        cv_dir.mkdir(parents=True, exist_ok=True)
+        async with aiofiles.open(cv_dir / "cv.pdf", "wb") as f:
+            await f.write(contents)
+        logger.info("Uploaded CV locally")
+
+    return {"url": "/api/cv"}
 
 
 @router.get("/covers/{filename}")

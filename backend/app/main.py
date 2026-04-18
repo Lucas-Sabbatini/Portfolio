@@ -4,8 +4,10 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import resend
-from fastapi import FastAPI, Request
+from botocore.exceptions import ClientError
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -18,6 +20,11 @@ from app.newsletter.router import router as newsletter_router
 from app.post_images.router import router as post_images_router
 from app.posts.router import router as posts_router
 from app.rate_limit import limiter
+from app.upload.router import (
+    CV_DOWNLOAD_FILENAME,
+    CV_S3_KEY,
+    _get_s3_client,
+)
 from app.upload.router import router as upload_router
 
 logging.basicConfig(
@@ -77,6 +84,37 @@ async def log_requests(request: Request, call_next):
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/api/cv")
+async def serve_cv():
+    cv_settings = get_settings()
+    headers = {
+        "Content-Disposition": f'inline; filename="{CV_DOWNLOAD_FILENAME}"',
+        "Cache-Control": "public, max-age=3600",
+    }
+    if cv_settings.s3_bucket_name:
+        try:
+            obj = _get_s3_client().get_object(
+                Bucket=cv_settings.s3_bucket_name,
+                Key=CV_S3_KEY,
+            )
+        except ClientError as exc:
+            raise HTTPException(status_code=404, detail="CV not found") from exc
+        return Response(
+            content=obj["Body"].read(),
+            media_type="application/pdf",
+            headers=headers,
+        )
+
+    local_path = Path(cv_settings.upload_dir) / "cv" / "cv.pdf"
+    if not local_path.exists():
+        raise HTTPException(status_code=404, detail="CV not found")
+    return Response(
+        content=local_path.read_bytes(),
+        media_type="application/pdf",
+        headers=headers,
+    )
 
 
 app.include_router(auth_router)

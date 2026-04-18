@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchContent, patchContent, uploadImage } from '../../api/content'
+import { fetchContent, patchContent, uploadCv, uploadImage } from '../../api/content'
 
 interface FieldRowProps {
   section: string
@@ -107,6 +107,62 @@ function ImageFieldRow({ section, fieldKey, value: initialValue }: FieldRowProps
         </label>
       </div>
       {error && <span className="text-red-400 text-xs">{error}</span>}
+    </div>
+  )
+}
+
+function CvPanel() {
+  const [uploading, setUploading] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+  const apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setError('')
+    setSaved(false)
+    try {
+      await uploadCv(file)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      if (err instanceof Error) setError(err.message)
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
+
+  return (
+    <div className="glass-card rounded-[2rem] p-8 space-y-4">
+      <h2 className="font-bold text-[10px] uppercase tracking-widest text-primary/60">CV</h2>
+      <div className="flex items-center gap-4 py-3">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-48 flex-shrink-0">
+          cv.pdf
+        </span>
+        <a
+          href={`${apiBase}/api/cv`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-primary underline"
+        >
+          View current CV
+        </a>
+        <div className="flex-1" />
+        <label className="bg-primary text-on-primary font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full cursor-pointer disabled:opacity-60 flex-shrink-0">
+          {uploading ? 'Uploading…' : saved ? 'Saved' : 'Upload PDF'}
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handleUpload}
+            disabled={uploading}
+            className="hidden"
+          />
+        </label>
+        {error && <span className="text-red-400 text-xs">{error}</span>}
+      </div>
     </div>
   )
 }
@@ -226,6 +282,7 @@ export default function AdminContentPage() {
         keys={['copyright', 'tagline']}
         data={footer}
       />
+      <CvPanel />
     </div>
   )
 }
