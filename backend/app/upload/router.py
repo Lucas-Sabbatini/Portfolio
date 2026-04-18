@@ -1,93 +1,38 @@
 import logging
-import uuid
 
-import boto3
 from botocore.exceptions import ClientError
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi.responses import Response
 
 from app.auth.dependencies import get_current_admin
-from app.config import get_settings
+from app.upload import service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/upload", tags=["upload"])
 
-ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp"}
-MAX_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
-
-ALLOWED_CV_MIME = "application/pdf"
-MAX_CV_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
-CV_S3_KEY = "cv/cv.pdf"
-CV_DOWNLOAD_FILENAME = "lucas-janot-cv.pdf"
-
-
-def _is_pdf(data: bytes) -> bool:
-    return data[:5] == b"%PDF-"
-
-
-def detect_mime(data: bytes) -> str | None:
-    if data[:3] == b"\xff\xd8\xff":
-        return "image/jpeg"
-    if data[:4] == b"\x89PNG":
-        return "image/png"
-    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
-        return "image/webp"
-    return None
-
-
-def _get_s3_client():
-    settings = get_settings()
-    return boto3.client("s3", region_name=settings.aws_default_region)
-
 
 @router.post("")
-async def upload_file(
+async def upload_image(
     file: UploadFile = File(...),
     _admin: dict[str, str] = Depends(get_current_admin),
 ) -> dict[str, str]:
     contents = await file.read()
 
-    if len(contents) > MAX_SIZE_BYTES:
+    if len(contents) > service.MAX_IMAGE_SIZE_BYTES:
         raise HTTPException(status_code=422, detail="File exceeds 5 MB limit")
 
-    mime = detect_mime(contents)
-    if mime is None or mime not in ALLOWED_MIME_TYPES:
+    mime = service.detect_image_mime(contents)
+    if mime is None or mime not in service.ALLOWED_IMAGE_MIME_TYPES:
         raise HTTPException(status_code=422, detail="Invalid file type. Allowed: jpeg, png, webp")
 
-    ext_map = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
-    ext = ext_map[mime]
-    filename = f"{uuid.uuid4()}.{ext}"
-    s3_key = f"covers/{filename}"
+    try:
+        url = await service.save_cover_image(contents, mime)
+    except ClientError as exc:
+        logger.error("S3 upload failed", exc_info=True)
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
-    settings = get_settings()
-
-    if settings.s3_bucket_name:
-        try:
-            s3 = _get_s3_client()
-            s3.put_object(
-                Bucket=settings.s3_bucket_name,
-                Key=s3_key,
-                Body=contents,
-                ContentType=mime,
-            )
-            logger.info("Uploaded to S3: %s", s3_key)
-        except ClientError as exc:
-            logger.error("S3 upload failed", exc_info=True)
-            raise HTTPException(status_code=500, detail="internal server error") from exc
-    else:
-        # Fallback to local filesystem (development)
-        from pathlib import Path
-
-        import aiofiles
-
-        covers_dir = Path(settings.upload_dir) / "covers"
-        covers_dir.mkdir(parents=True, exist_ok=True)
-        dest = covers_dir / filename
-        async with aiofiles.open(dest, "wb") as f:
-            await f.write(contents)
-        logger.info("Uploaded locally: %s", filename)
-
-    return {"url": f"/uploads/covers/{filename}"}
+    return {"url": url}
 
 
 @router.post("/cv")
@@ -97,71 +42,52 @@ async def upload_cv(
 ) -> dict[str, str]:
     contents = await file.read()
 
-    if len(contents) > MAX_CV_SIZE_BYTES:
+    if len(contents) > service.MAX_CV_SIZE_BYTES:
         raise HTTPException(status_code=422, detail="File exceeds 10 MB limit")
-    if not _is_pdf(contents):
+    if not service.is_pdf(contents):
         raise HTTPException(status_code=422, detail="Invalid file type. Expected PDF")
 
-    settings = get_settings()
+    try:
+        await service.save_cv(contents)
+    except ClientError as exc:
+        logger.error("S3 CV upload failed", exc_info=True)
+        raise HTTPException(status_code=500, detail="internal server error") from exc
 
-    if settings.s3_bucket_name:
-        try:
-            s3 = _get_s3_client()
-            s3.put_object(
-                Bucket=settings.s3_bucket_name,
-                Key=CV_S3_KEY,
-                Body=contents,
-                ContentType=ALLOWED_CV_MIME,
-            )
-            logger.info("Uploaded CV to S3: %s", CV_S3_KEY)
-        except ClientError as exc:
-            logger.error("S3 CV upload failed", exc_info=True)
-            raise HTTPException(status_code=500, detail="internal server error") from exc
-    else:
-        from pathlib import Path
+    return {"url": "/api/upload/cv"}
 
-        import aiofiles
 
-        cv_dir = Path(settings.upload_dir) / "cv"
-        cv_dir.mkdir(parents=True, exist_ok=True)
-        async with aiofiles.open(cv_dir / "cv.pdf", "wb") as f:
-            await f.write(contents)
-        logger.info("Uploaded CV locally")
-
-    return {"url": "/api/cv"}
+@router.get("/cv")
+async def serve_cv():
+    data = await service.load_cv()
+    if data is None:
+        raise HTTPException(status_code=404, detail="CV not found")
+    return Response(
+        content=data,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'inline; filename="{service.CV_DOWNLOAD_FILENAME}"',
+            "Cache-Control": "public, max-age=3600",
+        },
+    )
 
 
 @router.get("/covers/{filename}")
-async def serve_cover(filename: str) -> bytes:
-    """Serve cover images from S3 or local filesystem."""
-    return await _serve_s3_file(f"covers/{filename}")
+async def serve_cover(filename: str):
+    return await _serve_uploaded_file(f"covers/{filename}")
 
 
 @router.get("/post-images/{filename}")
-async def serve_post_image(filename: str) -> bytes:
-    """Serve post images from S3 or local filesystem."""
-    return await _serve_s3_file(f"post-images/{filename}")
+async def serve_post_image(filename: str):
+    return await _serve_uploaded_file(f"post-images/{filename}")
 
 
-async def _serve_s3_file(s3_key: str):
-    settings = get_settings()
-
-    if settings.s3_bucket_name:
-        try:
-            s3 = _get_s3_client()
-            response = s3.get_object(
-                Bucket=settings.s3_bucket_name,
-                Key=s3_key,
-            )
-            from fastapi.responses import Response
-
-            return Response(
-                content=response["Body"].read(),
-                media_type=response["ContentType"],
-                headers={"Cache-Control": "public, max-age=31536000, immutable"},
-            )
-        except ClientError as exc:
-            raise HTTPException(status_code=404, detail="File not found") from exc
-    else:
-        # Local fallback handled by StaticFiles mount
+async def _serve_uploaded_file(s3_key: str):
+    result = await service.load_s3_object(s3_key)
+    if result is None:
         raise HTTPException(status_code=404, detail="File not found")
+    content, content_type = result
+    return Response(
+        content=content,
+        media_type=content_type,
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )

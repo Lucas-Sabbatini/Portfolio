@@ -107,7 +107,7 @@ async def test_upload_cv_success(client: AsyncClient, mock_db, auth_cookie: str)
         )
 
     assert response.status_code == 200
-    assert response.json() == {"url": "/api/cv"}
+    assert response.json() == {"url": "/api/upload/cv"}
 
 
 @pytest.mark.asyncio
@@ -157,7 +157,7 @@ async def test_serve_cv_local_success(client: AsyncClient, mock_db, tmp_path, mo
     monkeypatch.setenv("UPLOAD_DIR", str(tmp_path))
     get_settings.cache_clear()
 
-    response = await client.get("/api/cv")
+    response = await client.get("/api/upload/cv")
 
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/pdf"
@@ -173,7 +173,7 @@ async def test_serve_cv_local_missing(client: AsyncClient, mock_db, tmp_path, mo
     monkeypatch.setenv("UPLOAD_DIR", str(tmp_path))
     get_settings.cache_clear()
 
-    response = await client.get("/api/cv")
+    response = await client.get("/api/upload/cv")
 
     assert response.status_code == 404
 
@@ -190,8 +190,8 @@ async def test_serve_cv_s3_not_found(client: AsyncClient, mock_db, monkeypatch):
     s3_client.get_object.side_effect = ClientError(
         {"Error": {"Code": "NoSuchKey", "Message": "not found"}}, "GetObject"
     )
-    with patch("app.main._get_s3_client", return_value=s3_client):
-        response = await client.get("/api/cv")
+    with patch("app.upload.service.get_s3_client", return_value=s3_client):
+        response = await client.get("/api/upload/cv")
 
     assert response.status_code == 404
 
@@ -208,8 +208,8 @@ async def test_serve_cv_s3_success(client: AsyncClient, mock_db, monkeypatch):
     body_stream.read.return_value = PDF_BYTES
     s3_client = MagicMock()
     s3_client.get_object.return_value = {"Body": body_stream}
-    with patch("app.main._get_s3_client", return_value=s3_client):
-        response = await client.get("/api/cv")
+    with patch("app.upload.service.get_s3_client", return_value=s3_client):
+        response = await client.get("/api/upload/cv")
 
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/pdf"

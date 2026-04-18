@@ -14,7 +14,12 @@ from app.config import get_settings
 from app.database import get_session
 from app.post_images import service
 from app.post_images.schemas import PostImageResponse
-from app.upload.router import ALLOWED_MIME_TYPES, MAX_SIZE_BYTES, _get_s3_client, detect_mime
+from app.upload.service import (
+    ALLOWED_IMAGE_MIME_TYPES,
+    MAX_IMAGE_SIZE_BYTES,
+    detect_image_mime,
+    get_s3_client,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -51,11 +56,11 @@ async def upload_post_image(
 ):
     contents = await file.read()
 
-    if len(contents) > MAX_SIZE_BYTES:
+    if len(contents) > MAX_IMAGE_SIZE_BYTES:
         raise HTTPException(status_code=422, detail="File exceeds 5 MB limit")
 
-    mime = detect_mime(contents)
-    if mime is None or mime not in ALLOWED_MIME_TYPES:
+    mime = detect_image_mime(contents)
+    if mime is None or mime not in ALLOWED_IMAGE_MIME_TYPES:
         raise HTTPException(status_code=422, detail="Invalid file type. Allowed: jpeg, png, webp")
 
     ext_map = {"image/jpeg": "jpg", "image/png": "png", "image/webp": "webp"}
@@ -70,7 +75,7 @@ async def upload_post_image(
 
     if settings.s3_bucket_name:
         try:
-            s3 = _get_s3_client()
+            s3 = get_s3_client()
             s3.put_object(
                 Bucket=settings.s3_bucket_name,
                 Key=s3_key,
@@ -110,7 +115,7 @@ async def delete_post_image(
 
     if settings.s3_bucket_name:
         try:
-            s3 = _get_s3_client()
+            s3 = get_s3_client()
             s3.delete_object(Bucket=settings.s3_bucket_name, Key=relative)
             logger.info("Deleted post image from S3: %s", relative)
         except ClientError:

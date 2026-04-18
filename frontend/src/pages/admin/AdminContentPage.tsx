@@ -143,7 +143,7 @@ function CvPanel() {
           cv.pdf
         </span>
         <a
-          href={`${apiBase}/api/cv`}
+          href={`${apiBase}/api/upload/cv`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs text-primary underline"
