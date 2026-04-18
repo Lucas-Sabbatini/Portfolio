@@ -63,7 +63,7 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
           )}
 
           <a
-            href={`${API_BASE}/api/upload/cv`}
+            href={`${API_BASE}/cv`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => track('cv-click')}

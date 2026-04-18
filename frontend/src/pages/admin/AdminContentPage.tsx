@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { fetchContent, patchContent, uploadCv, uploadImage } from '../../api/content'
+import { deleteCv, fetchContent, patchContent, uploadCv, uploadImage } from '../../api/content'
+import { ApiError } from '../../api/client'
 
 interface FieldRowProps {
   section: string
@@ -113,7 +114,9 @@ function ImageFieldRow({ section, fieldKey, value: initialValue }: FieldRowProps
 
 function CvPanel() {
   const [uploading, setUploading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [missing, setMissing] = useState(false)
   const [error, setError] = useState('')
   const apiBase = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
@@ -126,12 +129,31 @@ function CvPanel() {
     try {
       await uploadCv(file)
       setSaved(true)
+      setMissing(false)
       setTimeout(() => setSaved(false), 2000)
     } catch (err) {
       if (err instanceof Error) setError(err.message)
     } finally {
       setUploading(false)
       e.target.value = ''
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!window.confirm('Delete the current CV? This cannot be undone.')) return
+    setDeleting(true)
+    setError('')
+    try {
+      await deleteCv()
+      setMissing(true)
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 404) {
+        setMissing(true)
+      } else if (err instanceof Error) {
+        setError(err.message)
+      }
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -142,15 +164,28 @@ function CvPanel() {
         <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant w-48 flex-shrink-0">
           cv.pdf
         </span>
-        <a
-          href={`${apiBase}/api/upload/cv`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs text-primary underline"
-        >
-          View current CV
-        </a>
+        {missing ? (
+          <span className="text-xs text-on-surface-variant italic">No CV uploaded</span>
+        ) : (
+          <a
+            href={`${apiBase}/cv`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary underline"
+          >
+            View current CV
+          </a>
+        )}
         <div className="flex-1" />
+        {!missing && (
+          <button
+            onClick={handleDelete}
+            disabled={deleting || uploading}
+            className="bg-error/80 hover:bg-error text-on-error font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full disabled:opacity-60 flex-shrink-0"
+          >
+            {deleting ? 'Deleting…' : 'Delete'}
+          </button>
+        )}
         <label className="bg-primary text-on-primary font-bold tracking-wider text-[10px] uppercase px-4 py-2 rounded-full cursor-pointer disabled:opacity-60 flex-shrink-0">
           {uploading ? 'Uploading…' : saved ? 'Saved' : 'Upload PDF'}
           <input

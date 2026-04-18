@@ -40,9 +40,9 @@ def get_s3_client():
     return boto3.client("s3", region_name=settings.aws_default_region)
 
 
-async def save_cover_image(contents: bytes, mime: str) -> str:
+async def _save_image(contents: bytes, mime: str, prefix: str) -> str:
     filename = f"{uuid.uuid4()}.{_IMAGE_EXT[mime]}"
-    s3_key = f"covers/{filename}"
+    s3_key = f"{prefix}/{filename}"
     settings = get_settings()
 
     if settings.s3_bucket_name:
@@ -54,13 +54,46 @@ async def save_cover_image(contents: bytes, mime: str) -> str:
         )
         logger.info("Uploaded to S3: %s", s3_key)
     else:
-        covers_dir = Path(settings.upload_dir) / "covers"
-        covers_dir.mkdir(parents=True, exist_ok=True)
-        async with aiofiles.open(covers_dir / filename, "wb") as f:
+        local_dir = Path(settings.upload_dir) / prefix
+        local_dir.mkdir(parents=True, exist_ok=True)
+        async with aiofiles.open(local_dir / filename, "wb") as f:
             await f.write(contents)
-        logger.info("Uploaded locally: %s", filename)
+        logger.info("Uploaded locally: %s/%s", prefix, filename)
 
-    return f"/uploads/covers/{filename}"
+    return f"/uploads/{prefix}/{filename}"
+
+
+async def save_cover_image(contents: bytes, mime: str) -> str:
+    return await _save_image(contents, mime, "covers")
+
+
+async def save_post_image(contents: bytes, mime: str) -> str:
+    return await _save_image(contents, mime, "post-images")
+
+
+async def delete_uploaded_file(url: str) -> None:
+    """Delete a file by its public /uploads/... URL.
+
+    Raises ValueError if the derived path escapes the uploads root (traversal
+    guard). No-op when the underlying file is already missing.
+    """
+    settings = get_settings()
+    relative = url.removeprefix("/uploads/")
+
+    if settings.s3_bucket_name:
+        try:
+            get_s3_client().delete_object(Bucket=settings.s3_bucket_name, Key=relative)
+            logger.info("Deleted from S3: %s", relative)
+        except ClientError:
+            logger.error("S3 delete failed: %s", relative, exc_info=True)
+        return
+
+    upload_root = Path(settings.upload_dir).resolve()
+    file_path = (upload_root / relative).resolve()
+    if not str(file_path).startswith(str(upload_root)):
+        raise ValueError("Invalid path")
+    if file_path.exists():
+        file_path.unlink()
 
 
 async def save_cv(contents: bytes) -> None:
@@ -80,6 +113,28 @@ async def save_cv(contents: bytes) -> None:
         async with aiofiles.open(cv_dir / "cv.pdf", "wb") as f:
             await f.write(contents)
         logger.info("Uploaded CV locally")
+
+
+async def delete_cv() -> bool:
+    """Returns True when a CV existed and was deleted, False when none existed."""
+    settings = get_settings()
+
+    if settings.s3_bucket_name:
+        client = get_s3_client()
+        try:
+            client.head_object(Bucket=settings.s3_bucket_name, Key=CV_S3_KEY)
+        except ClientError:
+            return False
+        client.delete_object(Bucket=settings.s3_bucket_name, Key=CV_S3_KEY)
+        logger.info("Deleted CV from S3")
+        return True
+
+    local_path = Path(settings.upload_dir) / "cv" / "cv.pdf"
+    if not local_path.exists():
+        return False
+    local_path.unlink()
+    logger.info("Deleted CV locally")
+    return True
 
 
 async def load_cv() -> bytes | None:

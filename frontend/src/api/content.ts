@@ -34,6 +34,9 @@ export const uploadCv = (file: File): Promise<{ url: string }> => {
   })
 }
 
+export const deleteCv = (): Promise<void> =>
+  apiFetch('/api/upload/cv', { method: 'DELETE' })
+
 export const fetchExperience = (): Promise<ExperienceEntry[]> =>
   apiFetch('/api/experience')
 

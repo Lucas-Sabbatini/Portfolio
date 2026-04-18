@@ -18,6 +18,7 @@ from app.newsletter.router import router as newsletter_router
 from app.post_images.router import router as post_images_router
 from app.posts.router import router as posts_router
 from app.rate_limit import limiter
+from app.upload.router import public_router as upload_public_router
 from app.upload.router import router as upload_router
 
 logging.basicConfig(
@@ -85,6 +86,7 @@ app.include_router(content_router)
 app.include_router(newsletter_router)
 app.include_router(post_images_router)
 app.include_router(upload_router)
+app.include_router(upload_public_router)
 
 # Serve uploaded files locally (dev only; production uses S3 via upload router)
 if not settings.s3_bucket_name:

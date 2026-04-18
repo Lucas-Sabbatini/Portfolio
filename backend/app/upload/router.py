@@ -10,6 +10,7 @@ from app.upload import service
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/upload", tags=["upload"])
+public_router = APIRouter(tags=["public"])
 
 
 @router.post("")
@@ -53,10 +54,22 @@ async def upload_cv(
         logger.error("S3 CV upload failed", exc_info=True)
         raise HTTPException(status_code=500, detail="internal server error") from exc
 
-    return {"url": "/api/upload/cv"}
+    return {"url": "/cv"}
 
 
-@router.get("/cv")
+@router.delete("/cv", status_code=204)
+async def delete_cv(_admin: dict[str, str] = Depends(get_current_admin)):
+    try:
+        deleted = await service.delete_cv()
+    except ClientError as exc:
+        logger.error("S3 CV delete failed", exc_info=True)
+        raise HTTPException(status_code=500, detail="internal server error") from exc
+    if not deleted:
+        raise HTTPException(status_code=404, detail="CV not found")
+    return Response(status_code=204)
+
+
+@public_router.get("/cv")
 async def serve_cv():
     data = await service.load_cv()
     if data is None:
