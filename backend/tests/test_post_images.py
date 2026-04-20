@@ -61,8 +61,8 @@ async def test_list_post_images_unauthenticated(client: AsyncClient, mock_db):
 async def test_upload_post_image_success(client: AsyncClient, mock_db, auth_cookie: str):
     with (
         _mock_aiofiles_open(),
-        patch("app.post_images.router.Path.mkdir"),
-        patch("app.post_images.router.get_settings") as mock_settings,
+        patch("app.upload.service.Path.mkdir"),
+        patch("app.upload.service.get_settings") as mock_settings,
         patch("app.post_images.service.create_image", new_callable=AsyncMock) as mock_create,
     ):
         mock_settings.return_value = MagicMock(s3_bucket_name="", upload_dir="./uploads")
@@ -86,8 +86,8 @@ async def test_upload_post_image_derives_key_from_filename(
     row = {**IMAGE_ROW, "key": "my-photo"}
     with (
         _mock_aiofiles_open(),
-        patch("app.post_images.router.Path.mkdir"),
-        patch("app.post_images.router.get_settings") as mock_settings,
+        patch("app.upload.service.Path.mkdir"),
+        patch("app.upload.service.get_settings") as mock_settings,
         patch("app.post_images.service.create_image", new_callable=AsyncMock) as mock_create,
     ):
         mock_settings.return_value = MagicMock(s3_bucket_name="", upload_dir="./uploads")
@@ -157,7 +157,7 @@ async def test_delete_post_image_success(client: AsyncClient, mock_db, auth_cook
 
     with (
         patch("app.post_images.service.delete_image", new_callable=AsyncMock) as mock_del,
-        patch("app.post_images.router.get_settings") as mock_settings,
+        patch("app.upload.service.get_settings") as mock_settings,
     ):
         mock_del.return_value = "/uploads/post-images/abc.jpg"
         mock_settings.return_value = MagicMock(upload_dir=str(upload_dir), s3_bucket_name="")
@@ -198,7 +198,7 @@ async def test_delete_post_image_file_not_on_disk(
 
     with (
         patch("app.post_images.service.delete_image", new_callable=AsyncMock) as mock_del,
-        patch("app.post_images.router.get_settings") as mock_settings,
+        patch("app.upload.service.get_settings") as mock_settings,
     ):
         mock_del.return_value = "/uploads/post-images/missing.jpg"
         mock_settings.return_value = MagicMock(upload_dir=str(upload_dir), s3_bucket_name="")

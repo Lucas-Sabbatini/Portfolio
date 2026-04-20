@@ -26,5 +26,6 @@ export async function apiFetch<T>(
     const body = await res.json().catch(() => ({ detail: 'Unknown error' }))
     throw new ApiError(res.status, body.detail ?? 'Unknown error')
   }
+  if (res.status === 204) return undefined as T
   return res.json()
 }

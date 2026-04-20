@@ -11,7 +11,7 @@ from app.auth.service import create_access_token, hash_password, verify_password
 from app.post_images.router import _sanitize_key
 from app.posts.schemas import slugify
 from app.posts.service import compute_read_time
-from app.upload.router import detect_mime
+from app.upload.service import detect_image_mime
 from app.utils import orm_to_dict
 
 # ---------------------------------------------------------------------------
@@ -186,32 +186,32 @@ def test_sanitize_key_already_clean():
 
 
 # ---------------------------------------------------------------------------
-# detect_mime
+# detect_image_mime
 # ---------------------------------------------------------------------------
 
 
-def test_detect_mime_jpeg():
-    assert detect_mime(b"\xff\xd8\xff\xe0" + b"\x00" * 100) == "image/jpeg"
+def test_detect_image_mime_jpeg():
+    assert detect_image_mime(b"\xff\xd8\xff\xe0" + b"\x00" * 100) == "image/jpeg"
 
 
-def test_detect_mime_png():
-    assert detect_mime(b"\x89PNG" + b"\x00" * 100) == "image/png"
+def test_detect_image_mime_png():
+    assert detect_image_mime(b"\x89PNG" + b"\x00" * 100) == "image/png"
 
 
-def test_detect_mime_webp():
-    assert detect_mime(b"RIFF\x00\x00\x00\x00WEBP" + b"\x00" * 100) == "image/webp"
+def test_detect_image_mime_webp():
+    assert detect_image_mime(b"RIFF\x00\x00\x00\x00WEBP" + b"\x00" * 100) == "image/webp"
 
 
-def test_detect_mime_unknown():
-    assert detect_mime(b"random bytes here") is None
+def test_detect_image_mime_unknown():
+    assert detect_image_mime(b"random bytes here") is None
 
 
-def test_detect_mime_empty():
-    assert detect_mime(b"") is None
+def test_detect_image_mime_empty():
+    assert detect_image_mime(b"") is None
 
 
-def test_detect_mime_partial_webp():
-    assert detect_mime(b"RIFF") is None
+def test_detect_image_mime_partial_webp():
+    assert detect_image_mime(b"RIFF") is None
 
 
 # ---------------------------------------------------------------------------
