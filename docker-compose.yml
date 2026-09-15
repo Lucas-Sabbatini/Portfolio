@@ -3,7 +3,7 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-blog}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
@@ -24,6 +24,7 @@ services:
       - ./backend/.env
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
+      - ./backend:/app
       - uploads_data:/app/uploads
     depends_on:
       db:
@@ -33,7 +34,7 @@ services:
     image: ghcr.io/umami-software/umami:postgresql-latest
     profiles: [umami]
     ports:
-      - "3000:3000"
+      - "${UMAMI_HOST_PORT:-3000}:3000"
     environment:
       DATABASE_URL: ${UMAMI_DATABASE_URL}
       DATABASE_TYPE: postgresql

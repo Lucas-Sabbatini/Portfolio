@@ -2,6 +2,9 @@
 target-version = "py312"
 line-length = 100
 src = ["app", "tests"]
+# Markdown is documentation, not source — do not run the code formatter over
+# the Python examples embedded in it.
+extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "C4", "UP"]

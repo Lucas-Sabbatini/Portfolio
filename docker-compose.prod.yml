@@ -1,6 +1,7 @@
 services:
   nginx:
     image: nginx:1.27-alpine
+    container_name: blog-nginx
     network_mode: host
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
@@ -12,13 +13,27 @@ services:
       backend:
         condition: service_healthy
     restart: unless-stopped
+    # Running nginx does NOT pick up a renewed certificate until it is reloaded.
+    # Certbot renews in its own container, so nginx reloads itself: once ~60s
+    # after start (to catch the renewal that runs on deploy), then every 30 min.
+    # A reload is zero-downtime and a no-op when the certificate is unchanged.
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ( sleep 60; nginx -s reload; while :; do sleep 1800; nginx -s reload; done ) &
+        exec nginx -g 'daemon off;'
 
   certbot:
     image: certbot/certbot:latest
+    container_name: blog-certbot
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    # Renew every 12h using the webroot challenge served by nginx at
+    # /.well-known/acme-challenge/. nginx reloads itself (see above), so no
+    # --deploy-hook is needed here.
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h & wait $${!}; done;'"
     restart: unless-stopped
 
   frontend:
