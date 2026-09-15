@@ -13,7 +13,6 @@ import type { SocialLink } from '@/types/social'
 export const profile = {
   name: 'Lucas Janot',
   role: 'Software Engineer & AI Researcher',
-  status: 'Open to conversations',
   email: 'lucassabbatinijp@gmail.com',
   summary:
     'Software engineer building React and TypeScript products, with a background in payment infrastructure and microservices. Published applied-ML research on Transformer models for medical spectra classification.',
@@ -41,11 +40,6 @@ export const research = {
     { value: '14+', label: 'Citations' },
     { value: '02', label: 'Publications' },
   ],
-} as const
-
-export const footer = {
-  copyright: '© 2026 Lucas Janot.',
-  built_with: 'Built with React, TypeScript & Tailwind CSS.',
 } as const
 
 export const experiences: ExperienceEntry[] = [
@@ -107,31 +101,31 @@ export const skills: Skill[] = [
     sort_order: 1,
   },
   {
-    id: '481f4c47-ee8f-45ca-bd62-df42fe21b9a4',
-    name: 'Python',
-    category: 'Language',
-    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
-    sort_order: 2,
-  },
-  {
     id: 'f13506c2-51ad-476c-8dda-c10d7c16f08a',
     name: 'React',
     category: 'Framework',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
-    sort_order: 3,
-  },
-  {
-    id: '9a8c6a6a-6d90-4697-8157-c9562bfebf79',
-    name: 'PyTorch',
-    category: 'Framework',
-    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pytorch/pytorch-original.svg',
-    sort_order: 4,
+    sort_order: 2,
   },
   {
     id: '1efdb144-d8a2-455f-823d-a41ab046646e',
     name: 'PostgreSQL',
     category: 'Database',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg',
+    sort_order: 3,
+  },
+  {
+    id: '481f4c47-ee8f-45ca-bd62-df42fe21b9a4',
+    name: 'Python',
+    category: 'Language',
+    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
+    sort_order: 4,
+  },
+  {
+    id: '9a8c6a6a-6d90-4697-8157-c9562bfebf79',
+    name: 'PyTorch',
+    category: 'Framework',
+    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pytorch/pytorch-original.svg',
     sort_order: 5,
   },
   {
@@ -142,9 +136,6 @@ export const skills: Skill[] = [
     sort_order: 6,
   },
 ]
-
-/** Skill categories in display order. */
-export const skillCategories = ['Language', 'Framework', 'Database', 'Cloud'] as const
 
 export const socialLinks: SocialLink[] = [
   {

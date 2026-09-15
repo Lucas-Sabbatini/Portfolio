@@ -4,7 +4,7 @@ export default function ExperienceSection() {
   const sorted = [...experiences].sort((a, b) => a.sort_order - b.sort_order)
 
   return (
-    <section id="experience" className="scroll-mt-24 pt-20">
+    <section id="experience" className="pt-20">
       <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">
         Experience
       </h2>

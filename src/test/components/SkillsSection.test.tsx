@@ -18,12 +18,4 @@ describe('SkillsSection', () => {
       }
     }
   })
-
-  it('groups skills by category', () => {
-    render(<SkillsSection />)
-    expect(screen.getByText('Languages')).toBeInTheDocument()
-    expect(screen.getByText('Frameworks')).toBeInTheDocument()
-    expect(screen.getByText('Databases')).toBeInTheDocument()
-    expect(screen.getByText('Cloud')).toBeInTheDocument()
-  })
 })

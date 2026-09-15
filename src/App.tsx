@@ -1,5 +1,3 @@
-import Navbar from '@/components/shared/Navbar/Navbar'
-import Footer from '@/components/shared/Footer/Footer'
 import HomePage from '@/pages/HomePage'
 
 export default function App() {
@@ -11,9 +9,7 @@ export default function App() {
       >
         Skip to content
       </a>
-      <Navbar />
       <HomePage />
-      <Footer />
     </div>
   )
 }

@@ -2,7 +2,7 @@ import { research } from '@/data/content'
 
 export default function ResearchSection() {
   return (
-    <section id="research" className="scroll-mt-24 pt-20">
+    <section id="research" className="pt-20">
       <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">
         Research
       </h2>

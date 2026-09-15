@@ -7,12 +7,14 @@ import ContactSection from '@/components/sections/ContactSection/ContactSection'
 
 export default function HomePage() {
   return (
-    <main id="main-content" className="mx-auto max-w-content px-6">
-      <HeroSection />
-      <FactsSection />
-      <ExperienceSection />
-      <ResearchSection />
-      <SkillsSection />
+    <main id="main-content">
+      <div className="mx-auto max-w-content px-6 pb-20">
+        <HeroSection />
+        <FactsSection />
+        <ExperienceSection />
+        <ResearchSection />
+        <SkillsSection />
+      </div>
       <ContactSection />
     </main>
   )
