@@ -1,19 +1,17 @@
 node_modules/
 dist/
 tmp/
+
+# Local env
 .env
 .env.local
-__pycache__/
-*.pyc
-.pytest_cache/
-backend/.env
+.env.production
+
+# Editor / OS
 .claude/
-.venv
+.DS_Store
 
 # Terraform
 infra/.terraform/
 infra/*.tfstate*
 infra/terraform.tfvars
-
-# Production secrets
-.env.production

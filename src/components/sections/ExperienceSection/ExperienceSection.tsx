@@ -1,0 +1,74 @@
+import { motion } from 'framer-motion'
+import { fadeUp, slideLeft, staggerContainer } from '@/lib/animations'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
+import { experiences } from '@/data/content'
+import './ExperienceSection.css'
+
+export default function ExperienceSection() {
+  const reveal1 = useScrollReveal()
+  const reveal2 = useScrollReveal()
+
+  const sorted = [...experiences].sort((a, b) => a.sort_order - b.sort_order)
+
+  return (
+    <section className="space-y-16" id="experience" aria-label="Experience timeline">
+      <motion.div
+        ref={reveal1.ref}
+        className="flex justify-between items-end border-b border-white/5 pb-8"
+        variants={fadeUp}
+        initial="hidden"
+        animate={reveal1.animate}
+      >
+        <p className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
+          02 / Timeline
+        </p>
+        <span className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest opacity-40">
+          System History
+        </span>
+      </motion.div>
+
+      <motion.div
+        ref={reveal2.ref}
+        className="experience-timeline"
+        variants={staggerContainer}
+        initial="hidden"
+        animate={reveal2.animate}
+      >
+        {sorted.map((entry, idx) => {
+          const isActive = idx === 0
+          return (
+            <motion.div key={entry.id} variants={slideLeft} className="experience-node group">
+              <div className="experience-dot-wrapper">
+                <span className={isActive ? 'experience-dot-active' : 'experience-dot-inactive'} />
+              </div>
+
+              <motion.div
+                className="experience-card"
+                whileHover={{ x: 3, transition: { duration: 0.25, ease: 'easeOut' } }}
+              >
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+                  <div>
+                    <h2 className="text-3xl font-bold text-on-surface tracking-tight">
+                      {entry.role}
+                    </h2>
+                    <p className={isActive ? 'experience-company-active' : 'experience-company-inactive'}>
+                      {entry.company} • {entry.period}
+                    </p>
+                  </div>
+                  {isActive && (
+                    <span className="experience-badge">Active</span>
+                  )}
+                </div>
+                <ul className="experience-bullets">
+                  {entry.description.map((bullet, i) => (
+                    <li key={i}>{bullet}</li>
+                  ))}
+                </ul>
+              </motion.div>
+            </motion.div>
+          )
+        })}
+      </motion.div>
+    </section>
+  )
+}
