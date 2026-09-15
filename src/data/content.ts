@@ -5,63 +5,47 @@ import type { SocialLink } from '@/types/social'
 /**
  * Static site content.
  *
- * All strings below were captured verbatim from the live production API
- * (https://lucasjanot.com/api/*) before the backend was removed. This file
- * is now the single source of truth for the landing page copy.
+ * Facts (experience, research, stack, links) were captured from the former
+ * production API. Marketing/poetic copy was intentionally dropped in favor of
+ * information-only content.
  */
 
-export interface Stat {
+export const profile = {
+  name: 'Lucas Janot',
+  role: 'Software Engineer & AI Researcher',
+  status: 'Open to conversations',
+  email: 'lucassabbatinijp@gmail.com',
+  summary:
+    'Software engineer building React and TypeScript products, with a background in payment infrastructure and microservices. Published applied-ML research on Transformer models for medical spectra classification.',
+} as const
+
+export interface Fact {
   label: string
   value: string
-  sub: string
-  small: boolean
 }
 
-export const hero = {
-  status_badge: 'Open to conversations · ML Engineering 🇧🇷',
-  headline_line1: '(Engineering)',
-  headline_line2: 'at the edge of AI',
-  cta_primary: 'Explore Thoughts',
-  // The original target was /blog, removed with the static migration.
-  cta_primary_link: '#research',
-  cta_secondary: 'LinkedIn',
-  cta_secondary_link: 'https://www.linkedin.com/in/lucas-janot/',
-} as const
-
-export const narrative: { section_label: string; body: string; stats: Stat[] } = {
-  section_label: '01 / Philosophy',
-  body: 'AI researcher and software engineer, measure honestly, design from first principles, prove impact before claiming it.',
-  stats: [
-    { label: 'Experience', value: '3+', sub: 'Years building', small: false },
-    { label: 'Stack', value: 'Full', sub: 'Front · Back · AI', small: false },
-    { label: 'Language', value: 'C1', sub: 'English', small: true },
-    { label: 'Education', value: 'CS', sub: 'UFU · 2026', small: true },
-  ],
-}
+export const facts: Fact[] = [
+  { label: 'Experience', value: '3+ years' },
+  { label: 'Focus', value: 'Full-stack & AI' },
+  { label: 'English', value: 'C1' },
+  { label: 'Education', value: 'CS · UFU 2026' },
+]
 
 export const research = {
-  section_label: '03 / Research',
-  title_line1: 'AI Researcher',
-  title_line2: '@ AINet · UFU',
+  title: 'AI Researcher',
+  org: '@ AINet · UFU',
   body: 'Developed a Transformer-Based Architecture for FTIR Spectra Classification in Oral Cancer Diagnosis. Evaluated against several state-of-the-art baselines. Our model was able to outperform all Neural Network architectures for this task.',
   image_url: '/research-topology.webp',
+  image_alt: 'Neural topology',
   stats: [
     { value: '14+', label: 'Citations' },
-    { value: '02', label: 'Pubs' },
+    { value: '02', label: 'Publications' },
   ],
-} as const
-
-export const contact = {
-  section_label: '05 / Contact',
-  heading: "Let's build",
-  heading_dim: 'Together.',
-  subtitle: 'Have a project in mind, or just want to talk shop? Reach out.',
-  email: 'lucassabbatinijp@gmail.com',
 } as const
 
 export const footer = {
   copyright: '© 2026 Lucas Janot.',
-  tagline: 'Built with 🧑🏼‍💻 & ☕',
+  built_with: 'Built with React, TypeScript & Tailwind CSS.',
 } as const
 
 export const experiences: ExperienceEntry[] = [
@@ -75,7 +59,7 @@ export const experiences: ExperienceEntry[] = [
       'Architected a headless state-machine layer (React 19, TypeScript, Zustand, React Hook Form + Zod) for a multi-step digital product contracting flow, driving checkout conversion from 4.28% to 5.12% (+19.6%) across ~80k monthly sessions, validated via Amplitude A/B tests over 6 weeks.',
       'Eliminated inconsistent UI states and silent submission failures by designing a layered validation pattern (schema-level with Zod, step-level via the state machine, server-level against SYDLE ONE), cutting flow-related support tickets by 25% quarter-over-quarter (~120 → ~90/month).',
       'Authored the `petQueue` selection pattern (web components embedded in React) to persist multi-entity choices across back-navigation, lifting step-to-step conversion by 19.74% versus the prior form-based UI; shipped team-wide after peer review via GitLab MRs.',
-      'Stack:React 19, TypeScript, Zustand, React Hook Form, Zod, TanStack Query, Stencil.js, Vite, Cypress, MSW, Amplitude, SYDLE ONE, Elasticsearch, GitLab CI.',
+      'Stack: React 19, TypeScript, Zustand, React Hook Form, Zod, TanStack Query, Stencil.js, Vite, Cypress, MSW, Amplitude, SYDLE ONE, Elasticsearch, GitLab CI.',
     ],
     sort_order: 0,
   },
@@ -123,31 +107,31 @@ export const skills: Skill[] = [
     sort_order: 1,
   },
   {
-    id: 'f13506c2-51ad-476c-8dda-c10d7c16f08a',
-    name: 'React',
-    category: 'Framework',
-    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
-    sort_order: 2,
-  },
-  {
-    id: '1efdb144-d8a2-455f-823d-a41ab046646e',
-    name: 'PostgreSQL',
-    category: 'DataBase',
-    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg',
-    sort_order: 3,
-  },
-  {
     id: '481f4c47-ee8f-45ca-bd62-df42fe21b9a4',
     name: 'Python',
     category: 'Language',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
-    sort_order: 4,
+    sort_order: 2,
+  },
+  {
+    id: 'f13506c2-51ad-476c-8dda-c10d7c16f08a',
+    name: 'React',
+    category: 'Framework',
+    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
+    sort_order: 3,
   },
   {
     id: '9a8c6a6a-6d90-4697-8157-c9562bfebf79',
     name: 'PyTorch',
     category: 'Framework',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pytorch/pytorch-original.svg',
+    sort_order: 4,
+  },
+  {
+    id: '1efdb144-d8a2-455f-823d-a41ab046646e',
+    name: 'PostgreSQL',
+    category: 'Database',
+    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg',
     sort_order: 5,
   },
   {
@@ -159,6 +143,9 @@ export const skills: Skill[] = [
   },
 ]
 
+/** Skill categories in display order. */
+export const skillCategories = ['Language', 'Framework', 'Database', 'Cloud'] as const
+
 export const socialLinks: SocialLink[] = [
   {
     id: '5f6aa580-2e9e-49a6-8fd0-af918088905a',
@@ -166,7 +153,6 @@ export const socialLinks: SocialLink[] = [
     url: 'https://github.com/Lucas-Sabbatini',
     label: 'GitHub',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/github/github-original.svg',
-    color: '#ffff',
     sort_order: 0,
   },
   {

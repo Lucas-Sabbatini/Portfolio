@@ -1,74 +1,40 @@
-import { motion } from 'framer-motion'
-import { fadeUp, slideLeft, staggerContainer } from '@/lib/animations'
-import { useScrollReveal } from '@/hooks/useScrollReveal'
 import { experiences } from '@/data/content'
-import './ExperienceSection.css'
 
 export default function ExperienceSection() {
-  const reveal1 = useScrollReveal()
-  const reveal2 = useScrollReveal()
-
   const sorted = [...experiences].sort((a, b) => a.sort_order - b.sort_order)
 
   return (
-    <section className="space-y-16" id="experience" aria-label="Experience timeline">
-      <motion.div
-        ref={reveal1.ref}
-        className="flex justify-between items-end border-b border-white/5 pb-8"
-        variants={fadeUp}
-        initial="hidden"
-        animate={reveal1.animate}
-      >
-        <p className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60">
-          02 / Timeline
-        </p>
-        <span className="text-on-surface-variant text-[10px] font-bold uppercase tracking-widest opacity-40">
-          System History
-        </span>
-      </motion.div>
+    <section id="experience" className="scroll-mt-24 pt-20">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">
+        Experience
+      </h2>
 
-      <motion.div
-        ref={reveal2.ref}
-        className="experience-timeline"
-        variants={staggerContainer}
-        initial="hidden"
-        animate={reveal2.animate}
-      >
-        {sorted.map((entry, idx) => {
-          const isActive = idx === 0
-          return (
-            <motion.div key={entry.id} variants={slideLeft} className="experience-node group">
-              <div className="experience-dot-wrapper">
-                <span className={isActive ? 'experience-dot-active' : 'experience-dot-inactive'} />
-              </div>
+      <div className="mt-8 space-y-4">
+        {sorted.map((entry) => (
+          <article
+            key={entry.id}
+            className="rounded-2xl border border-slate-200 p-6 transition-colors hover:border-slate-300 sm:p-8"
+          >
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+              <h3 className="text-lg font-bold tracking-tight text-slate-900">
+                {entry.role}
+              </h3>
+              <span className="text-sm text-slate-400">{entry.period}</span>
+            </div>
 
-              <motion.div
-                className="experience-card"
-                whileHover={{ x: 3, transition: { duration: 0.25, ease: 'easeOut' } }}
-              >
-                <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
-                  <div>
-                    <h2 className="text-3xl font-bold text-on-surface tracking-tight">
-                      {entry.role}
-                    </h2>
-                    <p className={isActive ? 'experience-company-active' : 'experience-company-inactive'}>
-                      {entry.company} • {entry.period}
-                    </p>
-                  </div>
-                  {isActive && (
-                    <span className="experience-badge">Active</span>
-                  )}
-                </div>
-                <ul className="experience-bullets">
-                  {entry.description.map((bullet, i) => (
-                    <li key={i}>{bullet}</li>
-                  ))}
-                </ul>
-              </motion.div>
-            </motion.div>
-          )
-        })}
-      </motion.div>
+            <p className="mt-1 text-sm font-semibold text-blue-600">{entry.company}</p>
+
+            <ul className="mt-4 space-y-2.5">
+              {entry.description.map((bullet, i) => (
+                <li key={i} className="flex gap-3 text-sm leading-relaxed text-slate-600">
+                  <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-slate-300" />
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
     </section>
   )
 }

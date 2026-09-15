@@ -10,7 +10,7 @@ the repo and the only dynamic asset is the CV (a PDF stored in S3).
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18, TypeScript, Vite, Tailwind CSS, Framer Motion |
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS |
 | Hosting | S3 (private) + CloudFront (OAC) |
 | File sharing | CV PDF at `s3://<bucket>/cv/cv.pdf`, served at `/cv` |
 | Infra | Terraform |
@@ -22,7 +22,7 @@ the repo and the only dynamic asset is the CV (a PDF stored in S3).
 .
 ├── src/                  # React app (single page)
 │   ├── components/       # Navbar, Footer, landing sections
-│   ├── data/content.ts   # ALL site copy (captured from the former API)
+│   ├── data/content.ts   # profile, experience, research, stack, links
 │   ├── pages/HomePage.tsx
 │   └── types/
 ├── public/               # Static assets bundled into the build

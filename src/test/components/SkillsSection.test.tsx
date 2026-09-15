@@ -4,24 +4,26 @@ import SkillsSection from '../../components/sections/SkillsSection/SkillsSection
 import { skills } from '../../data/content'
 
 describe('SkillsSection', () => {
-  it('renders section heading', () => {
+  it('renders the section heading', () => {
     render(<SkillsSection />)
-    expect(screen.getByText('04 / Core Stack')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Stack' })).toBeInTheDocument()
   })
 
-  it('renders a pill per skill', () => {
+  it('renders every skill name and icon', () => {
     render(<SkillsSection />)
     for (const skill of skills) {
       expect(screen.getByText(skill.name)).toBeInTheDocument()
-    }
-  })
-
-  it('renders skill icons', () => {
-    render(<SkillsSection />)
-    for (const skill of skills) {
       if (skill.icon) {
         expect(document.querySelector(`img[src="${skill.icon}"]`)).toBeInTheDocument()
       }
     }
+  })
+
+  it('groups skills by category', () => {
+    render(<SkillsSection />)
+    expect(screen.getByText('Languages')).toBeInTheDocument()
+    expect(screen.getByText('Frameworks')).toBeInTheDocument()
+    expect(screen.getByText('Databases')).toBeInTheDocument()
+    expect(screen.getByText('Cloud')).toBeInTheDocument()
   })
 })

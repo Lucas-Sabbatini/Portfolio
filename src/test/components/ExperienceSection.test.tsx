@@ -4,21 +4,17 @@ import ExperienceSection from '../../components/sections/ExperienceSection/Exper
 import { experiences } from '../../data/content'
 
 describe('ExperienceSection', () => {
-  it('renders section heading and subtitle', () => {
+  it('renders the section heading', () => {
     render(<ExperienceSection />)
-    expect(screen.getByText('02 / Timeline')).toBeInTheDocument()
-    expect(screen.getByText('System History')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Experience' })).toBeInTheDocument()
   })
 
-  it('renders all experience entries', () => {
+  it('renders every role, company, and period', () => {
     render(<ExperienceSection />)
     for (const entry of experiences) {
       expect(screen.getByText(entry.role)).toBeInTheDocument()
+      expect(screen.getByText(entry.company)).toBeInTheDocument()
+      expect(screen.getByText(entry.period)).toBeInTheDocument()
     }
-  })
-
-  it('shows Active badge on the first entry only', () => {
-    render(<ExperienceSection />)
-    expect(screen.getAllByText('Active')).toHaveLength(1)
   })
 })

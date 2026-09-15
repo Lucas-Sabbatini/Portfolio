@@ -1,57 +1,50 @@
-import { motion } from 'framer-motion'
-import { fadeUp, staggerFast } from '@/lib/animations'
-import { useScrollReveal } from '@/hooks/useScrollReveal'
-import { skills } from '@/data/content'
-import './SkillsSection.css'
+import { skillCategories, skills } from '@/data/content'
 
-const pill: import('framer-motion').Variants = {
-  hidden: { opacity: 0, scale: 0.8, y: 10 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-  },
+const categoryLabels: Record<string, string> = {
+  Language: 'Languages',
+  Framework: 'Frameworks',
+  Database: 'Databases',
+  Cloud: 'Cloud',
 }
 
 export default function SkillsSection() {
-  const reveal1 = useScrollReveal()
-  const reveal2 = useScrollReveal()
-
   return (
-    <section className="space-y-12">
-      <motion.p
-        ref={reveal1.ref}
-        variants={fadeUp}
-        initial="hidden"
-        animate={reveal1.animate}
-        className="font-bold text-xs uppercase tracking-[0.6em] text-primary/60"
-      >
-        04 / Core Stack
-      </motion.p>
+    <section id="stack" className="scroll-mt-24 pt-20">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">
+        Stack
+      </h2>
 
-      <motion.div
-        ref={reveal2.ref}
-        className="flex flex-wrap gap-4 justify-center"
-        variants={staggerFast}
-        initial="hidden"
-        animate={reveal2.animate}
-      >
-        {skills.map((skill) => (
-          <motion.span
-            key={skill.id}
-            variants={pill}
-            whileHover={{ y: -3, transition: { duration: 0.15 } }}
-            whileTap={{ scale: 0.95 }}
-            className="skill-pill"
-          >
-            {skill.icon && (
-              <img src={skill.icon} height="40" width="50" alt="" className="inline-block" aria-hidden="true" />
-            )}
-            <span className="sr-only">{skill.name}</span>
-          </motion.span>
-        ))}
-      </motion.div>
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        {skillCategories.map((category) => {
+          const items = skills
+            .filter((skill) => skill.category === category)
+            .sort((a, b) => a.sort_order - b.sort_order)
+
+          if (items.length === 0) return null
+
+          return (
+            <div key={category} className="rounded-2xl border border-slate-200 p-6">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                {categoryLabels[category] ?? category}
+              </h3>
+
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {items.map((skill) => (
+                  <li
+                    key={skill.id}
+                    className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700"
+                  >
+                    {skill.icon && (
+                      <img src={skill.icon} alt="" className="h-4 w-4" />
+                    )}
+                    {skill.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        })}
+      </div>
     </section>
   )
 }

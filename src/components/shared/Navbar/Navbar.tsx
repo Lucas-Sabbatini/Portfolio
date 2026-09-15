@@ -1,42 +1,28 @@
-import { motion } from 'framer-motion'
 import { CV_URL } from '@/data/content'
-import './Navbar.css'
 
 const navLinks = [
-  { label: 'Work', href: '#work' },
-  { label: 'Research', href: '#research' },
   { label: 'Experience', href: '#experience' },
+  { label: 'Research', href: '#research' },
+  { label: 'Stack', href: '#stack' },
   { label: 'Contact', href: '#contact' },
 ]
 
 export default function Navbar() {
   return (
-    <motion.nav
-      className="nav-bar"
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <div className="nav-inner">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          <a href="/" className="text-xl font-extrabold tracking-tight text-on-surface">
-            lucas.janot
-          </a>
-        </motion.div>
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur">
+      <nav className="mx-auto flex max-w-content items-center justify-between px-6 py-3.5">
+        <a href="/" className="text-sm font-bold tracking-tight text-slate-900">
+          Lucas Janot
+        </a>
 
-        <motion.div
-          className="flex items-center gap-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          <div className="hidden md:flex gap-10 font-medium tracking-tight">
+        <div className="flex items-center gap-6">
+          <div className="hidden items-center gap-7 sm:flex">
             {navLinks.map((link) => (
-              <a key={link.href} href={link.href} className="nav-link">
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm text-slate-500 transition-colors hover:text-blue-600"
+              >
                 {link.label}
               </a>
             ))}
@@ -46,12 +32,12 @@ export default function Navbar() {
             href={CV_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="nav-cv"
+            className="rounded-lg bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
           >
             CV
           </a>
-        </motion.div>
-      </div>
-    </motion.nav>
+        </div>
+      </nav>
+    </header>
   )
 }

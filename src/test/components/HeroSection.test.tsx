@@ -1,26 +1,22 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import HeroSection from '../../components/sections/HeroSection/HeroSection'
-import { hero } from '../../data/content'
+import { CV_URL, profile } from '../../data/content'
 
 describe('HeroSection', () => {
-  it('renders the static headline', () => {
+  it('renders name, role, and status', () => {
     render(<HeroSection />)
-    const h1 = document.querySelector('h1')
-    expect(h1?.textContent).toContain('Engineering')
-    expect(h1?.textContent).toContain('at the edge of AI')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(profile.name)
+    expect(screen.getByText(profile.role)).toBeInTheDocument()
+    expect(screen.getByText(profile.status)).toBeInTheDocument()
   })
 
-  it('renders the status badge', () => {
+  it('links to email and CV', () => {
     render(<HeroSection />)
-    expect(screen.getByText(hero.status_badge)).toBeInTheDocument()
-  })
-
-  it('renders both CTAs', () => {
-    render(<HeroSection />)
-    const primary = screen.getByText(hero.cta_primary).closest('a')
-    const secondary = screen.getByText(hero.cta_secondary).closest('a')
-    expect(primary).toHaveAttribute('href', hero.cta_primary_link)
-    expect(secondary).toHaveAttribute('href', hero.cta_secondary_link)
+    expect(screen.getByRole('link', { name: /email me/i })).toHaveAttribute(
+      'href',
+      `mailto:${profile.email}`,
+    )
+    expect(screen.getByRole('link', { name: /download cv/i })).toHaveAttribute('href', CV_URL)
   })
 })
