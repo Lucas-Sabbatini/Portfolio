@@ -4,6 +4,8 @@ A static personal landing page built with React + Vite, deployed to **S3 + Cloud
 There is no backend, no database, no blog, and no admin area — all copy lives in
 the repo and the only dynamic asset is the CV (a PDF stored in S3).
 
+> **Going to production?** Follow the step-by-step runbook in [`DEPLOY.md`](./DEPLOY.md).
+
 ## Stack
 
 | Layer | Technology |
