@@ -72,9 +72,23 @@ jobs:
         id: owner
         run: echo "lowercase=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
+      - name: Checkout umami v3.0.3
+        uses: actions/checkout@v4
+        with:
+          repository: umami-software/umami
+          ref: v3.0.3
+          path: umami
+
+      - name: Pin pnpm in umami Dockerfile
+        # umami v3.0.3 runs `npm install -g pnpm`, which now resolves to a
+        # version that hard-errors on ignored build scripts
+        # (ERR_PNPM_IGNORED_BUILDS). Pin the pnpm major the v9.0 lockfile was
+        # written for so the build is reproducible.
+        run: sed -i 's|npm install -g pnpm|npm install -g pnpm@10.34.5|g' umami/Dockerfile
+
       - uses: docker/build-push-action@v6
         with:
-          context: "https://github.com/umami-software/umami.git#v3.0.3"
+          context: ./umami
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ steps.owner.outputs.lowercase }}/blog-umami:v3.0.3
