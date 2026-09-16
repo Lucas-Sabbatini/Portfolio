@@ -4,18 +4,24 @@ import ResearchSection from '../../components/sections/ResearchSection/ResearchS
 import { research } from '../../data/content'
 
 describe('ResearchSection', () => {
-  it('renders title, org, and body', () => {
+  it('renders title and org', () => {
     render(<ResearchSection />)
     expect(screen.getByRole('heading', { name: research.title })).toBeInTheDocument()
     expect(screen.getByText(research.org)).toBeInTheDocument()
-    expect(screen.getByText(research.body)).toBeInTheDocument()
   })
 
-  it('renders the stats', () => {
+  it('renders every bullet', () => {
+    render(<ResearchSection />)
+    for (const bullet of research.bullets) {
+      expect(screen.getByText(bullet)).toBeInTheDocument()
+    }
+  })
+
+  it('renders the stats as bullets', () => {
     render(<ResearchSection />)
     for (const stat of research.stats) {
       expect(screen.getByText(stat.value)).toBeInTheDocument()
-      expect(screen.getByText(stat.label)).toBeInTheDocument()
+      expect(screen.getByText(new RegExp(stat.label, 'i'))).toBeInTheDocument()
     }
   })
 

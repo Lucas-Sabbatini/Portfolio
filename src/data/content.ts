@@ -33,7 +33,11 @@ export const facts: Fact[] = [
 export const research = {
   title: 'AI Researcher',
   org: '@ AINet · UFU',
-  body: 'Developed a Transformer-Based Architecture for FTIR Spectra Classification in Oral Cancer Diagnosis. Evaluated against several state-of-the-art baselines. Our model was able to outperform all Neural Network architectures for this task.',
+  bullets: [
+    'Developed a Transformer-Based Architecture for FTIR Spectra Classification in Oral Cancer Diagnosis.',
+    'Evaluated against several state-of-the-art baselines.',
+    'Outperformed all Neural Network architectures for this task.',
+  ],
   image_url: '/research-topology.webp',
   image_alt: 'Neural topology',
   stats: [

@@ -7,31 +7,39 @@ export default function ResearchSection() {
         Research
       </h2>
 
-      <div className="mt-8 grid gap-8 rounded-2xl border border-slate-200 p-6 sm:p-8 lg:grid-cols-2 lg:items-center">
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
-          <h3 className="text-2xl font-bold tracking-tight text-slate-900">
-            {research.title}
-          </h3>
-          <p className="mt-1 text-sm font-semibold text-blue-600">{research.org}</p>
-          <p className="mt-4 text-sm leading-relaxed text-slate-600">{research.body}</p>
-
-          <div className="mt-6 flex gap-10">
-            {research.stats.map((stat) => (
-              <div key={stat.label}>
-                <div className="text-2xl font-extrabold text-slate-900">{stat.value}</div>
-                <div className="text-xs uppercase tracking-wide text-slate-400">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+            <h3 className="text-base font-bold tracking-tight text-slate-900">
+              {research.title}
+            </h3>
+            <span className="text-sm text-slate-400">{research.org}</span>
           </div>
+
+          <ul className="mt-4 space-y-2">
+            {research.bullets.map((bullet, i) => (
+              <li key={i} className="flex gap-3 text-sm leading-relaxed text-slate-600">
+                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-blue-400" />
+                <span>{bullet}</span>
+              </li>
+            ))}
+            {research.stats.map((stat) => (
+              <li key={stat.label} className="flex gap-3 text-sm leading-relaxed text-slate-600">
+                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-blue-400" />
+                <span>
+                  <span className="font-semibold text-slate-900">{stat.value}</span>{' '}
+                  {stat.label.toLowerCase()}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <img
           src={research.image_url}
           alt={research.image_alt}
           loading="lazy"
-          className="w-full rounded-xl border border-slate-200"
+          className="w-40 rounded-2xl lg:w-56"
         />
       </div>
     </section>
