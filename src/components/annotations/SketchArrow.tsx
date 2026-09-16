@@ -38,15 +38,17 @@ export default function SketchArrow({
       className={`pointer-events-none ${className}`}
       style={{ transform: `rotate(${ROTATION[direction]}deg)` }}
     >
+      {/* The head is angled to the shaft's end tangent (26.6°) so the two
+          strokes meet cleanly instead of crossing at an angle. */}
       <path
-        d="M4 27C15 11 30 30 47 16"
+        d="M6 30C15 21 32 21 46 14"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M38 9 48 15 39 22"
+        d="M35 14.1 46 14 39.3 22.7"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
