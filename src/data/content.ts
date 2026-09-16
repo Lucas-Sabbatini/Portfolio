@@ -40,10 +40,7 @@ export const research = {
   ],
   image_url: '/research-topology.webp',
   image_alt: 'Neural topology',
-  stats: [
-    { value: '14+', label: 'Citations' },
-    { value: '02', label: 'Publications' },
-  ],
+  stats: [{ value: '02', label: 'Publications' }],
   doi: {
     label: '10.5753/sbcas.2026.21672',
     url: 'https://doi.org/10.5753/sbcas.2026.21672',
