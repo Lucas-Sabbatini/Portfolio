@@ -17,7 +17,7 @@ export const profile = {
   roleEmphasis: 'AI Researcher',
   email: 'lucassabbatinijp@gmail.com',
   summary:
-    'Software engineer building React and TypeScript products, with a background in payment infrastructure and microservices. Published applied-ML research on Transformer models for medical spectra classification.',
+    'Software Engineer building Nest.js fintech products. Indie hacker for fun. Published applied-ML research on Transformer models for medical spectra classification.',
 } as const
 
 export interface Fact {
@@ -27,7 +27,7 @@ export interface Fact {
 
 export const facts: Fact[] = [
   { label: 'Experience', value: '3+ years' },
-  { label: 'Focus', value: 'Full-stack & AI' },
+  { label: 'Focus', value: 'Backend & AI' },
   { label: 'English', value: 'C1' },
   { label: 'Education', value: 'CS · UFU 2026' },
 ]
@@ -56,12 +56,11 @@ export const experiences: ExperienceEntry[] = [
     company: 'Levty, Belo Horizonte, Brazil',
     period: 'Sep 2026 – Present',
     description: [
-      'Engineer on a 5-person squad reporting to a Tech Lead, building React/TypeScript contracting flows on top of SYDLE ONE (Elasticsearch-backed) for digital product sales.',
-      'Architected a headless state-machine layer (React 19, TypeScript, Zustand, React Hook Form + Zod) for a multi-step digital product contracting flow, driving checkout conversion from 4.28% to 5.12% (+19.6%) across ~80k monthly sessions, validated via Amplitude A/B tests over 6 weeks.',
-      'Eliminated inconsistent UI states and silent submission failures by designing a layered validation pattern (schema-level with Zod, step-level via the state machine, server-level against SYDLE ONE), cutting flow-related support tickets by 25% quarter-over-quarter (~120 → ~90/month).',
-      'Authored the `petQueue` selection pattern (web components embedded in React) to persist multi-entity choices across back-navigation, lifting step-to-step conversion by 19.74% versus the prior form-based UI; shipped team-wide after peer review via GitLab MRs.',
-      'Stack: React 19, TypeScript, Zustand, React Hook Form, Zod, TanStack Query, Stencil.js, Vite, Cypress, MSW, Amplitude, SYDLE ONE, Elasticsearch, GitLab CI.',
+      'Engineer on a 5-person squad building React/TypeScript contracting flows on SYDLE ONE (Elasticsearch-backed) for digital product sales.',
+      'Architected a headless state-machine layer (React 19, Zustand, React Hook Form + Zod) that lifted checkout conversion from 4.28% to 5.12% (+19.6%) across ~80k monthly sessions.',
+      'Cut flow-related support tickets 25% quarter-over-quarter (~120 → ~90/month) with a layered validation pattern (Zod schema, state machine, server-side).',
     ],
+    mark: { text: '+19.6%' },
     sort_order: 0,
   },
   {
@@ -70,12 +69,11 @@ export const experiences: ExperienceEntry[] = [
     company: 'Trivvo, Remote, Brazil',
     period: 'Jul 2024 - Sep 2025',
     description: [
-      'Built the payment routing layer integrating Stripe, Asaas, and other gateways with cascading fallback logic for course-purchase transactions, enabling automatic retries across providers and reducing failed checkouts on production traffic.',
-      'Developed the transactions processing backbone on a microservices architecture (Java/Kotlin, Spring Boot, Apache Kafka, Redis), handling course purchase events and exposing REST APIs consumed by business-facing dashboards and the routing layer.',
-      'Built real-time analytics dashboards (React.js, JavaScript, Tailwind CSS) used by ~50 business customers to monitor course revenue, transaction status, and enrollments, replacing manual spreadsheet reporting.',
-      'Designed and shipped 4 automation flows across marketing and finance operations (campaign triggers, reconciliation, payout reporting), eliminating an estimated 8–12 hours/week of manual operational work.',
-      'Contributed to production AWS environments alongside the DevOps lead deploying containerized services (Docker, Kubernetes) and maintaining CI/CD pipelines for backend microservices.',
+      'Built the payment routing layer integrating Stripe, Asaas, and other gateways with cascading fallback and automatic retries, reducing failed checkouts in production.',
+      'Developed the transactions processing backbone on a microservices stack (Java/Kotlin, Spring Boot, Apache Kafka, Redis), exposing REST APIs to business dashboards.',
+      'Shipped 4 automation flows that removed ~8–12 hours/week of manual work, and built real-time React analytics dashboards used by ~50 customers.',
     ],
+    mark: { text: 'payment routing layer' },
     sort_order: 1,
   },
   {

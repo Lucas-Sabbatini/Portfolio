@@ -1,4 +1,20 @@
+import { Annotation } from '@/components/annotations'
+import type { ExperienceMark } from '@/types/experience'
 import { experiences } from '@/data/content'
+
+/** Renders a bullet, hand-marking the entry's key phrase when present. */
+function BulletText({ text, mark }: { text: string; mark?: ExperienceMark }) {
+  const index = mark ? text.indexOf(mark.text) : -1
+  if (!mark || index === -1) return <>{text}</>
+
+  return (
+    <>
+      {text.slice(0, index)}
+      <Annotation type={mark.type ?? 'underline'}>{mark.text}</Annotation>
+      {text.slice(index + mark.text.length)}
+    </>
+  )
+}
 
 export default function ExperienceSection() {
   const sorted = [...experiences].sort((a, b) => a.sort_order - b.sort_order)
@@ -25,7 +41,9 @@ export default function ExperienceSection() {
               {entry.description.map((bullet, i) => (
                 <li key={i} className="flex gap-3 text-sm leading-relaxed text-slate-600">
                   <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-blue-400" />
-                  <span>{bullet}</span>
+                  <span>
+                    <BulletText text={bullet} mark={entry.mark} />
+                  </span>
                 </li>
               ))}
             </ul>
