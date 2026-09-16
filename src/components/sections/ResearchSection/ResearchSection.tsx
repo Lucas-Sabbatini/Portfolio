@@ -9,12 +9,10 @@ export default function ResearchSection() {
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-            <h3 className="text-base font-bold tracking-tight text-slate-900">
-              {research.title}
-            </h3>
-            <span className="text-sm text-slate-400">{research.org}</span>
-          </div>
+          <h3 className="text-base font-bold tracking-tight text-slate-900">
+            {research.title}
+          </h3>
+          <p className="mt-0.5 text-sm font-medium text-slate-500">{research.org}</p>
 
           <ul className="mt-4 space-y-2">
             {research.bullets.map((bullet, i) => (
