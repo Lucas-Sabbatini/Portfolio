@@ -9,7 +9,7 @@ export default function SkillsSection() {
         Stack
       </h2>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
         {sorted.map((skill) => (
           <span
             key={skill.id}

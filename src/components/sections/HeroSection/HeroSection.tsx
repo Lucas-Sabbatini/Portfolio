@@ -8,7 +8,7 @@ export default function HeroSection() {
         alt={profile.name}
         width={224}
         height={224}
-        className="h-56 w-56 rounded-2xl object-cover ring-1 ring-slate-200"
+        className="h-56 w-56 rounded-full object-cover ring-1 ring-slate-200"
       />
 
       <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">

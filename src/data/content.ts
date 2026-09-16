@@ -113,32 +113,39 @@ export const skills: Skill[] = [
     sort_order: 2,
   },
   {
+    id: '150e3baa-6a29-4b68-b597-f58ea8bbeb7d',
+    name: 'NestJS',
+    category: 'Framework',
+    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nestjs/nestjs-original.svg',
+    sort_order: 3,
+  },
+  {
     id: '1efdb144-d8a2-455f-823d-a41ab046646e',
     name: 'PostgreSQL',
     category: 'Database',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg',
-    sort_order: 3,
+    sort_order: 4,
   },
   {
     id: '481f4c47-ee8f-45ca-bd62-df42fe21b9a4',
     name: 'Python',
     category: 'Language',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg',
-    sort_order: 4,
+    sort_order: 5,
   },
   {
     id: '9a8c6a6a-6d90-4697-8157-c9562bfebf79',
     name: 'PyTorch',
     category: 'Framework',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pytorch/pytorch-original.svg',
-    sort_order: 5,
+    sort_order: 6,
   },
   {
     id: 'a91349eb-569a-47dc-ad47-7ba7290ef232',
     name: 'AWS',
     category: 'Cloud',
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg',
-    sort_order: 6,
+    sort_order: 7,
   },
 ]
 
