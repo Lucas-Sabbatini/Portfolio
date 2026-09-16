@@ -56,8 +56,9 @@ export const experiences: ExperienceEntry[] = [
     company: 'Mottu, São Paulo, Brazil',
     period: 'May 2026 – Present',
     description: [
-      'Developing fintech credit products in Nest.js, mainly leveraging credit to Mottu users.',
+      'Developing fintech credit products in Nest.js, mainly extending credit to Mottu users.',
     ],
+    marks: [{ text: 'fintech credit products in Nest.js', type: 'highlight' }],
     sort_order: 0,
   },
   {
