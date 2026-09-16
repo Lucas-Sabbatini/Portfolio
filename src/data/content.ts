@@ -166,6 +166,14 @@ export const socialLinks: SocialLink[] = [
     icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linkedin/linkedin-original.svg',
     sort_order: 1,
   },
+  {
+    id: '6925830b-7e80-410e-b50a-d2a2bb788f5b',
+    platform: 'X',
+    url: 'https://x.com/LucasProcp0t',
+    label: 'X',
+    icon: 'https://cdn.simpleicons.org/x',
+    sort_order: 2,
+  },
 ]
 
 /** Public URL of the CV object hosted on S3 (served through CloudFront). */

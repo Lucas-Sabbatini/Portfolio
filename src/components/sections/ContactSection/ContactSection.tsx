@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
-import { CV_URL, profile, socialLinks } from '@/data/content'
+import SocialLinks from '@/components/shared/SocialLinks/SocialLinks'
+import { CV_URL, profile } from '@/data/content'
 
 export default function ContactSection() {
   const [copied, setCopied] = useState(false)
@@ -44,20 +45,7 @@ export default function ContactSection() {
           </a>
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-5">
-          {socialLinks.map((link) => (
-            <a
-              key={link.id}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-blue-600"
-            >
-              {link.icon && <img src={link.icon} alt="" className="h-4 w-4" />}
-              {link.label}
-            </a>
-          ))}
-        </div>
+        <SocialLinks className="mt-8 justify-center" />
       </div>
     </section>
   )
