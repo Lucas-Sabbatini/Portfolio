@@ -1,21 +1,4 @@
-import { Annotation } from '@/components/annotations'
 import { experiences } from '@/data/content'
-
-/** Renders a bullet, hand-circling the entry's key metric when present. */
-function BulletText({ text, emphasis }: { text: string; emphasis?: string }) {
-  if (!emphasis) return <>{text}</>
-
-  const index = text.indexOf(emphasis)
-  if (index === -1) return <>{text}</>
-
-  return (
-    <>
-      {text.slice(0, index)}
-      <Annotation type="circle">{emphasis}</Annotation>
-      {text.slice(index + emphasis.length)}
-    </>
-  )
-}
 
 export default function ExperienceSection() {
   const sorted = [...experiences].sort((a, b) => a.sort_order - b.sort_order)
@@ -42,9 +25,7 @@ export default function ExperienceSection() {
               {entry.description.map((bullet, i) => (
                 <li key={i} className="flex gap-3 text-sm leading-relaxed text-slate-600">
                   <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-blue-400" />
-                  <span>
-                    <BulletText text={bullet} emphasis={entry.emphasis} />
-                  </span>
+                  <span>{bullet}</span>
                 </li>
               ))}
             </ul>
