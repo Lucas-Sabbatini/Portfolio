@@ -60,7 +60,7 @@ export const experiences: ExperienceEntry[] = [
       'Architected a headless state-machine layer (React 19, Zustand, React Hook Form + Zod) that lifted checkout conversion from 4.28% to 5.12% (+19.6%) across ~80k monthly sessions.',
       'Cut flow-related support tickets 25% quarter-over-quarter (~120 → ~90/month) with a layered validation pattern (Zod schema, state machine, server-side).',
     ],
-    mark: { text: '+19.6%' },
+    mark: { text: '+19.6%', type: 'highlight' },
     sort_order: 0,
   },
   {
@@ -73,7 +73,7 @@ export const experiences: ExperienceEntry[] = [
       'Developed the transactions processing backbone on a microservices stack (Java/Kotlin, Spring Boot, Apache Kafka, Redis), exposing REST APIs to business dashboards.',
       'Shipped 4 automation flows that removed ~8–12 hours/week of manual work, and built real-time React analytics dashboards used by ~50 customers.',
     ],
-    mark: { text: 'payment routing layer' },
+    mark: { text: 'payment routing layer', type: 'highlight' },
     sort_order: 1,
   },
   {

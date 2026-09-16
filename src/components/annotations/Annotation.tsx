@@ -10,7 +10,13 @@ export type AnnotationType = RoughNotationType
  * override a value when a specific mark genuinely needs it.
  */
 const PEN = {
+  /** Ink for underline / box / circle. */
   color: '#2563eb', // blue-600 — the site accent
+  /**
+   * Marker swipe drawn *behind* the text, so it has to stay light enough to
+   * keep the text legible on top of it.
+   */
+  highlightColor: '#bfdbfe', // blue-200
   strokeWidth: 2,
   padding: 3,
   iterations: 2,
@@ -89,7 +95,7 @@ interface AnnotationProps {
 export default function Annotation({
   children,
   type = 'underline',
-  color = PEN.color,
+  color,
   strokeWidth = PEN.strokeWidth,
   padding = PEN.padding,
   iterations = PEN.iterations,
@@ -98,6 +104,7 @@ export default function Annotation({
 }: AnnotationProps) {
   const { ref, revealed } = useRevealOnce<HTMLSpanElement>()
   const reducedMotion = useReducedMotion()
+  const ink = color ?? (type === 'highlight' ? PEN.highlightColor : PEN.color)
 
   return (
     <span ref={ref} className={className}>
@@ -107,7 +114,7 @@ export default function Annotation({
         animate={!reducedMotion}
         animationDuration={PEN.animationDuration}
         animationDelay={PEN.animationDelay}
-        color={color}
+        color={ink}
         strokeWidth={strokeWidth}
         padding={padding}
         iterations={iterations}
