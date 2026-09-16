@@ -12,9 +12,18 @@ describe('ExperienceSection', () => {
   it('renders every role, company, and period', () => {
     render(<ExperienceSection />)
     for (const entry of experiences) {
-      expect(screen.getByText(entry.role)).toBeInTheDocument()
+      // Roles can repeat (two "Software Engineer" roles), companies/periods can't.
+      expect(screen.getAllByText(entry.role).length).toBeGreaterThan(0)
       expect(screen.getByText(entry.company)).toBeInTheDocument()
       expect(screen.getByText(entry.period)).toBeInTheDocument()
     }
+  })
+
+  it('lists the most recent role first', () => {
+    render(<ExperienceSection />)
+    const first = [...experiences].sort((a, b) => a.sort_order - b.sort_order)[0]
+    const headings = screen.getAllByRole('heading', { level: 3 })
+    expect(headings[0]).toHaveTextContent(first.role)
+    expect(screen.getByText(first.period)).toBeInTheDocument()
   })
 })

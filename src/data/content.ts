@@ -51,17 +51,27 @@ export const research = {
 
 export const experiences: ExperienceEntry[] = [
   {
+    id: 'd93ed566-4177-444a-8b01-f1ef59d37a2d',
+    role: 'Software Engineer',
+    company: 'Mottu, São Paulo, Brazil',
+    period: 'May 2026 – Present',
+    description: [
+      'Developing fintech credit products in Nest.js, mainly leveraging credit to Mottu users.',
+    ],
+    sort_order: 0,
+  },
+  {
     id: '60b9a048-67c1-4f88-9cea-4eea745276ec',
     role: 'Software Engineer',
     company: 'Levty, Belo Horizonte, Brazil',
-    period: 'Sep 2026 – Present',
+    period: 'Sep 2025 – May 2026',
     description: [
       'Engineer on a 5-person squad building React/TypeScript contracting flows on SYDLE ONE (Elasticsearch-backed) for digital product sales.',
       'Architected a headless state-machine layer (React 19, Zustand, React Hook Form + Zod) that lifted checkout conversion from 4.28% to 5.12% (+19.6%) across ~80k monthly sessions.',
       'Cut flow-related support tickets 25% quarter-over-quarter (~120 → ~90/month) with a layered validation pattern (Zod schema, state machine, server-side).',
     ],
     marks: [{ text: '+19.6%', type: 'highlight' }],
-    sort_order: 0,
+    sort_order: 1,
   },
   {
     id: 'd7988d5d-a0a6-4e86-b38c-e84bd4d5036b',
@@ -74,7 +84,7 @@ export const experiences: ExperienceEntry[] = [
       'Shipped 4 automation flows that removed ~8–12 hours/week of manual work, and built real-time React analytics dashboards used by ~50 customers.',
     ],
     marks: [{ text: 'payment routing layer', type: 'highlight' }],
-    sort_order: 1,
+    sort_order: 2,
   },
   {
     id: 'bed44f4d-f04c-4bf3-818b-6e23d3c459b5',
@@ -90,7 +100,7 @@ export const experiences: ExperienceEntry[] = [
       { text: 'leading a team of 5', type: 'highlight' },
       { text: 'high-growth organization', type: 'highlight' },
     ],
-    sort_order: 2,
+    sort_order: 3,
   },
 ]
 
