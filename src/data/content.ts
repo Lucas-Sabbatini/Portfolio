@@ -60,7 +60,7 @@ export const experiences: ExperienceEntry[] = [
       'Architected a headless state-machine layer (React 19, Zustand, React Hook Form + Zod) that lifted checkout conversion from 4.28% to 5.12% (+19.6%) across ~80k monthly sessions.',
       'Cut flow-related support tickets 25% quarter-over-quarter (~120 → ~90/month) with a layered validation pattern (Zod schema, state machine, server-side).',
     ],
-    mark: { text: '+19.6%', type: 'highlight' },
+    marks: [{ text: '+19.6%', type: 'highlight' }],
     sort_order: 0,
   },
   {
@@ -73,7 +73,7 @@ export const experiences: ExperienceEntry[] = [
       'Developed the transactions processing backbone on a microservices stack (Java/Kotlin, Spring Boot, Apache Kafka, Redis), exposing REST APIs to business dashboards.',
       'Shipped 4 automation flows that removed ~8–12 hours/week of manual work, and built real-time React analytics dashboards used by ~50 customers.',
     ],
-    mark: { text: 'payment routing layer', type: 'highlight' },
+    marks: [{ text: 'payment routing layer', type: 'highlight' }],
     sort_order: 1,
   },
   {
@@ -85,6 +85,10 @@ export const experiences: ExperienceEntry[] = [
       'Directed delivery of 5+ concurrent software projects leading a team of 5, owning scope, timelines, client communication, and delivery retrospectives.',
       'Led development of an internal desktop contract management system (Python, PostgreSQL) that automated contract drafting, saving ~5 hours per contract across 25+ recurring contract templates.',
       'Contributed to the company\'s React.js institutional website, supporting lead generation. Therefore, recognized by the "Núcleo Triângulo" as a high-growth organization.',
+    ],
+    marks: [
+      { text: 'leading a team of 5', type: 'highlight' },
+      { text: 'high-growth organization', type: 'highlight' },
     ],
     sort_order: 2,
   },

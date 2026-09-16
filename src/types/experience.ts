@@ -10,7 +10,7 @@ export interface ExperienceEntry {
   company: string
   period: string
   description: string[]
-  /** Optional phrase within `description` to underline/highlight. */
-  mark?: ExperienceMark
+  /** Optional phrases within `description` to underline/highlight. */
+  marks?: ExperienceMark[]
   sort_order: number
 }
