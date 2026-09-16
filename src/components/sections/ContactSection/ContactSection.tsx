@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { SketchArrow } from '@/components/annotations'
 import SocialLinks from '@/components/shared/SocialLinks/SocialLinks'
 import { CV_URL, profile } from '@/data/content'
 
@@ -22,7 +23,9 @@ export default function ContactSection() {
           Contact
         </h2>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div className="relative mt-6 inline-flex flex-wrap items-center justify-center gap-3">
+          <SketchArrow className="absolute -left-14 top-1/2 hidden -translate-y-1/2 text-blue-500 sm:block" />
+
           <button
             type="button"
             onClick={handleCopy}

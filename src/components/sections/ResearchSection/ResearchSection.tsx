@@ -1,3 +1,4 @@
+import { Annotation } from '@/components/annotations'
 import { research } from '@/data/content'
 
 export default function ResearchSection() {
@@ -32,14 +33,16 @@ export default function ResearchSection() {
             ))}
             <li className="flex gap-3 text-sm leading-relaxed text-slate-600">
               <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-blue-400" />
-              <a
-                href={research.doi.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-blue-600 hover:underline"
-              >
-                DOI: {research.doi.label}
-              </a>
+              <Annotation type="underline">
+                <a
+                  href={research.doi.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-blue-600 hover:underline"
+                >
+                  DOI: {research.doi.label}
+                </a>
+              </Annotation>
             </li>
           </ul>
         </div>

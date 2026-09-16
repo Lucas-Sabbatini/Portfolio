@@ -13,6 +13,8 @@ import type { SocialLink } from '@/types/social'
 export const profile = {
   name: 'Lucas Janot',
   role: 'Software Engineer & AI Researcher',
+  /** The part of `role` that gets the hand-drawn underline. */
+  roleEmphasis: 'AI Researcher',
   email: 'lucassabbatinijp@gmail.com',
   summary:
     'Software engineer building React and TypeScript products, with a background in payment infrastructure and microservices. Published applied-ML research on Transformer models for medical spectra classification.',
@@ -53,6 +55,8 @@ export const experiences: ExperienceEntry[] = [
     role: 'Software Engineer',
     company: 'Levty, Belo Horizonte, Brazil',
     period: 'Sep 2026 – Present',
+    // The one metric that gets hand-circled in the Experience section.
+    emphasis: '+19.6%',
     description: [
       'Engineer on a 5-person squad reporting to a Tech Lead, building React/TypeScript contracting flows on top of SYDLE ONE (Elasticsearch-backed) for digital product sales.',
       'Architected a headless state-machine layer (React 19, TypeScript, Zustand, React Hook Form + Zod) for a multi-step digital product contracting flow, driving checkout conversion from 4.28% to 5.12% (+19.6%) across ~80k monthly sessions, validated via Amplitude A/B tests over 6 weeks.',
