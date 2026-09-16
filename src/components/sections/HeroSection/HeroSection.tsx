@@ -1,4 +1,3 @@
-import SocialLinks from '@/components/shared/SocialLinks/SocialLinks'
 import { profile } from '@/data/content'
 
 export default function HeroSection() {
@@ -16,7 +15,6 @@ export default function HeroSection() {
         {profile.name}
       </h1>
       <p className="mt-1 text-base font-semibold text-blue-600">{profile.role}</p>
-      <SocialLinks className="mt-4" showLabels={false} />
       <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-500 sm:text-base">
         {profile.summary}
       </p>
