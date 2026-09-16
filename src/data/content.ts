@@ -44,6 +44,10 @@ export const research = {
     { value: '14+', label: 'Citations' },
     { value: '02', label: 'Publications' },
   ],
+  doi: {
+    label: '10.5753/sbcas.2026.21672',
+    url: 'https://doi.org/10.5753/sbcas.2026.21672',
+  },
 } as const
 
 export const experiences: ExperienceEntry[] = [

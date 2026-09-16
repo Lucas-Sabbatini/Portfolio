@@ -25,6 +25,12 @@ describe('ResearchSection', () => {
     }
   })
 
+  it('links to the paper DOI', () => {
+    render(<ResearchSection />)
+    const link = screen.getByRole('link', { name: /doi/i })
+    expect(link).toHaveAttribute('href', research.doi.url)
+  })
+
   it('renders the research image', () => {
     render(<ResearchSection />)
     expect(screen.getByAltText(research.image_alt)).toHaveAttribute('src', research.image_url)
