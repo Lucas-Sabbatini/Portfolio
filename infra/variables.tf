@@ -5,36 +5,36 @@ variable "environment" {
 }
 
 variable "aws_region" {
-  description = "AWS region"
+  description = "AWS region for the S3 origin and provider"
   type        = string
   default     = "us-east-1"
 }
 
 variable "domain_name" {
-  description = "Domain name for the blog (e.g., lucasjanot.com)"
+  description = "Apex domain served by CloudFront (e.g. lucasjanot.com)"
   type        = string
+  default     = "lucasjanot.com"
 }
 
-variable "db_username" {
-  description = "RDS master username"
-  type        = string
-  default     = "blog"
+variable "custom_domain_enabled" {
+  description = <<-EOT
+    Attach the ACM certificate and custom-domain aliases to CloudFront.
+    Keep false until the ACM validation CNAMEs have been added at the DNS
+    provider (Hostinger) and the certificate is ISSUED, otherwise CloudFront
+    rejects the alias.
+  EOT
+  type        = bool
+  default     = false
 }
 
-variable "db_password" {
-  description = "RDS master password"
+variable "alert_email" {
+  description = "Email address for the monthly cost budget alarm (empty disables it)"
   type        = string
-  sensitive   = true
+  default     = ""
 }
 
-variable "ec2_instance_type" {
-  description = "EC2 instance type"
+variable "monthly_budget_usd" {
+  description = "Monthly cost budget in USD"
   type        = string
-  default     = "t3.small"
-}
-
-variable "rds_instance_class" {
-  description = "RDS instance class"
-  type        = string
-  default     = "db.t3.micro"
+  default     = "5"
 }
